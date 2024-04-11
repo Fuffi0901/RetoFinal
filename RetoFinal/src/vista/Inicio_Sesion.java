@@ -10,6 +10,8 @@ import controlador.Dao;
 import modelo.Usuario;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -111,10 +113,8 @@ public class Inicio_Sesion extends JFrame implements ActionListener{
 	private void entrarAplicacion() {
 		Usuario usu = dao.comprobarUsuario(tFUsuario.getText(),pFConstraseña.getText());
 		if(null==usu) {
-	
+			JOptionPane.showMessageDialog(null, "NOMBRE O CONTRASEÑA INCORRECTO","ERROR",JOptionPane.ERROR_MESSAGE);
 		}else {
-			VverPlaylist v = new VverPlaylist(null, true, null, dao);
-			v.setVisible(true);
 			VPrincipal ven = new VPrincipal(this, true);
 			ven.setVisible(true);
 		}
