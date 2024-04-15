@@ -36,7 +36,7 @@ public class DaoImplementacion implements Dao{
 	private void openConnection() {
 		try {
 			con = DriverManager.getConnection(
-					"jdbc:mysql://localhost:3306/beatdam?serverTimezone=Europe/Madrid&useSSL=false ", "root",
+					"jdbc:mysql://localhost:3306/beatdam?serverTimezone=Europe/Madrid&useSSL=false", "root",
 					"abcd*1234");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block

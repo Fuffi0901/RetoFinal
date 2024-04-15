@@ -9,14 +9,19 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import controlador.Dao;
+
 import javax.swing.JLabel;
 import java.awt.Font;
 import java.awt.Color;
+import javax.swing.ImageIcon;
 
 public class VCerrar_Sesion extends JDialog implements ActionListener{
 	
 	private JButton btnSi;
 	private JButton btnNo;
+	private Dao dao;
 
 	private final JPanel contentPanel = new JPanel();
 
@@ -26,19 +31,26 @@ public class VCerrar_Sesion extends JDialog implements ActionListener{
 	 * @param vPrincipal 
 	 * @wbp.parser.constructor
 	 */
-	public VCerrar_Sesion(VBuscar vBuscar, boolean modal) {
-		super(vBuscar);
+	
+	public VCerrar_Sesion(VentanaPlay ventanaPlay, boolean modal, Dao dao) {
+		super(ventanaPlay);
 		setModal(modal);
-		Pantalla();
+		Pantalla(dao);
 	}
 	
-	public VCerrar_Sesion(VPrincipal vPrincipal, boolean modal) {
+	public VCerrar_Sesion(Dao dao, VPrincipal vPrincipal, boolean modal) {
 		super(vPrincipal);
 		setModal(modal);
-		Pantalla();
+		Pantalla(dao);
 	}
 
-	public void Pantalla() {
+	public VCerrar_Sesion(VBuscar vBuscar, boolean modal, Dao dao2) {
+		super(vBuscar);
+		setModal(modal);
+		Pantalla(dao);	}
+
+	public void Pantalla(Dao dao) {
+		this.dao = dao;
 		setBackground(new Color(64, 128, 128));
 		
 		setBackground(new Color(64, 128, 128));
@@ -65,6 +77,9 @@ public class VCerrar_Sesion extends JDialog implements ActionListener{
 			btnSi.setBackground(new Color(64, 128, 128));
 			btnSi.setFont(new Font("Imprint MT Shadow", Font.PLAIN, 46));
 			btnSi.setBounds(402, 430, 122, 97);
+			btnSi.setOpaque(false);
+			btnSi.setBorderPainted(false);
+			btnSi.setFocusable(false);
 			contentPanel.add(btnSi);
 			btnSi.addActionListener(this);
 			
@@ -74,7 +89,16 @@ public class VCerrar_Sesion extends JDialog implements ActionListener{
 			btnNo.setBackground(new Color(64, 128, 128));
 			btnNo.setFont(new Font("Imprint MT Shadow", Font.PLAIN, 46));
 			btnNo.setBounds(697, 430, 122, 97);
+			btnNo.setOpaque(false);
+			btnNo.setBorderPainted(false);
+			btnNo.setFocusable(false);
 			contentPanel.add(btnNo);
+			{
+				JLabel lblNewLabel = new JLabel("");
+				lblNewLabel.setIcon(new ImageIcon("..\\RetoFinal\\Img\\fondo1.gif"));
+				lblNewLabel.setBounds(0, 0, 1259, 749);
+				contentPanel.add(lblNewLabel);
+			}
 			btnNo.addActionListener(this);
 		}
 	}
@@ -92,13 +116,13 @@ public class VCerrar_Sesion extends JDialog implements ActionListener{
 
 	private void volverInicio_Sesion() {
 		this.setVisible(false);
-		Inicio_Sesion ven = new Inicio_Sesion(this, true);
+		Inicio_Sesion ven = new Inicio_Sesion(dao);
 		ven.setVisible(true);
 	}
 
 	private void volverVPrincipal() {
 		this.setVisible(false);
-		VPrincipal ven = new VPrincipal(this, true);
+		VPrincipal ven = new VPrincipal(this, true, dao);
 		ven.setVisible(true);
 	}
 
