@@ -28,28 +28,28 @@ public class VCerrar_Sesion extends JDialog implements ActionListener{
 	/**
 	 * Create the dialog.
 	 * @param b 
-	 * @param vPrincipal 
+	 * @param VCerrar_Sesion 
 	 * @wbp.parser.constructor
 	 */
 	
 	public VCerrar_Sesion(VentanaPlay ventanaPlay, boolean modal, Dao dao) {
 		super(ventanaPlay);
 		setModal(modal);
-		Pantalla(dao);
+		pantalla(dao);
 	}
 	
-	public VCerrar_Sesion(Dao dao, VPrincipal vPrincipal, boolean modal) {
+	public VCerrar_Sesion(VPrincipal vPrincipal, boolean modal, Dao dao) {
 		super(vPrincipal);
 		setModal(modal);
-		Pantalla(dao);
+		pantalla(dao);
 	}
 
-	public VCerrar_Sesion(VBuscar vBuscar, boolean modal, Dao dao2) {
+	public VCerrar_Sesion(VBuscar vBuscar, boolean modal, Dao dao) {
 		super(vBuscar);
 		setModal(modal);
-		Pantalla(dao);	}
+		pantalla(dao);	}
 
-	public void Pantalla(Dao dao) {
+	public void pantalla(Dao dao) {
 		this.dao = dao;
 		setBackground(new Color(64, 128, 128));
 		
@@ -72,7 +72,7 @@ public class VCerrar_Sesion extends JDialog implements ActionListener{
 			lblTexto.setBounds(261, 198, 730, 160);
 			contentPanel.add(lblTexto);
 		}
-		{
+		
 			btnSi = new JButton("SI");
 			btnSi.setBackground(new Color(64, 128, 128));
 			btnSi.setFont(new Font("Imprint MT Shadow", Font.PLAIN, 46));
@@ -83,8 +83,6 @@ public class VCerrar_Sesion extends JDialog implements ActionListener{
 			contentPanel.add(btnSi);
 			btnSi.addActionListener(this);
 			
-		}
-		{
 			btnNo = new JButton("NO");
 			btnNo.setBackground(new Color(64, 128, 128));
 			btnNo.setFont(new Font("Imprint MT Shadow", Font.PLAIN, 46));
@@ -93,14 +91,12 @@ public class VCerrar_Sesion extends JDialog implements ActionListener{
 			btnNo.setBorderPainted(false);
 			btnNo.setFocusable(false);
 			contentPanel.add(btnNo);
-			{
-				JLabel lblNewLabel = new JLabel("");
-				lblNewLabel.setIcon(new ImageIcon("..\\RetoFinal\\Img\\fondo1.gif"));
-				lblNewLabel.setBounds(0, 0, 1259, 749);
-				contentPanel.add(lblNewLabel);
-			}
 			btnNo.addActionListener(this);
-		}
+			
+		JLabel lblNewLabel = new JLabel("");
+		lblNewLabel.setIcon(new ImageIcon("..\\RetoFinal\\Img\\fondo1.gif"));
+		lblNewLabel.setBounds(0, 0, 1259, 749);
+		contentPanel.add(lblNewLabel);
 	}
 
 	@Override

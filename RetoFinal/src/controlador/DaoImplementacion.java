@@ -1,13 +1,18 @@
 package controlador;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 import modelo.Cancion;
+import modelo.Playlist;
 import modelo.Usuario;
 
 public class DaoImplementacion implements Dao{
@@ -19,11 +24,14 @@ public class DaoImplementacion implements Dao{
 	
 	
 	//consultas usuarios
-	
+	private final String CONSULTA_PLAYLIST = "select * from playlist where codPlayList=?";
+	private final String NUMERO_ALBUM = "select count(*) from album";
+	private final String NUMERO_PLAYLIST = "select count(*) from playlist";
 	private final String CONSULTA_USUARIO = "select * from Usuario where  Contraseina=? and NombreUsuario=?";
-	
+	private final String CONSULTA_NUMALBUM = "select count(codAlbum) from album";
 	private final String INSERT_PERSONA =  "insert into persona(Dni,nombrePersona,apellidoPersona,pais,edad) values (?,?,?,?,?)";
 	private final String INSERT_USUARIO =  "insert into usuario(Dni,contraseina,NombreUsuario) values (?,?,?)";
+	private final String INSERT_ALBUM = "insert into album(codAlbum,nombreAlbum,fotoAlbum,fechaLan) values (?,?,?,?)";
 	
 	//consultas canciones
 	private final String SACAR_CANCIONES = "select * from Cancion";
@@ -232,7 +240,183 @@ public class DaoImplementacion implements Dao{
 		// TODO Auto-generated method stub
 		return null;
 	}
+	public int sacarNumeroDePlayList() {
+		int num = 0;
+		try {
+			this.openConnection();
+			stmt = con.prepareStatement(NUMERO_PLAYLIST);
+			ResultSet rs = stmt.executeQuery();
+			if (rs.next()) {
+	            num = rs.getInt(1); // Utiliza el índice de la columna en lugar del nombre
+			}
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return num;
+		
+	}
 	
-	
+	@Override
+	public void crearAlbum(int codAlbum, String fecha, String foto, String nombre) {
+		// TODO Auto-generated method stub
+		this.openConnection();
 
+		try {
+
+			stmt = con.prepareStatement(INSERT_ALBUM);
+			stmt.setInt(1, codAlbum);
+			stmt.setString(2, nombre);
+			stmt.setString(3, foto);
+			 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+	            Date fechaDate = null;
+				try {
+					fechaDate = (Date) sdf.parse(fecha);
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	            // Establecer la fecha en el PreparedStatement
+	            stmt.setDate(4, new java.sql.Date(fechaDate.getTime()));
+
+			stmt.executeUpdate();
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+	}
+
+	@Override
+	public int consultarNumAlbum() {
+
+		int NumAlbum = 0;
+		this.openConnection();
+		try {
+
+			stmt = con.prepareStatement(CONSULTA_NUMALBUM);
+
+			ResultSet rs = stmt.executeQuery();
+
+			if (rs.next()) {
+				NumAlbum=rs.getInt("count(codAlbum)");
+				
+
+			}
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+		return NumAlbum;
+	}
+	
+	public int sacarNumeroDeAlbum() {
+		int num = 0;
+		try {
+			this.openConnection();
+			stmt = con.prepareStatement(NUMERO_ALBUM);
+			ResultSet rs = stmt.executeQuery();
+			if (rs.next()) {
+	            num = rs.getInt(1); // Utiliza el índice de la columna en lugar del nombre
+			}
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return num;
+		
+	}
+	public Playlist consultaPlaylist(int cod) {
+	    Playlist play = null; // Inicializamos la playlist como null
+	    
+	    try {
+	        this.openConnection();
+	        stmt = con.prepareStatement(CONSULTA_PLAYLIST); // CORREGIDO: Se asume que CONSULTA_PLAYLIST es la consulta correcta
+	        stmt.setInt(1, cod);
+	        ResultSet rs = stmt.executeQuery();
+	        
+	        if (rs.next()) {
+	            play = new Playlist(); // Creamos una nueva instancia de Playlist solo si encontramos resultados
+	            play.setCodPlaylist(rs.getInt("codPlayList")); // Suponiendo que "cod_playlist" es el nombre de la columna en la tabla
+	            // Aquí puedes añadir más asignaciones de propiedades de la playlist si es necesario
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace(); // Manejamos la excepción imprimiendo el rastreo de la pila, pero podrías querer un manejo más sofisticado dependiendo del contexto
+	    } finally { // Añadimos un bloque finally para asegurarnos de cerrar la conexión incluso si hay una excepción
+	        try {
+	            closeConnection();
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	    }
+	    
+	    return play; // Devolvemos la playlist, que puede ser null si no se encontraron resultados
+	}
+
+	 public List<Playlist> getAllPlaylists() {
+	        List<Playlist> playlists = new ArrayList<>();
+	        PreparedStatement stmt = null;
+	        ResultSet rs = null;
+
+	        try {
+	            this.openConnection(); // Supongamos que tienes un método getConnection() que devuelve una conexión establecida
+
+	            String query = "SELECT * FROM playlist";
+	            stmt = con.prepareStatement(query);
+	            rs = stmt.executeQuery();
+
+	            while (rs.next()) {
+	                Playlist playlist = new Playlist();
+	                playlist.setCodPlaylist(rs.getInt("codPlayList")); // Supongamos que "cod_playlist" es el nombre de la columna en la tabla
+	                playlist.setNombrePlaylist(rs.getString("nombrePlayList")); // Supongamos que "nombre_playlist" es el nombre de la columna en la tabla
+	                // Aquí puedes añadir más asignaciones de propiedades de la playlist si es necesario
+	                playlists.add(playlist);
+	            }
+	        } catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} finally {
+	            // Cerramos recursos en un bloque finally para asegurarnos de que siempre se cierren
+	            if (rs != null) {
+	                try {
+						rs.close();
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+	            }
+	            if (stmt != null) {
+	                try {
+						stmt.close();
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+	            }
+	            // No cerramos la conexión aquí porque podría estar siendo usada por otras operaciones
+	            // La conexión debería ser cerrada en un lugar apropiado, como en la clase que la gestiona
+	        }
+
+	        return playlists;
+	    }
+
+	
 }

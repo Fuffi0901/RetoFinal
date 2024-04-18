@@ -1,5 +1,6 @@
 package modelo;
 
+import java.sql.Date;
 import java.time.LocalDate;
 
 public class Album {
@@ -7,7 +8,7 @@ public class Album {
 	private int codAlbum;
 	private String nombreAlbum;
 	private String fotoAlbum;
-	private LocalDate fechaLan;
+	private Date fechaLan;
 	
 	//Getters y Setters.
 	public int getCodAlbum() {
@@ -28,10 +29,10 @@ public class Album {
 	public void setFotoAlbum(String fotoAlbum) {
 		this.fotoAlbum = fotoAlbum;
 	}
-	public LocalDate getFechaLan() {
+	public Date getFechaLan() {
 		return fechaLan;
 	}
-	public void setFechaLan(LocalDate fechaLan) {
+	public void setFechaLan(Date fechaLan) {
 		this.fechaLan = fechaLan;
 	}
 }

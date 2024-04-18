@@ -196,25 +196,26 @@ public class VentanaPlay extends JDialog implements ActionListener{
 		// TODO Auto-generated method stub
 		clip.setFramePosition(0);
 		progressValue = 0;
-       progressBar.setValue(progressValue);
-		stop();
+        progressBar.setValue(progressValue);
+		play();
 	}
+	
 	protected void barraProgreso(Cancion cancion) {
 		// TODO Auto-generated method stub
        progressBar.setValue(progressValue);
        timer.start();
 	}
+	
 	protected void stop() {
 		// TODO Auto-generated method stub
 		if (clip != null && clip.isRunning()) {
-           clip.stop();
-           num = 0;
-           progressValue = progressBar.getValue();
-           timer.stop();
-       	btnPlay.setVisible(true);
-       	btnStop.setVisible(false);
-       	
-           pos = clip.getFramePosition();
+            clip.stop();
+            num = 0;
+            progressValue = progressBar.getValue();
+            timer.stop();
+	       	btnPlay.setVisible(true);
+	       	btnStop.setVisible(false);
+	        pos = clip.getFramePosition();
 		}
 	}
 	public void play() {
