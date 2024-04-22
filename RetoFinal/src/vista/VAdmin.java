@@ -39,21 +39,21 @@ public class VAdmin extends JDialog implements ActionListener{
 		btnAniadir = new JButton("Añadir Canciones");
 		btnAniadir.setBackground(Color.GREEN);
 		btnAniadir.setFont(new Font("Stencil", Font.PLAIN, 26));
-		btnAniadir.setBounds(104, 254, 236, 123);
+		btnAniadir.setBounds(104, 254, 273, 123);
 		btnAniadir.addActionListener(this);
 		contentPanel.add(btnAniadir);
 		
 		btnBorrar = new JButton("Borrar Canciones");
 		btnBorrar.setBackground(Color.RED);
 		btnBorrar.setFont(new Font("Stencil", Font.PLAIN, 26));
-		btnBorrar.setBounds(923, 254, 252, 123);
+		btnBorrar.setBounds(892, 254, 283, 123);
 		btnBorrar.addActionListener(this);
 		contentPanel.add(btnBorrar);
 		
 		bntModificar = new JButton("Modificar Canciones");
 		bntModificar.setBackground(Color.ORANGE);
 		bntModificar.setFont(new Font("Stencil", Font.PLAIN, 26));
-		bntModificar.setBounds(520, 254, 241, 123);
+		bntModificar.setBounds(483, 254, 323, 123);
 		bntModificar.addActionListener(this);
 		contentPanel.add(bntModificar);
 	}
@@ -61,7 +61,7 @@ public class VAdmin extends JDialog implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
-		if(e.getSource().equals(btnAniadir)) {
+		/*if(e.getSource().equals(btnAniadir)) {
 			aniadirCancion();
 		}
 		if(e.getSource().equals(bntModificar)) {
@@ -69,24 +69,24 @@ public class VAdmin extends JDialog implements ActionListener{
 		}
 		if(e.getSource().equals(btnBorrar)) {
 			modificarCancion();
-		}
+		}*/
 	}
-
+/*
 	private void modificarCancion() {
-		// TODO Auto-generated method stub
+		this.setVisible(false);
 		VModificarCancion ven = new VModificarCancion(this, true);
 		ven.setVisible(true);
 	}
 
 	private void borrarCancion() {
-		// TODO Auto-generated method stub
+		this.setVisible(false);
 		VBorrarCancion ven = new VBorrarCancion(this, true);
 		ven.setVisible(true);
 	}
 
 	private void aniadirCancion() {
-		// TODO Auto-generated method stub
-		VAniadirrCancion ven = new VAniadirrCancion(this, true);
+		this.setVisible(false);
+		VAniadirCancion ven = new VAniadirCancion(this, true);
 		ven.setVisible(true);
-	}
+	}*/
 }

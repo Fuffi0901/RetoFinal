@@ -17,6 +17,7 @@ import javax.swing.JOptionPane;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.JComboBox;
 
 public class VAlbum extends JDialog implements ActionListener{
 
@@ -45,38 +46,42 @@ public class VAlbum extends JDialog implements ActionListener{
 		contentPanel.setLayout(null);
 		
 		textNombre = new JTextField();
-		textNombre.setBounds(471, 85, 221, 58);
+		textNombre.setBounds(345, 88, 221, 58);
 		contentPanel.add(textNombre);
 		textNombre.setColumns(10);
 		
 		textFoto = new JTextField();
 		textFoto.setColumns(10);
-		textFoto.setBounds(471, 229, 221, 58);
+		textFoto.setBounds(345, 232, 221, 58);
 		contentPanel.add(textFoto);
 		
 		textFecha = new JTextField();
 		textFecha.setColumns(10);
-		textFecha.setBounds(471, 398, 221, 58);
+		textFecha.setBounds(345, 401, 221, 58);
 		contentPanel.add(textFecha);
 		
 		JLabel lblNewLabel = new JLabel("nombre");
 		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 30));
-		lblNewLabel.setBounds(226, 95, 135, 36);
+		lblNewLabel.setBounds(100, 98, 135, 36);
 		contentPanel.add(lblNewLabel);
 		
 		JLabel lblFoto = new JLabel("foto");
 		lblFoto.setFont(new Font("Tahoma", Font.PLAIN, 30));
-		lblFoto.setBounds(226, 251, 135, 36);
+		lblFoto.setBounds(100, 254, 135, 36);
 		contentPanel.add(lblFoto);
 		
 		JLabel lblFecha = new JLabel("fecha");
 		lblFecha.setFont(new Font("Tahoma", Font.PLAIN, 30));
-		lblFecha.setBounds(226, 420, 135, 36);
+		lblFecha.setBounds(100, 423, 135, 36);
 		contentPanel.add(lblFecha);
 		
 		btnIntroducir = new JButton("Introducir");
 		btnIntroducir.setBounds(631, 568, 111, 41);
 		contentPanel.add(btnIntroducir);
+		
+		JComboBox comboBox = new JComboBox();
+		comboBox.setBounds(865, 98, 155, 36);
+		contentPanel.add(comboBox);
 		btnIntroducir.addActionListener(this);
 	}
 

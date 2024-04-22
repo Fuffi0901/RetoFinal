@@ -6,13 +6,19 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import controlador.Dao;
+
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JTextField;
 import java.awt.Color;
+import javax.swing.ImageIcon;
 
 public class VRegistrarse extends JDialog implements ActionListener{
 
@@ -26,14 +32,17 @@ public class VRegistrarse extends JDialog implements ActionListener{
 	private JTextField tFContraseña;
 	private JButton btnVolver;
 	private JButton btnRegistrar;
+	private JLabel lblLogo;
+	private Dao dao;
 
 	/**
 	 * Create the dialog.
 	 * @param b 
 	 * @param inicio_Sesion 
 	 */
-	public VRegistrarse(Inicio_Sesion inicio_Sesion, boolean modal) {
+	public VRegistrarse(Inicio_Sesion inicio_Sesion, boolean modal, Dao dao) {
 		super(inicio_Sesion);
+		this.dao = dao;
 		setBackground(new Color(64, 128, 128));
 		setModal(modal);
 		
@@ -46,7 +55,7 @@ public class VRegistrarse extends JDialog implements ActionListener{
 		
 		JLabel lbTitulo = new JLabel("REGISTRAR USUARIO");
 		lbTitulo.setFont(new Font("Stencil", Font.PLAIN, 87));
-		lbTitulo.setBounds(183, 21, 891, 105);
+		lbTitulo.setBounds(235, 10, 891, 105);
 		contentPanel.add(lbTitulo);
 		
 		JLabel lbDni = new JLabel("DNI:");
@@ -137,25 +146,132 @@ public class VRegistrarse extends JDialog implements ActionListener{
 		btnRegistrar.setBackground(new Color(64, 128, 128));
 		btnRegistrar.setFont(new Font("Imprint MT Shadow", Font.BOLD, 26));
 		btnRegistrar.setBounds(1052, 617, 183, 53);
+		btnRegistrar.setOpaque(false);
+		btnRegistrar.setBorderPainted(false);
+		btnRegistrar.setFocusable(false);
 		contentPanel.add(btnRegistrar);
+		btnRegistrar.addActionListener(this);
 		
 		btnVolver = new JButton("Volver");
 		btnVolver.setBackground(new Color(64, 128, 128));
 		btnVolver.setFont(new Font("Imprint MT Shadow", Font.BOLD, 26));
 		btnVolver.setBounds(845, 617, 183, 53);
-		contentPanel.add(btnVolver);
+		btnVolver.setOpaque(false);
+		btnVolver.setBorderPainted(false);
+		btnRegistrar.setFocusable(false);
 		btnVolver.addActionListener(this);
+		contentPanel.add(btnVolver);
+		
+		lblLogo = new JLabel("");
+		lblLogo.setIcon(new ImageIcon("..\\RetoFinal\\Img\\logoPequeña.png"));
+		lblLogo.setBounds(1181, 10, 56, 75);
+		contentPanel.add(lblLogo);
+		lblLogo.setOpaque(false);
+		lblLogo.setFocusable(false);
+		btnVolver.addActionListener(this);
+		
+		JLabel lblFondo = new JLabel("");
+		lblFondo.setIcon(new ImageIcon("..\\FinalChalenge\\Img\\fondo1.gif"));
+		lblFondo.setBounds(0, 0, 1257, 748);
+		contentPanel.add(lblFondo);
+		
 	}
 	
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource().equals(btnVolver)) {
 			volverInicio_Sesion();
 		}
+		if(e.getSource().equals(btnRegistrar)) {
+			hacerRegistro();
+		}
 	}
+	
+	private void hacerRegistro() {
+		// TODO Auto-generated method stub
+		
+		if(validar()) {
+			dao.registrarPersona(tFDni.getText(),tFNombre.getText(),tFApellido.getText(),tFPais.getText(),Integer.valueOf(tFEdad.getText()));
+			dao.registrarUsuario(tFDni.getText(),tFNombreUsuario.getText(),tFContraseña.getText());
+			JOptionPane.showMessageDialog(null, "TE HAS REGISTRADO","Registro",JOptionPane.INFORMATION_MESSAGE);
+			this.dispose();
+			Inicio_Sesion ini = new Inicio_Sesion(dao);
+			ini.setVisible(true);
+		}
+	}
+
+	private boolean validar() {
+		// TODO Auto-generated method stub
+	
+		boolean bien=true;
+		
+		if(!comprobarDni()) {
+			JOptionPane.showMessageDialog(null, "DNI NO VALIDO","ERROR",JOptionPane.ERROR_MESSAGE);
+			bien = false;
+		}
+		if(tFDni.getText().isEmpty()) {
+			JOptionPane.showMessageDialog(null, "DNI VACIO","ERROR",JOptionPane.ERROR_MESSAGE);
+			tFDni.setBackground(Color.RED);
+			bien = false;
+		}
+		if(tFNombre.getText().isEmpty()) {
+			JOptionPane.showMessageDialog(null, "NOMBRE VACIO","ERROR",JOptionPane.ERROR_MESSAGE);
+			tFNombre.setBackground(Color.RED);
+			bien = false;
+		}
+		if(tFApellido.getText().isEmpty()) {
+			JOptionPane.showMessageDialog(null, "APELLIDO VACIO","ERROR",JOptionPane.ERROR_MESSAGE);
+			tFApellido.setBackground(Color.RED);
+			bien = false;
+		}
+		if(tFPais.getText().isEmpty()) {
+			JOptionPane.showMessageDialog(null, "PAIS VACIO","ERROR",JOptionPane.ERROR_MESSAGE);
+			tFPais.setBackground(Color.RED);
+			bien = false;
+		}
+		if(tFEdad.getText().isEmpty()) {
+			JOptionPane.showMessageDialog(null, "EDAD VACIO","ERROR",JOptionPane.ERROR_MESSAGE);
+			tFEdad.setBackground(Color.RED);
+			bien = false;
+		}
+		if(tFNombreUsuario.getText().isEmpty()) {
+			JOptionPane.showMessageDialog(null, "NOMBRE USUARIO VACIO","ERROR",JOptionPane.ERROR_MESSAGE);
+			tFNombreUsuario.setBackground(Color.RED);
+			bien = false;
+		}
+		if(tFContraseña.getText().isEmpty()) {
+			JOptionPane.showMessageDialog(null, "CONTRASEÑA VACIA","ERROR",JOptionPane.ERROR_MESSAGE);
+			tFContraseña.setBackground(Color.RED);
+			bien = false;
+		}
+		
+		
+		return bien;
+	}
+
+	private boolean comprobarDni() {
+		String dni = tFDni.getText();
+
+		if (dni.isEmpty() || dni.length() != 9)
+			return false;
+
+		String numero = dni.substring(0, 8);
+		char letraControl = dni.charAt(8);
+
+		try {
+			int num = Integer.parseInt(numero);
+			int resto = num % 23;
+			char[] letrasControl = { 'T', 'R', 'W', 'A', 'G', 'M', 'Y', 'F', 'P', 'D', 'X', 'B', 'N', 'J', 'Z', 'S',
+					'Q', 'V', 'H', 'L', 'C', 'K', 'E' };
+			return letraControl == letrasControl[resto];
+		} catch (NumberFormatException e) {
+			return false;
+		}
+	}
+
 
 	private void volverInicio_Sesion() {
 		this.setVisible(false);
-		Inicio_Sesion ven = new Inicio_Sesion(this, true);
+		Inicio_Sesion ven = new Inicio_Sesion(dao);
 		ven.setVisible(true);
 	}
 

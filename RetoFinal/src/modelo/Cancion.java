@@ -3,10 +3,11 @@ package modelo;
 public class Cancion {
 	//Atributos.
 	private int codCancion;
+	private int codAlbum;
 	private String nombreCancion;
 	private int duracion;
 	private String audio;
-	
+
 	//Getters y Setters.
 	public int getCodCancion() {
 		return codCancion;
@@ -31,5 +32,11 @@ public class Cancion {
 	}
 	public void setAudio(String audio) {
 		this.audio = audio;
+	}
+	public int getCodAlbum() {
+		return codAlbum;
+	}
+	public void setCodAlbum(int codAlbum) {
+		this.codAlbum = codAlbum;
 	}
 }
