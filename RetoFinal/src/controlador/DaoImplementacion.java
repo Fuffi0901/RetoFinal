@@ -34,6 +34,7 @@ public class DaoImplementacion implements Dao{
 	//consultas canciones
 	private final String SACAR_CANCIONES = "select * from Cancion";
 	private final String BORRAR_CANCIONES = "delete from Cancion where codCancion=?";
+	private final String BORRAR_ALBUM = "delete from album where codAlbum=?";
 	private final String MODIFICAR_CANCIONES = "update cancion set  Duracion = ? , nombreCancion = ?, Audio = ?,codAlbum = ? where codCancion=?";
 	private final String INSERT_CANCIONES =  "insert into cancion(codCancion,Duracion,nombreCancion, Audio,codAlbum) values (?,?,?,?,?)";
 	private final String INSERT_CANTA =  "insert into canta(dni,codCancion) values (?,?)";
@@ -583,6 +584,35 @@ public class DaoImplementacion implements Dao{
 
 		}
 
+	}
+
+	@Override
+	public void borrarAlbum(int codAlbum) {
+		// TODO Auto-generated method stub
+
+		this.openConnection();
+		
+		try {
+
+			stmt = con.prepareStatement(BORRAR_ALBUM);
+			stmt.setInt(1, codAlbum);
+			
+			
+			stmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+		
 	}
 	
 }

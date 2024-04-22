@@ -44,4 +44,6 @@ public interface Dao {
 	public ArrayList<Artista> sacarartistas();
 
 	public void meterAlbum(int cod, String nombre, String foto, String fecha);
+
+	public void borrarAlbum(int codAlbum);
 }

@@ -9,6 +9,8 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import controlador.Dao;
+import modelo.Album;
+import modelo.Cancion;
 
 import javax.swing.JTextField;
 import javax.swing.JLabel;
@@ -17,6 +19,8 @@ import javax.swing.JOptionPane;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+
 import javax.swing.JComboBox;
 
 public class VAlbum extends JDialog implements ActionListener{
@@ -27,6 +31,8 @@ public class VAlbum extends JDialog implements ActionListener{
 	private JTextField textFecha;
 	private JButton btnIntroducir;
 	private Dao dao;
+	private JComboBox comboAlbum;
+	private JButton btnBorrar;
 
 	/**
 	 * Launch the application.
@@ -79,10 +85,27 @@ public class VAlbum extends JDialog implements ActionListener{
 		btnIntroducir.setBounds(631, 568, 111, 41);
 		contentPanel.add(btnIntroducir);
 		
-		JComboBox comboBox = new JComboBox();
-		comboBox.setBounds(865, 98, 155, 36);
-		contentPanel.add(comboBox);
+		comboAlbum = new JComboBox();
+		comboAlbum.setBounds(865, 98, 155, 36);
+		contentPanel.add(comboAlbum);
+		
+		btnBorrar = new JButton("borrar");
+		btnBorrar.setBounds(446, 578, 101, 31);
+		contentPanel.add(btnBorrar);
 		btnIntroducir.addActionListener(this);
+		btnBorrar.addActionListener(this);
+		cargarCombo();
+	}
+
+	private void cargarCombo() {
+		// TODO Auto-generated method stub
+		comboAlbum.removeAllItems();
+		ArrayList<Album> albumes = dao.sacarAlbumes();
+		for(Album a:albumes) {
+			comboAlbum.addItem(a.getCodAlbum()+" | "+a.getNombreAlbum());
+		}
+		comboAlbum.setSelectedIndex(-1);
+		
 	}
 
 	@Override
@@ -91,6 +114,25 @@ public class VAlbum extends JDialog implements ActionListener{
 		if(e.getSource().equals(btnIntroducir)) {
 			meterAlbum();
 		}
+		if(e.getSource().equals(btnBorrar)) {
+			borrarAlbum();
+		}
+	}
+
+	private void borrarAlbum() {
+		// TODO Auto-generated method stub
+		ArrayList<Album> albumes = dao.sacarAlbumes();
+		int pos = comboAlbum.getSelectedIndex();
+		int opcion = JOptionPane.showConfirmDialog(null, "¿Desea continuar Borando el album?", "Confirmación", JOptionPane.YES_NO_OPTION);
+		if (opcion == JOptionPane.YES_OPTION) {
+			dao.borrarAlbum(albumes.get(pos).getCodAlbum());
+			JOptionPane.showMessageDialog(null, "Se ha borrado la cancion : "+textNombre.getText(),"Cancion",JOptionPane.INFORMATION_MESSAGE);
+			comboAlbum.setSelectedIndex(-1);
+			
+		}else {
+			JOptionPane.showMessageDialog(null, "Se mantiene la cancion : "+textNombre.getText(),"Cancion",JOptionPane.INFORMATION_MESSAGE);
+		}
+		cargarCombo();
 	}
 
 	private void meterAlbum() {
