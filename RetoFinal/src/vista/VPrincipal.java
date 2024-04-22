@@ -31,11 +31,13 @@ public class VPrincipal extends JDialog implements ActionListener {
 	 * @wbp.parser.constructor
 	 */
     private static final long serialVersionUID = 1L;
-    private JButton btnBuscar, btnLogo, btnInicio, btnSecreto, btnFotoAlbum;
-    private JLabel lblPlayList, lblAlbumes, lblInicio, lblBuscar, lblAlbum;
+    private JButton btnBuscar, btnLogo, btnInicio, btnSecreto, btnFotoAlbum, btnFotoPlay;
+    private JLabel lblPlayList, lblAlbumes, lblInicio, lblBuscar;
     private Dao dao;
     private final JPanel contentPanel = new JPanel();
-    private int numPlay, numAlbum;
+    private int numPlay, numAlbum, num = 1;
+    private Playlist play;
+    private Album album;
     private ArrayList<Playlist> plays;
     private ArrayList<Album> albums;
 
@@ -44,6 +46,9 @@ public class VPrincipal extends JDialog implements ActionListener {
 		setModal(modal);
 		pantalla(dao);
 	}
+	/**
+	 * @wbp.parser.constructor
+	 */
 	public VPrincipal(VCerrar_Sesion vCerrar_Sesion, boolean modal, Dao dao) {
 		super(vCerrar_Sesion);
 		setModal(modal);
@@ -86,24 +91,26 @@ public class VPrincipal extends JDialog implements ActionListener {
         contentPanel.add(lblAlbumes);
 
         lblInicio = new JLabel("Inicio");
+        lblInicio.setHorizontalAlignment(SwingConstants.CENTER);
         lblInicio.setFont(new Font("Informal Roman", Font.PLAIN, 27));
         lblInicio.setBounds(447, 679, 56, 24);
         contentPanel.add(lblInicio);
 
         lblBuscar = new JLabel("Buscar");
+        lblBuscar.setHorizontalAlignment(SwingConstants.CENTER);
         lblBuscar.setFont(new Font("Informal Roman", Font.PLAIN, 27));
         lblBuscar.setBounds(647, 679, 78, 24);
         contentPanel.add(lblBuscar);
 
-        btnInicio = createButton("", "..\\RetoFinal\\Img\\casaInicio.png", 447, 631);
+        btnInicio = CrearBoton("", "..\\RetoFinal\\Img\\casaInicio.png", 447, 631);
         btnInicio.addActionListener(this);
         contentPanel.add(btnInicio);
 
-        btnBuscar = createButton("", "..\\RetoFinal\\Img\\lupaBuscar.png", 647, 622);
+        btnBuscar = CrearBoton("", "..\\RetoFinal\\Img\\lupaBuscar.png", 647, 622);
         btnBuscar.addActionListener(this);
         contentPanel.add(btnBuscar);
 
-        btnLogo = createButton("", "..\\RetoFinal\\Img\\logoPequeña.png", 1181, 10);
+        btnLogo = CrearBoton("", "..\\RetoFinal\\Img\\logoPequeña.png", 1181, 10);
         btnLogo.addActionListener(this);
         contentPanel.add(btnLogo);
 
@@ -113,8 +120,8 @@ public class VPrincipal extends JDialog implements ActionListener {
         btnSecreto.addActionListener(this);
         contentPanel.add(btnSecreto);
 
-        createPlayListButtons();
-        createAlbumButtons();
+        BotonesPlaylist();
+        BotonesAlbum();
 
         JLabel lblFondo = new JLabel("");
         lblFondo.setIcon(new ImageIcon("..\\RetoFinal\\Img\\fondo1.gif"));
@@ -123,57 +130,66 @@ public class VPrincipal extends JDialog implements ActionListener {
         contentPanel.add(lblFondo);
     }
 
-    private void createPlayListButtons() {
+    private void BotonesPlaylist() {
         int[] playListButtonX = { 70, 210, 350, 490, 630, 770, 910, 1050 };
+        num = dao.sacarNumeroDePlayList();
+        plays = new ArrayList<>();
+        for (int i = 0; i < num; i++) {
+            Playlist play = dao.sacarPlaylist(i+1);
+            plays.add(play);
+        }
         
         for (int i = 0; i < Math.min(numPlay, 8); i++) {
-            Playlist play = null; // Creamos la instancia de Playlist dentro del bucle
-            if (plays != null && i < plays.size()) { // Verificamos si la lista de playlists no es nula y si hay suficientes elementos en ella
-                play = dao.consultaPlaylist(plays.get(i).getCodPlaylist()); // CORREGIDO: Pasamos el código de playlist correcto al método consultaPlayList()
-            }
-            
-            JButton btnFotoPlay;
-            if (play != null) { // Verificamos si se encontró una playlist
-                btnFotoPlay = createButton("", play.getFotoPlaylist(), playListButtonX[i], 135);
-            } else {
-                btnFotoPlay = createButton("", "", playListButtonX[i], 135);
-            }
-            contentPanel.add(btnFotoPlay);
-            
             JLabel lblLista;
-            if (play != null) {
-                lblLista = new JLabel(play.getNombrePlaylist());
+            if (i < plays.size()) {
+                btnFotoPlay = CrearBoton("", plays.get(i).getFotoPlaylist(), playListButtonX[i], 135);
+                contentPanel.add(btnFotoPlay);
+                play = plays.get(i);
+                btnFotoPlay.addActionListener(this);
+
+                lblLista = new JLabel(plays.get(i).getNombrePlaylist());
             } else {
+                btnFotoPlay = CrearBoton("", "", playListButtonX[i], 135);
                 lblLista = new JLabel("Nombre Playlist");
             }
-            lblLista.setFont(new Font("Calibri", Font.PLAIN, 20));
+            lblLista.setFont(new Font("Calibri", Font.PLAIN, 17));
             lblLista.setHorizontalAlignment(SwingConstants.CENTER);
-            lblLista.setBounds(playListButtonX[i], 255, 100, 32);
+            lblLista.setBounds(playListButtonX[i]-25, 255, 150, 32);
             contentPanel.add(lblLista);
         }
     }
-    private void createAlbumButtons() {
-        int[] albumButtonX = { 70, 212, 350, 490, 630, 770, 910, 1050 };
+    private void BotonesAlbum() {
+    	int[] albumButtonX = { 70, 212, 350, 490, 630, 770, 910, 1050 };        
+    	num = dao.sacarNumeroDeAlbum();
+        albums = new ArrayList<>();
+        for (int i = 0; i < num; i++) {
+            Album album = dao.sacarAlbum(i+1);
+            albums.add(album);
+        }
+        
         for (int i = 0; i < Math.min(numAlbum, 8); i++) {
-        	if (albums != null) {
-                btnFotoAlbum = createButton("", albums.get(i).getFotoAlbum(), albumButtonX[i], 418);
-        	} else {
-                btnFotoAlbum = createButton("", "", albumButtonX[i], 418);
-        	}
-            contentPanel.add(btnFotoAlbum);
-            if (albums != null) {
+            JLabel lblAlbum;
+            if (i < albums.size()) {
+            	btnFotoAlbum = CrearBoton("", albums.get(i).getFotoAlbum(), albumButtonX[i], 418);
+                contentPanel.add(btnFotoAlbum);
+                album = albums.get(i);
+                btnFotoAlbum.addActionListener(this);
+
                 lblAlbum = new JLabel(albums.get(i).getNombreAlbum());
             } else {
+            	btnFotoAlbum = CrearBoton("", "", albumButtonX[i], 418);
                 lblAlbum = new JLabel("Nombre Album");
             }
-            lblAlbum.setFont(new Font("Calibri", Font.PLAIN, 20));
+            lblAlbum.setFont(new Font("Calibri", Font.PLAIN, 17));
             lblAlbum.setHorizontalAlignment(SwingConstants.CENTER);
-            lblAlbum.setBounds(albumButtonX[i], 538, 100, 32);
+            lblAlbum.setBounds(albumButtonX[i]-25, 538, 150, 32);
             contentPanel.add(lblAlbum);
         }
     }
+        
+    
 
-    private JButton createButton(String text, String imagePath, int x, int y) {
+    private JButton CrearBoton(String text, String imagePath, int x, int y) {
         JButton button = new JButton("");
         button.setBackground(new Color(64, 128, 128));
         button.setIcon(new ImageIcon(imagePath));
@@ -195,9 +211,25 @@ public class VPrincipal extends JDialog implements ActionListener {
         if (e.getSource() == btnSecreto) {
             irVentanaPlay();
         }
+        if (e.getSource() == btnFotoAlbum) {
+        	menuAlbum();
+        }
+        if (e.getSource() == btnFotoPlay) {
+        	menuPlay();
+        }
     }
 
-    private void irVentanaPlay() {
+    private void menuPlay() {
+    	this.setVisible(false);
+        VListaCanciones ven = new VListaCanciones(play, this, true, dao);
+        ven.setVisible(true);		
+	}
+	private void menuAlbum() {
+		this.setVisible(false);
+		VListaCanciones ven = new VListaCanciones(album, this,  true, dao);
+        ven.setVisible(true);		
+	}
+	private void irVentanaPlay() {
         Cancion cancion = new Cancion();
         Album album = new Album();
         album.setCodAlbum(1);

@@ -3,6 +3,7 @@ package controlador;
 import java.util.ArrayList;
 import java.util.List;
 import excepciones.CreateException;
+import modelo.Album;
 import modelo.Cancion;
 import modelo.Persona;
 import modelo.Playlist;
@@ -24,7 +25,9 @@ public interface Dao {
 		
 	public int sacarNumeroDePlayList();
 	
-	public Playlist consultaPlaylist(int cod);
+	public Playlist sacarPlaylist(int cod);
+
+	public Album sacarAlbum(int cod);
 	
 	public List<Playlist> getAllPlaylists();
 	

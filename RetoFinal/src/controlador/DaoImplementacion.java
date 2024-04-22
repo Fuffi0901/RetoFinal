@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import modelo.Album;
 import modelo.Cancion;
 import modelo.Playlist;
 import modelo.Usuario;
@@ -36,7 +37,8 @@ public class DaoImplementacion implements Dao{
 	//consultas canciones
 	private final String SACAR_CANCIONES = "select * from Cancion";
 	private final String CANCIONES_PLAYLIST = "select c.* from cancion c, pertenece p where c.codCancion=p.codCancion and p.codPlayList = ?";
-	
+	private final String TODAS_PLAYLIST = "select * from playlist where codPlayList = ?";
+	private final String TODAS_ALBUM = "select * from album where codAlbum = ?";
 	private final String SACAR_FOTO = "select fotoAlbum from Album where codAlbum = (select codAlbum from Cancion where codAlbum=?)";
 	
 	
@@ -355,7 +357,7 @@ public class DaoImplementacion implements Dao{
 	        
 	        if (rs.next()) {
 	            play = new Playlist(); // Creamos una nueva instancia de Playlist solo si encontramos resultados
-	            play.setCodPlaylist(rs.getInt("codPlayList")); // Suponiendo que "cod_playlist" es el nombre de la columna en la tabla
+	            play.setCodPlaylist(rs.getInt("codPlayL,fist")); // Suponiendo que "cod_playlist" es el nombre de la columna en la tabla
 	            // Aquí puedes añadir más asignaciones de propiedades de la playlist si es necesario
 	        }
 	    } catch (SQLException e) {
@@ -371,52 +373,77 @@ public class DaoImplementacion implements Dao{
 	    return play; // Devolvemos la playlist, que puede ser null si no se encontraron resultados
 	}
 
-	 public List<Playlist> getAllPlaylists() {
-	        List<Playlist> playlists = new ArrayList<>();
-	        PreparedStatement stmt = null;
-	        ResultSet rs = null;
+	public Playlist sacarPlaylist(int cod) {
 
-	        try {
-	            this.openConnection(); // Supongamos que tienes un método getConnection() que devuelve una conexión establecida
+		Playlist play = null;
 
-	            String query = "SELECT * FROM playlist";
-	            stmt = con.prepareStatement(query);
-	            rs = stmt.executeQuery();
+		this.openConnection();
 
-	            while (rs.next()) {
-	                Playlist playlist = new Playlist();
-	                playlist.setCodPlaylist(rs.getInt("codPlayList")); // Supongamos que "cod_playlist" es el nombre de la columna en la tabla
-	                playlist.setNombrePlaylist(rs.getString("nombrePlayList")); // Supongamos que "nombre_playlist" es el nombre de la columna en la tabla
-	                // Aquí puedes añadir más asignaciones de propiedades de la playlist si es necesario
-	                playlists.add(playlist);
-	            }
-	        } catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} finally {
-	            // Cerramos recursos en un bloque finally para asegurarnos de que siempre se cierren
-	            if (rs != null) {
-	                try {
-						rs.close();
-					} catch (SQLException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-	            }
-	            if (stmt != null) {
-	                try {
-						stmt.close();
-					} catch (SQLException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-	            }
-	            // No cerramos la conexión aquí porque podría estar siendo usada por otras operaciones
-	            // La conexión debería ser cerrada en un lugar apropiado, como en la clase que la gestiona
-	        }
+		try {
+			stmt = con.prepareStatement(TODAS_PLAYLIST);
+			stmt.setInt(1, cod);
+			ResultSet rs = stmt.executeQuery();
+			
+			while (rs.next()) {
+				play = new Playlist();
+				play.setCodPlaylist(rs.getInt("codPlayList"));
+				play.setNombrePlaylist(rs.getString("nombrePlayList"));
+				play.setFotoPlaylist(rs.getString("fotoPlayList"));
+			}
 
-	        return playlists;
-	    }
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+		return play;
+	}
+	
+	public Album sacarAlbum(int cod) {
+
+		Album album = null;
+
+		this.openConnection();
+
+		try {
+			stmt = con.prepareStatement(TODAS_ALBUM);
+			stmt.setInt(1, cod);
+			ResultSet rs = stmt.executeQuery();
+			
+			while (rs.next()) {
+				album = new Album();
+				album.setCodAlbum(rs.getInt("codAlbum"));
+				album.setNombreAlbum(rs.getString("nombreAlbum"));
+				album.setFotoAlbum(rs.getString("fotoAlbum"));
+				album.setFechaLan(rs.getDate("fechaLan"));
+			}
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+		return album;
+	}
+
+
+	@Override
+	public List<Playlist> getAllPlaylists() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	
 }
