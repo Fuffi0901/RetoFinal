@@ -19,6 +19,7 @@ import javax.swing.JOptionPane;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Date;
 import java.util.ArrayList;
 
 import javax.swing.JComboBox;
@@ -33,6 +34,7 @@ public class VAlbum extends JDialog implements ActionListener{
 	private Dao dao;
 	private JComboBox comboAlbum;
 	private JButton btnBorrar;
+	private JButton btnModificar;
 
 	/**
 	 * Launch the application.
@@ -88,10 +90,16 @@ public class VAlbum extends JDialog implements ActionListener{
 		comboAlbum = new JComboBox();
 		comboAlbum.setBounds(865, 98, 155, 36);
 		contentPanel.add(comboAlbum);
+		comboAlbum.addActionListener(this);
 		
 		btnBorrar = new JButton("borrar");
 		btnBorrar.setBounds(446, 578, 101, 31);
 		contentPanel.add(btnBorrar);
+		
+		btnModificar = new JButton("modificar");
+		btnModificar.setBounds(278, 583, 85, 21);
+		contentPanel.add(btnModificar);
+		btnModificar.addActionListener(this);
 		btnIntroducir.addActionListener(this);
 		btnBorrar.addActionListener(this);
 		cargarCombo();
@@ -116,6 +124,50 @@ public class VAlbum extends JDialog implements ActionListener{
 		}
 		if(e.getSource().equals(btnBorrar)) {
 			borrarAlbum();
+		}
+		if(e.getSource().equals(comboAlbum)) {
+			cargarDatos();
+		}
+		if(e.getSource().equals(btnModificar)) {
+			modificar();
+		}
+	}
+
+	private void modificar() {
+		// TODO Auto-generated method stub
+		int donde=comboAlbum.getSelectedItem().toString().indexOf(" |");
+		this.dispose();
+		dao.modificarAlbum(comboAlbum.getSelectedItem().toString().substring(0, donde),textNombre.getText(),textFoto.getText(),textFecha.getText());
+		JOptionPane.showMessageDialog(null, "MODIFICADO  CORRERCAMENTE");
+		VPrincipal ven = new VPrincipal(dao, this, true);
+		ven.setVisible(true);
+	}
+
+	private void cargarDatos() {
+		// TODO Auto-generated method stub
+		if(comboAlbum.getSelectedIndex()!=-1) {
+			int pos = comboAlbum.getSelectedIndex();
+			ArrayList<Album> albumes = dao.sacarAlbumes();
+			String can = comboAlbum.getSelectedItem().toString();
+			int donde = can.indexOf(" |");
+			can = can.substring(0, donde);
+			Album album=null;
+			for(Album a:albumes) {
+				if(a.getCodAlbum()==Integer.parseInt(can))
+					album=a;
+			}
+			btnIntroducir.setEnabled(false);		
+			textNombre.setText(albumes.get(pos).getNombreAlbum());
+			textFoto.setText(albumes.get(pos).getFotoAlbum());
+			textFecha.setText(""+(albumes.get(pos).getFechaLan()));
+			
+			
+		}else {
+			btnIntroducir.setEnabled(true);
+			textNombre.setText(null);
+			textFoto.setText(null);
+			textFecha.setText(null);
+			comboAlbum.setSelectedIndex(-1);
 		}
 	}
 

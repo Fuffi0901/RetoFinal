@@ -1,6 +1,7 @@
 package controlador;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -36,6 +37,7 @@ public class DaoImplementacion implements Dao{
 	private final String BORRAR_CANCIONES = "delete from Cancion where codCancion=?";
 	private final String BORRAR_ALBUM = "delete from album where codAlbum=?";
 	private final String MODIFICAR_CANCIONES = "update cancion set  Duracion = ? , nombreCancion = ?, Audio = ?,codAlbum = ? where codCancion=?";
+	private final String MODIFICAR_ALBUM = "update album set  codAlbum = ? , nombreAlbum = ?, fotoAlbum = ?,fechaLan = ? where codAlbum=?";
 	private final String INSERT_CANCIONES =  "insert into cancion(codCancion,Duracion,nombreCancion, Audio,codAlbum) values (?,?,?,?,?)";
 	private final String INSERT_CANTA =  "insert into canta(dni,codCancion) values (?,?)";
 	private final String CANCIONES_PLAYLIST = "select c.* from cancion c, pertenece p where c.codCancion=p.codCancion and p.codPlayList = ?";
@@ -614,5 +616,40 @@ public class DaoImplementacion implements Dao{
 		}
 		
 	}
+
+	@Override
+	public void modificarAlbum(String cod, String nombre, String foto, String fecha) {
+		// TODO Auto-generated method stub
+		
+		
+		this.openConnection();
+		
+		try {
+
+			stmt = con.prepareStatement(MODIFICAR_ALBUM);
+			
+			stmt.setInt(1, Integer.valueOf(cod));
+			stmt.setString(2, nombre);
+			stmt.setString(3, foto);
+			stmt.setDate(4, Date.valueOf(fecha));
+			stmt.setInt(5, Integer.valueOf(cod));
+			stmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+		
+	}
+
+
 	
 }

@@ -46,4 +46,6 @@ public interface Dao {
 	public void meterAlbum(int cod, String nombre, String foto, String fecha);
 
 	public void borrarAlbum(int codAlbum);
+
+	public void modificarAlbum(String cod, String nombre, String foto, String fecha);
 }
