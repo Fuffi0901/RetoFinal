@@ -7,12 +7,17 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import controlador.Dao;
+import modelo.Album;
+import modelo.Cancion;
 import modelo.Usuario;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import java.awt.Font;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -63,35 +68,35 @@ public class Inicio_Sesion extends JFrame implements ActionListener{
 		
 		JLabel lbTitulo = new JLabel("BEATDAM");
 		lbTitulo.setHorizontalAlignment(SwingConstants.CENTER);
-		lbTitulo.setForeground(new Color(73, 197, 250));
+		lbTitulo.setForeground(new Color(78, 78, 78));
 		lbTitulo.setBackground(new Color(255, 255, 255));
 		lbTitulo.setFont(new Font("Stencil", Font.PLAIN, 90));
-		lbTitulo.setBounds(10, 24, 1227, 91);
+		lbTitulo.setBounds(10, 40, 1227, 91);
 		contentPane.add(lbTitulo);
 		
-		JLabel lbUsuario = new JLabel("Usuario:");
+		JLabel lbUsuario = new JLabel("Introduce el usuario");
 		lbUsuario.setForeground(new Color(255, 255, 255));
-		lbUsuario.setFont(new Font("Eras Light ITC", Font.PLAIN, 52));
-		lbUsuario.setBounds(82, 163, 272, 59);
+		lbUsuario.setFont(new Font("Eras Light ITC", Font.PLAIN, 30));
+		lbUsuario.setBounds(209, 193, 252, 35);
 		contentPane.add(lbUsuario);
 		
-		JLabel lbConstraseña = new JLabel("Contraseña:");
+		JLabel lbConstraseña = new JLabel("Contraseña");
 		lbConstraseña.setForeground(new Color(255, 255, 255));
-		lbConstraseña.setFont(new Font("Eras Light ITC", Font.PLAIN, 53));
-		lbConstraseña.setBounds(82, 249, 272, 59);
+		lbConstraseña.setFont(new Font("Eras Light ITC", Font.PLAIN, 30));
+		lbConstraseña.setBounds(209, 307, 159, 25);
 		contentPane.add(lbConstraseña);
 		
 		tFUsuario = new JTextField();
 		tFUsuario.setFont(new Font("Tahoma", Font.PLAIN, 43));
-		tFUsuario.setBounds(372, 163, 733, 59);
+		tFUsuario.setBounds(209, 238, 839, 59);
 		contentPane.add(tFUsuario);
 		tFUsuario.setColumns(10);
 		
 		rbMostrarConstraseña = new JRadioButton("Mostrar Constraseña");
 		rbMostrarConstraseña.setForeground(new Color(255, 255, 255));
 		rbMostrarConstraseña.setBackground(new Color(64, 128, 128));
-		rbMostrarConstraseña.setFont(new Font("Times New Roman", Font.PLAIN, 27));
-		rbMostrarConstraseña.setBounds(372, 344, 272, 45);
+		rbMostrarConstraseña.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+		rbMostrarConstraseña.setBounds(209, 414, 193, 35);
 		rbMostrarConstraseña.setOpaque(false);
 			
 		
@@ -104,14 +109,14 @@ public class Inicio_Sesion extends JFrame implements ActionListener{
 		
 		pFConstraseña = new JPasswordField();
 		pFConstraseña.setFont(new Font("Tahoma", Font.PLAIN, 43));
-		pFConstraseña.setBounds(372, 249, 733, 59);
+		pFConstraseña.setBounds(209, 342, 839, 59);
 		contentPane.add(pFConstraseña);
 		
 		btnEntrar = new JButton("Iniciar Sesion");
 		btnEntrar.setForeground(new Color(255, 255, 255));
 		btnEntrar.setBackground(new Color(64, 128, 128));
 		btnEntrar.setFont(new Font("Imprint MT Shadow", Font.PLAIN, 40));
-		btnEntrar.setBounds(477, 423, 282, 75);
+		btnEntrar.setBounds(479, 486, 282, 75);
 		btnEntrar.setOpaque(false);
 		btnEntrar.setBorderPainted(false);
 		btnEntrar.setFocusable(false);
@@ -123,21 +128,21 @@ public class Inicio_Sesion extends JFrame implements ActionListener{
 		btnRegistrarse.setForeground(new Color(255, 255, 255));
 		btnRegistrarse.setBackground(new Color(64, 128, 128));
 		btnRegistrarse.setFont(new Font("Imprint MT Shadow", Font.PLAIN, 20));
-		btnRegistrarse.setBounds(636, 504, 124, 33);
+		btnRegistrarse.setBounds(638, 567, 124, 33);
 		btnRegistrarse.setOpaque(false);
 		btnRegistrarse.setBorderPainted(false);
 		btnRegistrarse.setFocusable(false);
 		contentPane.add(btnRegistrarse);
 		
 		lblLogo = new JLabel("");
-		lblLogo.setIcon(new ImageIcon("C:\\Users\\1dam\\Desktop\\RetoFinal\\Img\\logoPequeña.png"));
+		lblLogo.setIcon(new ImageIcon("..\\RetoFinal\\Img\\logoPequeña.png"));
 		lblLogo.setBounds(1181, 10, 56, 75);
 		contentPane.add(lblLogo);
 		
 		JLabel lblNewLabel = new JLabel("¿No tienes Cuenta?");
 		lblNewLabel.setFont(new Font("Eras Light ITC", Font.PLAIN, 20));
 		lblNewLabel.setForeground(new Color(192, 192, 192));
-		lblNewLabel.setBounds(487, 508, 167, 25);
+		lblNewLabel.setBounds(489, 571, 167, 25);
 		contentPane.add(lblNewLabel);
 		
 		lblNewLabel_1 = new JLabel("© 2024 BeatDam Application. All rights reserved. Created by Asier Del Campo, Guillermo Flecha, Erlantz Rey, Andoni García.");
@@ -156,10 +161,47 @@ public class Inicio_Sesion extends JFrame implements ActionListener{
 		btnLogo.setBounds(1181, 10, 56, 75);
 		contentPane.add(btnLogo);
 		
+		JButton btnNewButton = new JButton("New button");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				irVentanaPlay();
+			}
+		});
+		btnNewButton.setBounds(28, 247, 85, 21);
+		contentPane.add(btnNewButton);
+		
+		JLabel fondo = new JLabel("") {
+			protected void paintComponent(Graphics g) {
+				super.paintComponent(g);
+				Graphics2D g2d = (Graphics2D) g.create();
+				g2d.setPaint(new GradientPaint(0, 0, new Color(73, 197, 250), 0, getHeight(), new Color(78, 78, 78)));
+				g2d.fillRect(0, 0, getWidth(), getHeight());
+				g2d.dispose();
+			}
+		};
+		fondo.setBounds(0, 0, 1256, 724);
+		contentPane.add(fondo);
+		
 		btnRegistrarse.addActionListener(this);
 		
 		
 	}
+	private void irVentanaPlay() {
+        Cancion cancion = new Cancion();
+        Album album = new Album();
+        album.setCodAlbum(1);
+        album.setFotoAlbum("..\\RetoFinal\\Img\\DondeQuiero.jpg");
+        album.setNombreAlbum("Donde Quiero Estar");
+        cancion.setDuracion(220);
+        cancion.setCodCancion(1);
+        cancion.setNombreCancion("WANDA");
+        cancion.setAudio("..\\RetoFinal\\Audio\\Wanda.wav");
+        cancion.setCodAlbum(1);
+
+        this.setVisible(false);
+        VentanaPlay ven = new VentanaPlay(this, cancion, album.getFotoAlbum(), true, dao);
+        ven.setVisible(true);
+    }
 
 	@Override
 	public void actionPerformed(ActionEvent e) {

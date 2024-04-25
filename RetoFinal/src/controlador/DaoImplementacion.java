@@ -33,7 +33,6 @@ public class DaoImplementacion implements Dao{
 	private final String INSERT_PERSONA =  "insert into persona(Dni,nombrePersona,apellidoPersona,pais,edad) values (?,?,?,?,?)";
 	private final String INSERT_USUARIO =  "insert into usuario(Dni,contraseina,NombreUsuario) values (?,?,?)";
 	private final String INSERT_ALBUM = "insert into album(codAlbum,nombreAlbum,fotoAlbum,fechaLan) values (?,?,?,?)";
-	private final String SACAR_CANCIONES = "select * from Cancion";
 	private final String CANCIONES_PLAYLIST = "select c.* from cancion c, pertenece p where c.codCancion=p.codCancion and p.codPlayList = ?";
 	private final String TODAS_PLAYLIST = "select * from playlist where codPlayList = ?";
 	private final String TODAS_ALBUM = "select * from album where codAlbum = ?";
@@ -235,28 +234,8 @@ public class DaoImplementacion implements Dao{
 		return foto;
 	}
 
-	@Override
-	public ArrayList<Cancion> sacarCanciones(String nombre, String contraseña) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	public int sacarNumeroDePlayList() {
-		int num = 0;
-		try {
-			this.openConnection();
-			stmt = con.prepareStatement(NUMERO_PLAYLIST);
-			ResultSet rs = stmt.executeQuery();
-			if (rs.next()) {
-	            num = rs.getInt(1); // Utiliza el índice de la columna en lugar del nombre
-			}
-			
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return num;
-		
-	}
+
+
 	
 	@Override
 	public void crearAlbum(int codAlbum, String fecha, String foto, String nombre) {
@@ -327,6 +306,23 @@ public class DaoImplementacion implements Dao{
 		return NumAlbum;
 	}
 	
+	public int sacarNumeroDePlayList() {
+		int num = 0;
+		try {
+			this.openConnection();
+			stmt = con.prepareStatement(NUMERO_PLAYLIST);
+			ResultSet rs = stmt.executeQuery();
+			if (rs.next()) {
+	            num = rs.getInt(1); // Utiliza el índice de la columna en lugar del nombre
+			}
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return num;
+		
+	}
 	public int sacarNumeroDeAlbum() {
 		int num = 0;
 		try {
@@ -437,11 +433,6 @@ public class DaoImplementacion implements Dao{
 	}
 
 
-	@Override
-	public List<Playlist> getAllPlaylists() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	
 }

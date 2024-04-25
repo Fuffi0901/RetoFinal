@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import controlador.Dao;
+import modelo.Cancion;
 
 import java.awt.Color;
 import javax.swing.JLabel;
@@ -18,8 +19,17 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
+
+import javax.swing.Timer;
 
 import javax.swing.JTextField;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.ImageIcon;
 
 public class VBuscar extends JDialog implements ActionListener{
@@ -28,33 +38,55 @@ public class VBuscar extends JDialog implements ActionListener{
 	private JTextField txtBuscar;
 	private JButton btnSecreto;
 	private JButton btnInicio;
-	private JButton btnLogo, btnBuscar;
+	private JButton btnLogo, btnBuscar, btnPlay;
 	private Dao dao;
+	private boolean play;
+	private JButton btnStop;
+	private Clip clip;
+	private int num = 0, pos, progressValue;
+	private Timer timer;
+	private Cancion cancion;
 
 	/**
 	 * Create the dialog.
+	 * @param play 
+	 * @param pos 
 	 * @param b 
 	 * @param vPrincipal 
 	 * @wbp.parser.constructor
 	 */
-	public VBuscar(VentanaPlay ventanaPlay, boolean modal, Dao dao) {
+	public VBuscar(VentanaPlay ventanaPlay, boolean modal, Dao dao, boolean play, Cancion cancion, int pos) {
 		super(ventanaPlay);
 		setModal(modal);
-		Pantalla(dao);
+		Pantalla(dao, play, cancion, pos);
 	}
 	
 	public VBuscar(VPrincipal vPrincipal, boolean modal, Dao dao) {
 		super(vPrincipal);
 		setModal(modal);
-		Pantalla(dao);
+		Pantalla(dao, false, null, 0);
 	}
 	
-	public void Pantalla(Dao dao) {
+	public void Pantalla(Dao dao, boolean playyes, Cancion cancion, int pos) {
 		this.dao = dao;
+		this.play = playyes; 
+		this.pos = pos;
+		this.cancion = cancion;
 		
+		File archivoSonido = new File("..\\RetoFinal\\Audio\\Wanda.wav");
+	       AudioInputStream audio;
+			try {
+				audio = AudioSystem.getAudioInputStream(archivoSonido);
+				clip  = AudioSystem.getClip();
+		    	clip.open(audio);
+			} catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}		
+		
+		
+			
 		setBackground(new Color(78, 78, 78));	
-		
-		setBackground(new Color(64, 128, 128));
 		setBounds(100, 100, 1259, 749);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBackground(new Color(78, 78, 78));
@@ -135,10 +167,42 @@ public class VBuscar extends JDialog implements ActionListener{
 		btnLogo.setOpaque(false);
 		btnLogo.setBorderPainted(false);
 		btnLogo.setFocusable(false);
+		btnLogo.addActionListener(this);
 		contentPanel.add(btnLogo);
 		
 		
-		btnLogo.addActionListener(this);
+		
+		btnPlay = new JButton("");
+		btnPlay.setIcon(new ImageIcon("..\\RetoFinal\\Img\\playChiquito.png"));
+		btnPlay.setBounds(996, 560, 78, 71);
+		btnPlay.addActionListener(this);
+		contentPanel.add(btnPlay);
+		
+		btnStop = new JButton("");
+		btnStop.setIcon(new ImageIcon("..\\RetoFinal\\Img\\pause.png"));
+		btnStop.setBounds(996, 560, 78, 71);
+		btnStop.setVisible(false);
+		btnStop.addActionListener(this);
+		contentPanel.add(btnStop);
+		
+		JLabel lblFondoPlay = new JLabel("");
+		lblFondoPlay.setBounds(10, 560, 1225, 71);
+		contentPanel.add(lblFondoPlay);
+		
+		if (play == true) {
+			play();
+		}		
+		
+		timer = new Timer(1000, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                progressValue += 1;
+                if (progressValue >= cancion.getDuracion()) {
+                    timer.stop();
+                }
+            }
+        });
+		
+	
 	}
 
 	@Override
@@ -149,6 +213,36 @@ public class VBuscar extends JDialog implements ActionListener{
 		}
 		if(e.getSource().equals(btnLogo)) {
 			irCerrar_Sesion();
+		}
+		if(e.getSource().equals(btnPlay)) {
+			play();
+		}
+		if(e.getSource().equals(btnStop)) {
+			stop();
+		}
+	}
+	
+	protected void stop() {
+		// TODO Auto-generated method stub
+		if (clip != null && clip.isRunning()) {
+            clip.stop();
+            num = 0;
+            timer.stop();
+	       	btnPlay.setVisible(true);
+	       	btnStop.setVisible(false);
+	        pos = clip.getFramePosition();
+	        play = false;
+		}
+	}
+	public void play() {
+		// TODO Auto-generated method stub
+		if (num == 0) {
+			clip.setFramePosition(pos);
+	        clip.start();
+	        num++;
+	        btnPlay.setVisible(false);
+	        btnStop.setVisible(true);	
+	        play = true;
 		}
 	}
 

@@ -44,8 +44,12 @@ public class VentanaPlay extends JDialog implements ActionListener{
 	private int num = 0, pos = 0;
 	private Dao dao;
 	private Cancion cancion;
+	private boolean play;
 	
 	
+	/**
+	 * @wbp.parser.constructor
+	 */
 	public VentanaPlay(VPrincipal vPrincipal, Cancion cancion, String ruta, boolean modal, Dao dao) {
 		super(vPrincipal);
 		this.cancion = cancion;
@@ -59,6 +63,12 @@ public class VentanaPlay extends JDialog implements ActionListener{
 		setModal(modal);
 		Pantalla(dao, cancion, ruta);	
 	}
+
+	public VentanaPlay(Inicio_Sesion inicio_Sesion, Cancion cancion, String ruta, boolean modal, Dao dao) {
+		super(inicio_Sesion);
+		this.cancion = cancion;
+		setModal(modal);
+		Pantalla(dao, cancion, ruta);		}
 
 	public void Pantalla(Dao dao, Cancion cancion, String ruta) {
 		this.dao = dao;
@@ -220,6 +230,7 @@ public class VentanaPlay extends JDialog implements ActionListener{
 	       	btnPlay.setVisible(true);
 	       	btnStop.setVisible(false);
 	        pos = clip.getFramePosition();
+	        play = false;
 		}
 	}
 	public void play() {
@@ -230,6 +241,7 @@ public class VentanaPlay extends JDialog implements ActionListener{
 	        num++;
 	        btnPlay.setVisible(false);
 	        btnStop.setVisible(true);	
+	        play = true;
 		}
 	}
 	@Override
@@ -264,17 +276,18 @@ public class VentanaPlay extends JDialog implements ActionListener{
 
 	private void irAPrincipal() {
 		this.setVisible(false);
-		VPrincipal ven = new VPrincipal(this, true, dao);
+		VPrincipal ven = new VPrincipal(this, true, dao, play);
 		ven.setVisible(true);
 	}
 
 	private void irABuscar() {
+		int pos2 = clip.getFramePosition();
 		this.setVisible(false);
-		VBuscar ven = new VBuscar(this, true, dao);
+		VBuscar ven = new VBuscar(this, true, dao, play, cancion, pos2);
+		stop();
 		ven.setVisible(true);
 	}
 }
-		
 
 
 

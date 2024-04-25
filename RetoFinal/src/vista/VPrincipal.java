@@ -60,7 +60,7 @@ public class VPrincipal extends JDialog implements ActionListener {
 		setModal(modal);
 		pantalla(dao);
 	}
-	public VPrincipal(VentanaPlay ventanaPlay, boolean modal, Dao dao) {
+	public VPrincipal(VentanaPlay ventanaPlay, boolean modal, Dao dao, boolean play) {
 		super(ventanaPlay);
 		setModal(modal);
 		pantalla(dao);
@@ -68,7 +68,6 @@ public class VPrincipal extends JDialog implements ActionListener {
 
     public void pantalla(Dao dao) {
     	this.dao = dao;
-    	plays = (ArrayList<Playlist>) dao.getAllPlaylists();
         setBackground(new Color(78, 78, 78));
         setBounds(100, 100, 1259, 749);
         getContentPane().setLayout(new BorderLayout());
@@ -158,7 +157,7 @@ public class VPrincipal extends JDialog implements ActionListener {
         }
     }
     private void BotonesAlbum() {
-    	int[] albumButtonX = { 70, 212, 350, 490, 630, 770, 910, 1050 };        
+    	int[] albumButtonX = { 70, 210, 350, 490, 630, 770, 910, 1050 };        
     	num = dao.sacarNumeroDeAlbum();
         albums = new ArrayList<>();
         for (int i = 0; i < num; i++) {
