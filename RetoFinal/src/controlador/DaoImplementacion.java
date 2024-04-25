@@ -31,6 +31,7 @@ public class DaoImplementacion implements Dao{
 	private final String INSERT_PERSONA =  "insert into persona(Dni,nombrePersona,apellidoPersona,pais,edad) values (?,?,?,?,?)";
 	private final String INSERT_USUARIO =  "insert into usuario(Dni,contraseina,NombreUsuario) values (?,?,?)";
 	private final String INSERT_ALBUM = "insert into album(codAlbum,nombreAlbum,fotoAlbum,fechaLan) values(?,?,?,?)";
+	private final String INSERT_ARTISTA =  "insert into artista(Dni,nombreArtistico,CantaAutor,estilo) values (?,?,?,?)";
 	
 	//consultas canciones
 	private final String SACAR_CANCIONES = "select * from Cancion";
@@ -649,6 +650,38 @@ public class DaoImplementacion implements Dao{
 		}
 		
 	}
+
+	@Override
+	public void registrarArtista(String dni, String nombreArtistico, boolean cantaAutor, String estilo) {
+		// TODO Auto-generated method stub
+		this.openConnection();
+
+		try {
+
+			stmt = con.prepareStatement(INSERT_ARTISTA);
+			stmt.setString(1, dni);
+			stmt.setString(2, nombreArtistico);
+			stmt.setBoolean(3, cantaAutor);
+			stmt.setString(4, estilo);
+
+			stmt.executeUpdate();
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+
+	}
+
+
 
 
 	

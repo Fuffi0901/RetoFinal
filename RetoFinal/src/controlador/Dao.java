@@ -48,4 +48,6 @@ public interface Dao {
 	public void borrarAlbum(int codAlbum);
 
 	public void modificarAlbum(String cod, String nombre, String foto, String fecha);
+
+	public void registrarArtista(String dni, String nombreArtistico, boolean cantaAutor, String estilo);
 }

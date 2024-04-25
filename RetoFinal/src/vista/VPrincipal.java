@@ -26,6 +26,7 @@ public class VPrincipal extends JDialog implements ActionListener{
 	private Dao dao;
 
 	private final JPanel contentPanel = new JPanel();
+	private JButton btnArtista;
 
 	/**
 	 * Create the dialog.
@@ -91,6 +92,10 @@ public class VPrincipal extends JDialog implements ActionListener{
 		lblBuscar.setFont(new Font("Informal Roman", Font.PLAIN, 27));
 		lblBuscar.setBounds(647, 679, 78, 24);
 		contentPanel.add(lblBuscar);
+		btnArtista = new JButton("New button");
+		btnArtista.setBounds(162, 635, 85, 21);
+		contentPanel.add(btnArtista);
+		btnArtista.addActionListener(null);
 		
 		
 		btnInicio = new JButton("");
@@ -125,6 +130,8 @@ public class VPrincipal extends JDialog implements ActionListener{
 		lblFondo.setIcon(new ImageIcon("..\\FinalChalenge\\Img\\fondo1.gif"));
 		lblFondo.setBounds(0, 0, 1257, 748);
 		contentPanel.add(lblFondo);
+		
+		
 	}
 
 	@Override
@@ -147,7 +154,7 @@ public class VPrincipal extends JDialog implements ActionListener{
 	private void meterAlbum() {
 		// TODO Auto-generated method stub
 		this.setVisible(false);
-		VAlbum ven = new VAlbum(dao, this, true);
+		VArtista ven = new VArtista(dao, this, true);
 		ven.setVisible(true);
 	}
 	private void irVentanaPlay() {
