@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
+import java.awt.Toolkit;
 
 public class VentanaPlay extends JDialog implements ActionListener{
 
@@ -53,13 +54,16 @@ public class VentanaPlay extends JDialog implements ActionListener{
 	private Dao dao;
 	private Cancion can;
 	private Album album;
+	private boolean play;
 	
 	
 	/**
+	 * @param nombre 
 	 * @wbp.parser.constructor
 	 */
-	public VentanaPlay(VPrincipal vPrincipal, Cancion cancion, boolean modal, Dao dao) {
+	public VentanaPlay(VPrincipal vPrincipal, Cancion cancion, String nombre, boolean modal, Dao dao) {
 		super(vPrincipal);
+		setIconImage(Toolkit.getDefaultToolkit().getImage("C:\\Users\\1dam\\Desktop\\PGR\\3ª Eva\\RetoFinal\\Img\\logoPequeña.png"));
 		this.can = cancion;
 		setModal(modal);
 		Pantalla(dao, cancion);
@@ -71,12 +75,6 @@ public class VentanaPlay extends JDialog implements ActionListener{
 		setModal(modal);
 		Pantalla(dao, cancion);	
 	}
-
-	public VentanaPlay(VBuscar vBuscar, Cancion cancion, boolean modal, Dao dao) {
-		super(vBuscar);
-		this.can = cancion;
-		setModal(modal);
-		Pantalla(dao, cancion);	}
 
 	public void Pantalla(Dao dao, Cancion cancion) {
 		this.dao = dao;
@@ -136,7 +134,7 @@ public class VentanaPlay extends JDialog implements ActionListener{
 		btnPlay = new JButton("");
 		btnPlay.setIcon(new ImageIcon("..\\RetoFinal\\Img\\play.png"));
 		btnPlay.setBackground(new Color(255, 255, 255));
-		btnPlay.setBounds(589, 528, 81, 80);
+		btnPlay.setBounds(589, 536, 81, 80);
 		btnPlay.setVisible(true);
 		btnPlay.setOpaque(false);
 		btnPlay.setBorderPainted(false);
@@ -158,7 +156,7 @@ public class VentanaPlay extends JDialog implements ActionListener{
 		btnRebobinar = new JButton("");		
 		btnRebobinar.setBackground(new Color(255, 255, 255));
 		btnRebobinar.setIcon(new ImageIcon("..\\RetoFinal\\Img\\rebobinar.png"));
-		btnRebobinar.setBounds(405, 528, 81, 80);
+		btnRebobinar.setBounds(405, 536, 81, 80);
 		btnRebobinar.setOpaque(false);
 		btnRebobinar.setBorderPainted(false);
 		btnRebobinar.setFocusable(false);
@@ -211,7 +209,7 @@ public class VentanaPlay extends JDialog implements ActionListener{
 		btnAtras.addActionListener(this);
 		
 		btnadelantar = new JButton();
-		btnadelantar.setBounds(680, 528, 81, 80);
+		btnadelantar.setBounds(680, 536, 81, 80);
 		btnadelantar.addActionListener(this);
 		ImageIcon icon = new ImageIcon("..\\RetoFinal\\Img\\adelantar.png");
 		Image image = icon.getImage();
@@ -225,7 +223,7 @@ public class VentanaPlay extends JDialog implements ActionListener{
 		contentPanel.add(btnadelantar);
 		
 		btnatrasar = new JButton("");
-		btnatrasar.setBounds(496, 528, 81, 80);
+		btnatrasar.setBounds(496, 536, 81, 80);
 		ImageIcon ico = new ImageIcon("..\\RetoFinal\\Img\\atrasar.png");
 		Image imag = ico.getImage();
 		Image imagRedimensionada = imag.getScaledInstance(btnadelantar.getWidth(),btnadelantar.getHeight(), Image.SCALE_SMOOTH);
@@ -277,6 +275,7 @@ public class VentanaPlay extends JDialog implements ActionListener{
 	       	btnPlay.setVisible(true);
 	       	btnStop.setVisible(false);
 	        pos = clip.getFramePosition();
+	        play = false;
 		}
 	}
 	public void play() {
@@ -287,6 +286,7 @@ public class VentanaPlay extends JDialog implements ActionListener{
 	        num++;
 	        btnPlay.setVisible(false);
 	        btnStop.setVisible(true);	
+	        play = true;
 		}
 	}
 	
@@ -326,8 +326,10 @@ public class VentanaPlay extends JDialog implements ActionListener{
 	
 	private void volverAtras() {
 		// TODO Auto-generated method stub
+		stop();
+		int pos2 = clip.getFramePosition();
 		this.dispose();
-		VPrincipal ven = new VPrincipal(this, true, dao);
+		VPrincipal ven = new VPrincipal(this, true, dao, play, can, pos2);
 		ven.setVisible(true);
 	}
 	
@@ -375,23 +377,9 @@ public class VentanaPlay extends JDialog implements ActionListener{
 	}
 
 	private void irACerrarSesion() {
-		stop();
+		stop();	
 		this.setVisible(false);
 		VCerrar_Sesion ven = new VCerrar_Sesion(this, true, dao);
-		ven.setVisible(true);
-	}
-
-	private void irAPrincipal() {
-		stop();
-		this.setVisible(false);
-		VPrincipal ven = new VPrincipal(this, true, dao);
-		ven.setVisible(true);
-	}
-
-	private void irABuscar() {
-		stop();
-		this.setVisible(false);
-		VBuscar ven = new VBuscar(this, true, dao);
 		ven.setVisible(true);
 	}
 }

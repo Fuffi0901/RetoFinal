@@ -44,11 +44,6 @@ public class VCerrar_Sesion extends JDialog implements ActionListener{
 		pantalla(dao);
 	}
 
-	public VCerrar_Sesion(VBuscar vBuscar, boolean modal, Dao dao) {
-		super(vBuscar);
-		setModal(modal);
-		pantalla(dao);	}
-
 	public VCerrar_Sesion(VListaCanciones vListaCanciones, boolean modal, Dao dao) {
 		super(vListaCanciones);
 		setModal(modal);

@@ -29,6 +29,7 @@ import javax.swing.JButton;
 import java.awt.Color;
 import javax.swing.ImageIcon;
 import javax.swing.SwingConstants;
+import java.awt.Toolkit;
 
 public class Inicio_Sesion extends JFrame implements ActionListener{
 
@@ -51,6 +52,8 @@ public class Inicio_Sesion extends JFrame implements ActionListener{
 	 * @param vRegistrarse 
 	 */
 	public Inicio_Sesion (Dao dao) {
+		setTitle("BEATDAM");
+		setIconImage(Toolkit.getDefaultToolkit().getImage("C:\\Users\\1dam\\Desktop\\PGR\\3ª Eva\\RetoFinal\\Img\\logoPequeña.png"));
 		Pantallas(dao);
 	}
 	

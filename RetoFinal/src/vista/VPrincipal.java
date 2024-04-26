@@ -15,8 +15,15 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -27,17 +34,18 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-
 import controlador.Dao;
 import modelo.Album;
 import modelo.Artista;
 import modelo.Cancion;
 import modelo.Playlist;
+import java.awt.Toolkit;
 
 public class VPrincipal extends JDialog implements ActionListener {
 
@@ -54,45 +62,44 @@ public class VPrincipal extends JDialog implements ActionListener {
     private JLabel lblPlayList, lblAlbumes;
     private Dao dao;
     private final JPanel contentPanel = new JPanel();
-    private int numPlay, numAlbum, num = 1, numListPlay = 0, numListAlbum;
-    private Playlist play;
+    private int numPlay, numAlbum, num = 1, numListPlay = 0, numListAlbum, pos;
     private JTextField txtBuscar;
     private JButton btnSecreto;
     private JList<String> list;
-    private Album album;
     private ArrayList<Playlist> plays;
     private JScrollPane scrollPane;
     private ArrayList<Cancion> canciones = new ArrayList<Cancion>();
     private ArrayList<Album> albums;
     private JButton btnSiguientePlay;
     private JButton btnSiguienteAlbum;
-    private JPanel panelAlbum;
+    private JPanel panelAlbum = new JPanel();
+    private Cancion cancion;
+    private Clip clip;
+    private JButton btnStop;
+    private JButton btnPlay;
+    private boolean play = false;
+    private JPanel panelPlay;
+    private Playlist playlist;
+    private Album album;
     
     /**
-	 * @wbp.parser.constructor
+	 * @param play2 
+     * @wbp.parser.constructor
 	 */
-    
-    public VPrincipal(VBuscar buscar, boolean modal, Dao dao) {
-		super(buscar);
-		setModal(modal);
-		pantalla(dao);
-	}
-	
-	public VPrincipal(VCerrar_Sesion vCerrar_Sesion, boolean modal, Dao dao) {
-		super(vCerrar_Sesion);
-		setModal(modal);
-		pantalla(dao);
-	}
 	
 	public VPrincipal(Inicio_Sesion inicio_Sesion, boolean modal, Dao dao) {
 		super(inicio_Sesion);
+		setIconImage(Toolkit.getDefaultToolkit().getImage("..\\RetoFinal\\Img\\Real_Hasta_la_Muerte.png"));
 		setModal(modal);
 		pantalla(dao);
 	}
 	
-	public VPrincipal(VentanaPlay ventanaPlay, boolean modal, Dao dao) {
+	public VPrincipal(VentanaPlay ventanaPlay, boolean modal, Dao dao, boolean play, Cancion cancion, int pos2) {
 		super(ventanaPlay);
 		setModal(modal);
+		this.play = play;
+		this.pos = pos2;
+		this.cancion = cancion;
 		pantalla(dao);
 	}
 	
@@ -102,7 +109,12 @@ public class VPrincipal extends JDialog implements ActionListener {
 		pantalla(dao);
 	}
 
-    public void pantalla(Dao dao) {
+	public VPrincipal(VCerrar_Sesion vCerrar_Sesion, boolean modal, Dao dao) {
+		super(vCerrar_Sesion);
+		setModal(modal);
+		pantalla(dao);	}
+
+	public void pantalla(Dao dao) {
     	this.dao = dao;
         setBackground(new Color(214, 214, 214));
         setBounds(100, 100, 1259, 749);
@@ -125,6 +137,18 @@ public class VPrincipal extends JDialog implements ActionListener {
     
         contentPanel.add(btnSecreto);
         
+        panelAlbum = new JPanel();
+        panelAlbum.setBounds(31, 430, 1037, 143);
+        panelAlbum.setOpaque(false);
+		contentPanel.add(panelAlbum);        
+		panelAlbum.setLayout(null);
+		
+		panelPlay = new JPanel();
+		panelPlay.setOpaque(false);
+		panelPlay.setBounds(31, 181, 1037, 143);
+		contentPanel.add(panelPlay);
+		panelPlay.setLayout(null);
+        
         list = new JList<>();
         list.setFont(new Font("Felix Titling", Font.PLAIN, 32));
         list.setVisible(false);
@@ -135,11 +159,6 @@ public class VPrincipal extends JDialog implements ActionListener {
             }
         });
         contentPanel.add(list);
-        
-        
-        panelAlbum = new JPanel();
-        panelAlbum.setBounds(70, 445, 1009, 100);
-		contentPanel.add(panelAlbum);
 		
         btnSiguientePlay = new JButton("New button");
         btnSiguientePlay.addActionListener(new ActionListener() {
@@ -148,7 +167,7 @@ public class VPrincipal extends JDialog implements ActionListener {
                 BotonesPlaylist();
         	}
         });
-		btnSiguientePlay.setBounds(1089, 200, 100, 100);
+		btnSiguientePlay.setBounds(1089, 181, 100, 100);
 		contentPanel.add(btnSiguientePlay);
 		
 		btnSiguienteAlbum = new JButton("New button");
@@ -159,7 +178,7 @@ public class VPrincipal extends JDialog implements ActionListener {
 		        BotonesAlbum();
 			}
 		});
-		btnSiguienteAlbum.setBounds(1089, 445, 100, 100);
+		btnSiguienteAlbum.setBounds(1089, 430, 100, 100);
 		contentPanel.add(btnSiguienteAlbum);
 
         scrollPane = new JScrollPane(list);
@@ -198,7 +217,6 @@ public class VPrincipal extends JDialog implements ActionListener {
                     list.setVisible(true);
                 }
             }
-
             @Override
             public void focusLost(FocusEvent e) {
 
@@ -223,15 +241,37 @@ public class VPrincipal extends JDialog implements ActionListener {
         lblAlbumes.setBounds(70, 376, 242, 50);
         contentPanel.add(lblAlbumes);
 
-        btnLogo = CrearBoton("", "..\\RetoFinal\\Img\\logoPequeña.png", 1141, 10);
-        btnLogo.addActionListener(this);
-        contentPanel.add(btnLogo);
+        btnLogo = new JButton("");
+		btnLogo.setBackground(new Color(64, 128, 128));
+		btnLogo.setBounds(1181, 10, 56, 75);
+		btnLogo.setOpaque(false);
+		btnLogo.setBorderPainted(false);
+		btnLogo.setFocusable(false);
+		ImageIcon icono = new ImageIcon("..\\RetoFinal\\Img\\logoPequeña.png");
+		Image imagen = icono.getImage();
+		Image imagenRedimensionada = imagen.getScaledInstance(btnLogo.getWidth(),btnLogo.getHeight(), Image.SCALE_SMOOTH);
+		ImageIcon iconoRedimensionado = new ImageIcon(imagenRedimensionada);
+		btnLogo.setIcon(iconoRedimensionado);
+		contentPanel.add(btnLogo);
+		btnLogo.addActionListener(this);
        
-
+        btnStop = new JButton("");
+		btnStop.setBounds(969, 613, 80, 80);
+		contentPanel.add(btnStop);
+		
+		btnPlay = new JButton("");
+		btnPlay.setBounds(969, 613, 80, 80);
+		contentPanel.add(btnPlay);
+		
         BotonesPlaylist();
         BotonesAlbum();
         
         JLabel fondo = new JLabel("") {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
 			protected void paintComponent(Graphics g) {
 				super.paintComponent(g);
 				Graphics2D g2d = (Graphics2D) g.create();
@@ -244,49 +284,89 @@ public class VPrincipal extends JDialog implements ActionListener {
 		contentPanel.add(fondo);
 		
 		
-	
 		
 		
+		
+		if(play) {
+			 File archivoSonido = new File(cancion.getAudio());
+		       AudioInputStream audio;
+				try {
+					audio = AudioSystem.getAudioInputStream(archivoSonido);
+					clip  = AudioSystem.getClip();
+			    	clip.open(audio);
+				} catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			btnPlay.setVisible(false);
+			btnStop.setVisible(true);
+			play();
+		} else { 
+			btnPlay.setVisible(true);
+			btnStop.setVisible(false);
+			stop();
+		}
     }
-
     private void BotonesPlaylist() {
-        int[] playListButtonX = { 70, 210, 350, 490, 630, 770, 910, 1050 };
+        int[] playListButtonX = { 20, 160, 300, 440, 580, 720, 860, 1000 };
         num = dao.sacarNumeroDePlayList();
         plays = new ArrayList<>();
-        for (int i = numListPlay; i < num; i++) {
+        for (int i = 0; i < num; i++) {
             Playlist play = dao.sacarPlaylist(i+1);
             plays.add(play);
         }
         
-        for (int i = numListPlay; i < Math.min(numPlay, 7); i++) {
-        	JLabel lblLista = null;
+        for (int i = 0; i < Math.min(numPlay, 8); i++) {
+            JLabel lblLista;
             if (i < plays.size()) {
+                btnFotoPlay = CrearBoton("", plays.get(i).getFotoPlaylist(), playListButtonX[i], 0);
+                panelPlay.add(btnFotoPlay);
                 Playlist play = plays.get(i);
-                btnFotoPlay = CrearBoton("", plays.get(i).getFotoPlaylist(), playListButtonX[i], 200);
-                btnFotoPlay.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        // Acción al presionar el botón
-                        menuPlay(play);
-                    }
-                });
-                lblLista = new JLabel(plays.get(i).getNombrePlaylist());      	
+                btnFotoPlay.addActionListener(this);
 
+                lblLista = new JLabel(plays.get(i).getNombrePlaylist());
             } else {
                 btnFotoPlay = CrearBoton("", "", playListButtonX[i], 200);
                 lblLista = new JLabel("Nombre Playlist");
-
             }
-            contentPanel.add(btnFotoPlay);
-
             lblLista.setFont(new Font("Calibri", Font.PLAIN, 17));
             lblLista.setHorizontalAlignment(SwingConstants.CENTER);
-            lblLista.setBounds(playListButtonX[i]-25, 305, 150, 32);
+            lblLista.setBounds(playListButtonX[i]-25, 103, 150, 32);
             lblLista.setForeground(Color.WHITE);
-            contentPanel.add(lblLista);
+            panelPlay.add(lblLista);
         }
     }
-    
+    private void BotonesAlbum() {
+    	int[] albumButtonX = { 20, 160, 300, 440, 580, 720, 860, 1000 };        
+    	num = dao.sacarNumeroDeAlbum();
+        albums = new ArrayList<>();
+        for (int i = 0; i < num; i++) {
+            Album album = dao.sacarAlbum(i+1);
+            albums.add(album);
+        }
+        
+        for (int i = 0; i < Math.min(numAlbum, 8); i++) {
+            JLabel lblAlbum;
+            if (i < albums.size()) {
+            	btnFotoAlbum = CrearBoton("", albums.get(i).getFotoAlbum(), albumButtonX[i], 0);
+            	panelAlbum.add(btnFotoAlbum);
+            	Album album = albums.get(i);
+                btnFotoAlbum.addActionListener(this);
+
+                lblAlbum = new JLabel(albums.get(i).getNombreAlbum());
+            } else {
+            	btnFotoAlbum = CrearBoton("", "", albumButtonX[i], 430);
+                lblAlbum = new JLabel("Nombre Album");
+            }
+            lblAlbum.setFont(new Font("Calibri", Font.PLAIN, 17));
+            lblAlbum.setHorizontalAlignment(SwingConstants.CENTER);
+            lblAlbum.setBounds(albumButtonX[i]-25, 103, 150, 32);
+            lblAlbum.setForeground(Color.WHITE);
+            panelAlbum.add(lblAlbum);
+        }
+    }
+       
+      
     private void LimpiarAlbumes () {
     	for (Component component : contentPanel.getComponents()) {
             if (component instanceof JPanel) {
@@ -300,42 +380,7 @@ public class VPrincipal extends JDialog implements ActionListener {
         contentPanel.revalidate();
         contentPanel.repaint();
     }
-    private void BotonesAlbum() {
-    	int[] albumButtonX = { 70, 212, 350, 490, 630, 770, 910, 1050 };        
-    	num = dao.sacarNumeroDeAlbum();
-        albums = new ArrayList<>();
-        for (int i = numListAlbum; i < num; i++) {
-            Album album = dao.sacarAlbum(i+1);
-            albums.add(album);
-        }
-        
-        for (int i = numListAlbum; i < Math.min(numAlbum, 7); i++) {
-            JLabel lblAlbum;
-            if (i < albums.size()) {
-            	Album album = albums.get(i);
-            	btnFotoAlbum = CrearBoton("", albums.get(i).getFotoAlbum(), albumButtonX[i], 445);
-                btnFotoAlbum.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        // Acción que deseas realizar para este botón
-                        menuAlbum(album);
-                    }
-                });
-
-                lblAlbum = new JLabel(albums.get(i).getNombreAlbum());
-            } else {
-            	btnFotoAlbum = CrearBoton("", "", albumButtonX[i], 418);
-                lblAlbum = new JLabel("Nombre Album");
-            }
-            panelAlbum.add(btnFotoAlbum);
-            lblAlbum.setFont(new Font("Calibri", Font.PLAIN, 17));
-            lblAlbum.setHorizontalAlignment(SwingConstants.CENTER);
-            lblAlbum.setBounds(albumButtonX[i]-25, 550, 150, 32);
-            lblAlbum.setForeground(Color.WHITE);
-            panelAlbum.add(lblAlbum);
-        }
-    }
-        
+    
     protected void escucharCancion() {
         Cancion can = new Cancion();
         String nombre = list.getSelectedValue().toString();
@@ -348,9 +393,32 @@ public class VPrincipal extends JDialog implements ActionListener {
             }
         }
         this.dispose();
-		VentanaPlay play = new VentanaPlay(this, can, true, dao);
+		VentanaPlay play = new VentanaPlay(this, can, nombre, true, dao);
 		play.setVisible(true);
     }
+    
+    protected void stop() {
+		// TODO Auto-generated method stub
+		if (clip != null && clip.isRunning()) {
+            clip.stop();
+            num = 0;
+	       	btnPlay.setVisible(true);
+	       	btnStop.setVisible(false);
+	        pos = clip.getFramePosition();
+	        play = false;
+		}
+	}
+	public void play() {
+		// TODO Auto-generated method stub
+		if (num == 0) {
+			clip.setFramePosition(pos);
+	        clip.start();
+	        num++;
+	        btnPlay.setVisible(false);
+	        btnStop.setVisible(true);	
+	        play = true;
+		}
+	}
 
     private JButton CrearBoton(String text, String imagePath, int x, int y) {
         JButton button = new JButton("");
@@ -371,16 +439,27 @@ public class VPrincipal extends JDialog implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == btnLogo) {
+        if (e.getSource().equals(btnLogo)) {
             irCerrar_Sesion();
         }
+        if(e.getSource().equals(btnPlay)) {
+    		play();	
+    	}
+    	if(e.getSource().equals(btnStop)) {
+    		stop();	
+    	}
+    	if(e.getSource().equals(btnFotoPlay)) {
+    		menuPlay(playlist);
+    	}
+    	if(e.getSource().equals(btnFotoAlbum)) {
+    		menuAlbum(album);
+    	}
     }
     
     private void cargarLista() {
 		// TODO Auto-generated method stub
 		canciones = dao.sacarCanciones();
 		DefaultListModel<String> listModel = new DefaultListModel<>();
-		ArrayList<Cancion> cancion = new ArrayList<Cancion> ();
 		
 		//introducir primero los que empiezen igual
 		for (Cancion can : canciones) {
