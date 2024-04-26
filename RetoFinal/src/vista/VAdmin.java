@@ -7,10 +7,14 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 
 public class VAdmin extends JDialog implements ActionListener{
 
@@ -56,6 +60,19 @@ public class VAdmin extends JDialog implements ActionListener{
 		bntModificar.setBounds(483, 254, 323, 123);
 		bntModificar.addActionListener(this);
 		contentPanel.add(bntModificar);
+		
+		JLabel fondo = new JLabel("") {
+			protected void paintComponent(Graphics g) {
+				super.paintComponent(g);
+				Graphics2D g2d = (Graphics2D) g.create();
+				g2d.setPaint(new GradientPaint(0, 0, new Color(73, 197, 250), 0, getHeight(), new Color(78, 78, 78)));
+				g2d.fillRect(0, 0, getWidth(), getHeight());
+				g2d.dispose();
+			}
+		};
+		fondo.setBounds(0, 0, 1256, 724);
+		contentPanel.add(fondo);
+		
 	}
 
 	@Override

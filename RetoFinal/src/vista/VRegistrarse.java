@@ -13,12 +13,16 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import java.awt.Font;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JTextField;
 import java.awt.Color;
 import javax.swing.ImageIcon;
+import javax.swing.SwingConstants;
 
 public class VRegistrarse extends JDialog implements ActionListener{
 
@@ -35,6 +39,7 @@ public class VRegistrarse extends JDialog implements ActionListener{
 	private JLabel lblLogo;
 	private Dao dao;
 	private JLabel lblNewLabel;
+	private JButton btnLogo;
 
 	/**
 	 * Create the dialog.
@@ -44,109 +49,120 @@ public class VRegistrarse extends JDialog implements ActionListener{
 	public VRegistrarse(Inicio_Sesion inicio_Sesion, boolean modal, Dao dao) {
 		super(inicio_Sesion);
 		this.dao = dao;
-		setBackground(new Color(64, 128, 128));
+		setBackground(new Color(78, 78, 78));
 		setModal(modal);
 		
 		setBounds(100, 100, 1259, 749);
 		getContentPane().setLayout(new BorderLayout());
-		contentPanel.setBackground(new Color(64, 128, 128));
+		contentPanel.setBackground(new Color(78, 78, 78));
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(null);
 		
 		JLabel lbTitulo = new JLabel("REGISTRAR USUARIO");
+		lbTitulo.setBackground(new Color(0, 128, 255));
+		lbTitulo.setHorizontalAlignment(SwingConstants.CENTER);
+		lbTitulo.setForeground(new Color(75, 75, 75));
 		lbTitulo.setFont(new Font("Stencil", Font.PLAIN, 87));
-		lbTitulo.setBounds(235, 10, 891, 105);
+		lbTitulo.setBounds(10, 10, 1225, 105);
 		contentPanel.add(lbTitulo);
 		
 		JLabel lbDni = new JLabel("DNI:");
-		lbDni.setFont(new Font("Eras Light ITC", Font.PLAIN, 52));
-		lbDni.setBounds(83, 136, 101, 59);
+		lbDni.setForeground(new Color(255, 255, 255));
+		lbDni.setFont(new Font("Eras Light ITC", Font.PLAIN, 40));
+		lbDni.setBounds(83, 136, 208, 46);
 		contentPanel.add(lbDni);
 		
 		JLabel lblNombre = new JLabel("Nombre:");
-		lblNombre.setFont(new Font("Eras Light ITC", Font.PLAIN, 52));
-		lblNombre.setBounds(83, 205, 193, 59);
+		lblNombre.setForeground(new Color(255, 255, 255));
+		lblNombre.setFont(new Font("Eras Light ITC", Font.PLAIN, 40));
+		lblNombre.setBounds(83, 206, 208, 46);
 		contentPanel.add(lblNombre);
 		
 		JLabel lblApellido = new JLabel("Apellido:");
-		lblApellido.setFont(new Font("Eras Light ITC", Font.PLAIN, 52));
-		lblApellido.setBounds(83, 280, 193, 59);
+		lblApellido.setForeground(new Color(255, 255, 255));
+		lblApellido.setFont(new Font("Eras Light ITC", Font.PLAIN, 40));
+		lblApellido.setBounds(83, 276, 208, 46);
 		contentPanel.add(lblApellido);
 		
 		JLabel lblPais = new JLabel("Pais:");
-		lblPais.setFont(new Font("Eras Light ITC", Font.PLAIN, 52));
-		lblPais.setBounds(83, 361, 101, 59);
+		lblPais.setForeground(new Color(255, 255, 255));
+		lblPais.setFont(new Font("Eras Light ITC", Font.PLAIN, 40));
+		lblPais.setBounds(83, 346, 208, 46);
 		contentPanel.add(lblPais);
 		
 		JLabel lblEdad = new JLabel("Edad:");
-		lblEdad.setFont(new Font("Eras Light ITC", Font.PLAIN, 52));
-		lblEdad.setBounds(83, 439, 123, 59);
+		lblEdad.setForeground(new Color(255, 255, 255));
+		lblEdad.setFont(new Font("Eras Light ITC", Font.PLAIN, 40));
+		lblEdad.setBounds(83, 416, 208, 46);
 		contentPanel.add(lblEdad);
 		
-		JLabel lblNombreUsuario = new JLabel("Nombre usuario:");
-		lblNombreUsuario.setFont(new Font("Eras Light ITC", Font.PLAIN, 52));
-		lblNombreUsuario.setBounds(69, 514, 364, 59);
+		JLabel lblNombreUsuario = new JLabel("Usuario");
+		lblNombreUsuario.setForeground(new Color(255, 255, 255));
+		lblNombreUsuario.setFont(new Font("Eras Light ITC", Font.PLAIN, 40));
+		lblNombreUsuario.setBounds(83, 486, 208, 46);
 		contentPanel.add(lblNombreUsuario);
 		
 		JLabel lblContraseña = new JLabel("Contraseña:");
-		lblContraseña.setFont(new Font("Eras Light ITC", Font.PLAIN, 52));
-		lblContraseña.setBounds(83, 593, 304, 59);
+		lblContraseña.setForeground(new Color(255, 255, 255));
+		lblContraseña.setFont(new Font("Eras Light ITC", Font.PLAIN, 40));
+		lblContraseña.setBounds(83, 556, 208, 46);
 		contentPanel.add(lblContraseña);
 		
 		tFDni = new JTextField();
-		tFDni.setBackground(new Color(192, 192, 192));
+		tFDni.setBackground(new Color(255, 255, 255));
 		tFDni.setFont(new Font("Tahoma", Font.PLAIN, 43));
-		tFDni.setBounds(329, 136, 480, 59);
+		tFDni.setBounds(329, 136, 480, 46);
 		contentPanel.add(tFDni);
 		tFDni.setColumns(10);
 		
 		tFNombre = new JTextField();
-		tFNombre.setBackground(new Color(192, 192, 192));
+		tFNombre.setBackground(new Color(255, 255, 255));
 		tFNombre.setFont(new Font("Tahoma", Font.PLAIN, 43));
 		tFNombre.setColumns(10);
-		tFNombre.setBounds(329, 205, 480, 59);
+		tFNombre.setBounds(329, 206, 480, 46);
 		contentPanel.add(tFNombre);
 		
 		tFApellido = new JTextField();
-		tFApellido.setBackground(new Color(192, 192, 192));
+		tFApellido.setBackground(new Color(255, 255, 255));
 		tFApellido.setFont(new Font("Tahoma", Font.PLAIN, 43));
 		tFApellido.setColumns(10);
-		tFApellido.setBounds(329, 280, 480, 59);
+		tFApellido.setBounds(329, 276, 480, 46);
 		contentPanel.add(tFApellido);
 		
 		tFPais = new JTextField();
-		tFPais.setBackground(new Color(192, 192, 192));
+		tFPais.setBackground(new Color(255, 255, 255));
 		tFPais.setFont(new Font("Tahoma", Font.PLAIN, 43));
 		tFPais.setColumns(10);
-		tFPais.setBounds(329, 361, 480, 59);
+		tFPais.setBounds(329, 346, 480, 46);
 		contentPanel.add(tFPais);
 		
 		tFEdad = new JTextField();
-		tFEdad.setBackground(new Color(192, 192, 192));
+		tFEdad.setBackground(new Color(255, 255, 255));
 		tFEdad.setFont(new Font("Tahoma", Font.PLAIN, 43));
 		tFEdad.setColumns(10);
-		tFEdad.setBounds(329, 439, 480, 59);
+		tFEdad.setBounds(329, 416, 480, 46);
 		contentPanel.add(tFEdad);
 		
 		tFNombreUsuario = new JTextField();
-		tFNombreUsuario.setBackground(new Color(192, 192, 192));
+		tFNombreUsuario.setBackground(new Color(255, 255, 255));
 		tFNombreUsuario.setFont(new Font("Tahoma", Font.PLAIN, 43));
 		tFNombreUsuario.setColumns(10);
-		tFNombreUsuario.setBounds(443, 514, 366, 59);
+		tFNombreUsuario.setBounds(329, 486, 480, 46);
 		contentPanel.add(tFNombreUsuario);
 		
 		tFContraseña = new JTextField();
-		tFContraseña.setBackground(new Color(192, 192, 192));
+		tFContraseña.setBackground(new Color(255, 255, 255));
 		tFContraseña.setFont(new Font("Tahoma", Font.PLAIN, 43));
 		tFContraseña.setColumns(10);
-		tFContraseña.setBounds(350, 593, 459, 59);
+		tFContraseña.setBounds(329, 556, 480, 46);
 		contentPanel.add(tFContraseña);
 		
 		btnRegistrar = new JButton("Registrar");
+		btnRegistrar.setForeground(new Color(255, 255, 255));
 		btnRegistrar.setBackground(new Color(64, 128, 128));
 		btnRegistrar.setFont(new Font("Imprint MT Shadow", Font.BOLD, 26));
-		btnRegistrar.setBounds(1052, 617, 183, 53);
+		btnRegistrar.setBounds(1012, 549, 183, 53);
 		btnRegistrar.setOpaque(false);
 		btnRegistrar.setBorderPainted(false);
 		btnRegistrar.setFocusable(false);
@@ -154,9 +170,10 @@ public class VRegistrarse extends JDialog implements ActionListener{
 		btnRegistrar.addActionListener(this);
 		
 		btnVolver = new JButton("Volver");
+		btnVolver.setForeground(new Color(255, 255, 255));
 		btnVolver.setBackground(new Color(64, 128, 128));
 		btnVolver.setFont(new Font("Imprint MT Shadow", Font.BOLD, 26));
-		btnVolver.setBounds(845, 617, 183, 53);
+		btnVolver.setBounds(819, 549, 183, 53);
 		btnVolver.setOpaque(false);
 		btnVolver.setBorderPainted(false);
 		btnVolver.setFocusable(false);
@@ -167,11 +184,36 @@ public class VRegistrarse extends JDialog implements ActionListener{
 		lblLogo.setBounds(1181, 10, 56, 75);
 		contentPanel.add(lblLogo);
 		
-		lblNewLabel = new JLabel("");
-		lblNewLabel.setIcon(new ImageIcon("..\\RetoFinal\\Img\\fondo1.gif"));
-		lblNewLabel.setBounds(0, 0, 1259, 749);
+		lblNewLabel = new JLabel("© 2024 BeatDam Application. All rights reserved. Created by Asier Del Campo, Guillermo Flecha, Erlantz Rey, Andoni García.");
+		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewLabel.setForeground(Color.LIGHT_GRAY);
+		lblNewLabel.setFont(new Font("Eras Light ITC", Font.PLAIN, 12));
+		lblNewLabel.setBounds(10, 689, 1225, 13);
 		contentPanel.add(lblNewLabel);
+		
+		btnLogo = new JButton("");
+		btnLogo.setIcon(new ImageIcon("C:\\Users\\1dam\\Desktop\\RetoFinal\\Img\\logoPequeña.png"));
+		btnLogo.setOpaque(false);
+		btnLogo.setForeground(new Color(64, 128, 128));
+		btnLogo.setFocusable(false);
+		btnLogo.setBorderPainted(false);
+		btnLogo.setBackground(new Color(64, 128, 128));
+		btnLogo.setBounds(1181, 10, 56, 75);
+		contentPanel.add(btnLogo);
 		btnVolver.addActionListener(this);
+		
+		JLabel fondo = new JLabel("") {
+			protected void paintComponent(Graphics g) {
+				super.paintComponent(g);
+				Graphics2D g2d = (Graphics2D) g.create();
+				g2d.setPaint(new GradientPaint(0, 0, new Color(73, 197, 250), 0, getHeight(), new Color(78, 78, 78)));
+				g2d.fillRect(0, 0, getWidth(), getHeight());
+				g2d.dispose();
+			}
+		};
+		fondo.setBounds(0, 0, 1256, 724);
+		contentPanel.add(fondo);
+
 		
 		
 	}

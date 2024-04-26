@@ -8,11 +8,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-
 import modelo.Album;
+import modelo.Artista;
 import modelo.Cancion;
+import modelo.Estilo;
 import modelo.Playlist;
 import modelo.Usuario;
 
@@ -36,10 +38,23 @@ public class DaoImplementacion implements Dao{
 	
 	//consultas canciones
 	private final String SACAR_CANCIONES = "select * from Cancion";
+	private final String BORRAR_CANCIONES = "delete from Cancion where codCancion=?";
+	private final String MODIFICAR_CANCIONES = "update cancion set  Duracion = ? , nombreCancion = ?, Audio = ?,codAlbum = ? where codCancion=?";
+	private final String INSERT_CANCIONES =  "insert into cancion(codCancion,Duracion,nombreCancion, Audio,codAlbum) values (?,?,?,?,?)";
+	private final String INSERT_CANTA =  "insert into canta(dni,codCancion) values (?,?)";
+	private final String BORRAR_CANTA =  "delete from canta where codCancion=?";
 	private final String CANCIONES_PLAYLIST = "select c.* from cancion c, pertenece p where c.codCancion=p.codCancion and p.codPlayList = ?";
 	private final String TODAS_PLAYLIST = "select * from playlist where codPlayList = ?";
 	private final String TODAS_ALBUM = "select * from album where codAlbum = ?";
 	private final String SACAR_FOTO = "select fotoAlbum from Album where codAlbum = (select codAlbum from Cancion where codAlbum=?)";
+	
+	//CONSULTA ALBUM
+	private final String SACAR_ALBUM = "select * from album where codAlbum = ?";
+	private final String SACAR_ALBUMES = "select * from album ";
+	
+	//consultas artista
+	private final String SACAR_ARTISTA_CANCION = "select a.* from Artista a , Canta c where a.dni=c.dni and codCancion=?";
+	private final String SACAR_ARTISTAS = "select * from Artista ";
 	
 	
 	//abrir la conexion con la base de datos
@@ -134,7 +149,6 @@ public class DaoImplementacion implements Dao{
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-
 		}
 
 	}
@@ -169,6 +183,133 @@ public class DaoImplementacion implements Dao{
 		
 	}
 	
+	//Añadir nuevos canciones la base de datos
+	public void añadirCancion(int cod, int duracion, String nombreCancion, String audio, int codAlbum){
+		this.openConnection();
+		try {
+			stmt = con.prepareStatement(INSERT_CANCIONES);
+			stmt.setInt(1, cod);
+			stmt.setInt(2, duracion);
+			stmt.setString(3, nombreCancion);
+			stmt.setString(4, audio);
+			stmt.setInt(5, codAlbum);					
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+				
+	}
+
+
+	//Amodificar los datos de una cancion la base de datos
+	public void modificarCancion(int cod,int duracion, String nombreCancion, String audio,int codAlbum ){
+					
+		this.openConnection();
+					
+		try {
+
+			stmt = con.prepareStatement(MODIFICAR_CANCIONES);
+						
+			stmt.setInt(1, duracion);
+			stmt.setString(2, nombreCancion);
+			stmt.setString(3, audio);
+			stmt.setInt(4, codAlbum);
+			stmt.setInt(5, cod);
+						
+						
+			stmt.executeUpdate();
+						
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+					
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+			
+	}
+	public void borrarCancion(int cod){		
+		this.openConnection();		
+		try {
+			stmt = con.prepareStatement(BORRAR_CANCIONES);
+			stmt.setInt(1, cod);	
+			stmt.executeUpdate();	
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+				
+	}
+			
+
+//Añadir nuevos usuarios a la base de datos
+	public void insertarCanta(String dni,int codCancion){
+		
+		this.openConnection();
+		
+		try {
+
+			stmt = con.prepareStatement(INSERT_CANTA);
+			stmt.setString(1, dni);
+			stmt.setInt(2, codCancion);		
+			
+			stmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+					
+	}
+				
+				
+	//Añadir nuevos usuarios a la base de datos
+	public void eliminarCanta(int codCancion){
+		this.openConnection();			
+		try {
+			stmt = con.prepareStatement(BORRAR_CANTA);
+			stmt.setInt(1, codCancion);					
+			stmt.executeUpdate();
+						
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+					
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+					
+	}
+		
 	
 	// saca las canciones de una playlist
 	public ArrayList<Cancion> sacarCancionesPlaylist(int codPlaylist) {
@@ -190,7 +331,6 @@ public class DaoImplementacion implements Dao{
 				ca.setNombreCancion(rs.getString("nombreCancion"));
 				ca.setDuracion(rs.getInt("Duracion"));
 				ca.setAudio(rs.getString("Audio"));
-
 				canciones.add(ca);
 			}
 
@@ -236,28 +376,117 @@ public class DaoImplementacion implements Dao{
 		}
 		return foto;
 	}
-
-	@Override
-	public ArrayList<Cancion> sacarCanciones(String nombre, String contraseña) {
+	
+	public ArrayList<Artista> artistasPorCancion(int cod) {
 		// TODO Auto-generated method stub
-		return null;
-	}
-	public int sacarNumeroDePlayList() {
-		int num = 0;
+		ArrayList<Artista> artistas = new  ArrayList<>();
+		Artista art ;
+
+		this.openConnection();
+
 		try {
-			this.openConnection();
-			stmt = con.prepareStatement(NUMERO_PLAYLIST);
+
+			stmt = con.prepareStatement(SACAR_ARTISTA_CANCION);
+			stmt.setInt(1, cod);
 			ResultSet rs = stmt.executeQuery();
-			if (rs.next()) {
-	            num = rs.getInt(1); // Utiliza el índice de la columna en lugar del nombre
+
+			while (rs.next()) {
+				art = new Artista();
+				
+				art.setDni(rs.getString("dni"));
+				art.setNombreArtistico(rs.getString("NombreArtistico"));
+				art.setCantaAutor(rs.getBoolean("CantaAutor"));
+				art.setEstilo(Estilo.valueOf(rs.getString("Estilo")));
+				artistas.add(art);
 			}
-			
+
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return num;
-		
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return artistas;
+	}
+	
+	@Override
+	public ArrayList<Artista> sacarartistas() {
+		// TODO Auto-generated method stub
+		ArrayList<Artista> artistas = new  ArrayList<>();
+		Artista art ;
+
+		this.openConnection();
+
+		try {
+
+			stmt = con.prepareStatement(SACAR_ARTISTAS);
+			ResultSet rs = stmt.executeQuery();
+
+			while (rs.next()) {
+				art = new Artista();
+				art.setDni(rs.getString("Dni"));
+				art.setNombreArtistico(rs.getString("NombreArtistico"));
+				art.setCantaAutor(rs.getBoolean("CantaAutor"));
+				art.setEstilo(Estilo.valueOf(rs.getString("Estilo")));
+				artistas.add(art);
+			}
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+		return artistas;
+	}
+	
+
+	@Override
+	public ArrayList<Cancion> sacarCanciones() {
+		// TODO Auto-generated method stub
+		ArrayList<Cancion> canciones = new ArrayList<Cancion>();
+		Cancion ca ;
+
+		this.openConnection();
+
+		try {
+
+			stmt = con.prepareStatement(SACAR_CANCIONES);
+			
+			ResultSet rs = stmt.executeQuery();
+
+			while (rs.next()) {
+				ca = new Cancion();
+				ca.setCodCancion(rs.getInt("codCancion"));
+				ca.setNombreCancion(rs.getString("nombreCancion"));
+				ca.setDuracion(rs.getInt("Duracion"));
+				ca.setAudio(rs.getString("Audio"));
+				ca.setCodAlbum(rs.getInt("codAlbum"));
+				
+				canciones.add(ca);
+			}
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+		return canciones;
 	}
 	
 	@Override
@@ -329,6 +558,30 @@ public class DaoImplementacion implements Dao{
 		return NumAlbum;
 	}
 	
+	public int sacarNumeroDePlayList() {
+		int num = 0;
+		try {
+			this.openConnection();
+			stmt = con.prepareStatement(NUMERO_PLAYLIST);
+			ResultSet rs = stmt.executeQuery();
+			if (rs.next()) {
+	            num = rs.getInt(1); // Utiliza el índice de la columna en lugar del nombre
+			}
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return num;
+	}
+	
 	public int sacarNumeroDeAlbum() {
 		int num = 0;
 		try {
@@ -343,6 +596,13 @@ public class DaoImplementacion implements Dao{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
 		return num;
 		
 	}
@@ -405,24 +665,26 @@ public class DaoImplementacion implements Dao{
 		return play;
 	}
 	
+	@Override
 	public Album sacarAlbum(int cod) {
-
-		Album album = null;
-
+		// TODO Auto-generated method stub
+		Album album = new Album();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd"); 
 		this.openConnection();
 
 		try {
-			stmt = con.prepareStatement(TODAS_ALBUM);
+
+			stmt = con.prepareStatement(SACAR_ALBUM);
 			stmt.setInt(1, cod);
 			ResultSet rs = stmt.executeQuery();
 			
-			while (rs.next()) {
-				album = new Album();
+			if (rs.next()) {
 				album.setCodAlbum(rs.getInt("codAlbum"));
 				album.setNombreAlbum(rs.getString("nombreAlbum"));
 				album.setFotoAlbum(rs.getString("fotoAlbum"));
 				album.setFechaLan(rs.getDate("fechaLan"));
 			}
+			
 
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -437,13 +699,47 @@ public class DaoImplementacion implements Dao{
 		}
 		return album;
 	}
-
-
+	
+	
 	@Override
-	public List<Playlist> getAllPlaylists() {
+	public ArrayList<Album> sacarAlbumes() {
 		// TODO Auto-generated method stub
-		return null;
+		ArrayList<Album> albumes = new ArrayList<>();
+		Album album ;
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd"); 
+		this.openConnection();
+
+		try {
+
+			stmt = con.prepareStatement(SACAR_ALBUMES);
+			ResultSet rs = stmt.executeQuery();
+			
+			while (rs.next()) {
+				album = new Album();
+				album.setCodAlbum(rs.getInt("codAlbum"));
+				album.setNombreAlbum(rs.getString("nombreAlbum"));
+				album.setFotoAlbum(rs.getString("fotoAlbum"));
+				album.setFechaLan(rs.getDate("fechaLan"));
+				albumes.add(album);
+			}
+			
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+		return albumes;
 	}
 
+
+	
+	
 	
 }

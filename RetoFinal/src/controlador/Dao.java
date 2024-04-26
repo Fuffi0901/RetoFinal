@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import excepciones.CreateException;
 import modelo.Album;
+import modelo.Artista;
 import modelo.Cancion;
 import modelo.Persona;
 import modelo.Playlist;
@@ -17,21 +18,31 @@ public interface Dao {
 	
 	public void registrarUsuario(String dni, String nombreU, String contraseña );
 	
-	public ArrayList<Cancion> sacarCanciones(String nombre, String contraseña);
+	public ArrayList<Cancion> sacarCanciones();
+	public void borrarCancion(int cod);
+	public void modificarCancion(int cod,int duracion, String nombreCancion, String audio,int codAlbum );
 	
 	public ArrayList<Cancion> sacarCancionesPlaylist(int codPlaylist);
 	
 	public String sacarFotoCancion(int cod);
+	public void insertarCanta(String dni,int codCancion);
+	public void eliminarCanta(int codCancion);
+	public void añadirCancion(int cod,int duracion, String nombreCancion, String audio,int codAlbum );
+
 		
 	public int sacarNumeroDePlayList();
 	
 	public Playlist sacarPlaylist(int cod);
 
 	public Album sacarAlbum(int cod);
+	public ArrayList<Album> sacarAlbumes();
 	
-	public List<Playlist> getAllPlaylists();
 	
 	public int sacarNumeroDeAlbum();
+	
+	public ArrayList<Artista> artistasPorCancion(int cod);
+	
+	public ArrayList<Artista> sacarartistas();
 	
 	public void crearAlbum(int numAlbum, String fecha, String foto, String nombre);
 	
