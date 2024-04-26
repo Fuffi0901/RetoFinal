@@ -6,10 +6,16 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -37,7 +43,6 @@ public class VverAdmin extends JDialog implements ActionListener{
 
 	private final JPanel contentPanel = new JPanel();
 	private Dao dao;
-	private JTextField textDuracion;
 	private JTextField textNombre;
 	private JTable table;
 	private JComboBox comboAlbumC;
@@ -47,6 +52,7 @@ public class VverAdmin extends JDialog implements ActionListener{
 	private JComboBox comboCanciones;
 	private JButton btnEliminar;
 	private JButton btnModificar;
+	private JButton btnModificarA;
 	private JButton btnCancion;
 	private JTabbedPane tabbedPane;
 	private JButton btnVolver;
@@ -112,26 +118,15 @@ public class VverAdmin extends JDialog implements ActionListener{
 		lblNewLabel.setBounds(36, 41, 451, 61);
 		PadminCancion.add(lblNewLabel);
 		
-		JLabel lblNewLabel_1 = new JLabel("Duracion  :");
-		lblNewLabel_1.setForeground(new Color(255, 255, 255));
-		lblNewLabel_1.setFont(new Font("Arial", Font.PLAIN, 27));
-		lblNewLabel_1.setBounds(157, 160, 197, 51);
-		PadminCancion.add(lblNewLabel_1);
-		
-		textDuracion = new JTextField();
-		textDuracion.setBounds(157, 221, 278, 41);
-		PadminCancion.add(textDuracion);
-		textDuracion.setColumns(10);
-		
 		JLabel lblNewLabel_1_1 = new JLabel("Nombre  :");
 		lblNewLabel_1_1.setForeground(Color.WHITE);
 		lblNewLabel_1_1.setFont(new Font("Arial", Font.PLAIN, 27));
-		lblNewLabel_1_1.setBounds(715, 166, 197, 51);
+		lblNewLabel_1_1.setBounds(159, 137, 197, 51);
 		PadminCancion.add(lblNewLabel_1_1);
 		
 		textNombre = new JTextField();
 		textNombre.setColumns(10);
-		textNombre.setBounds(710, 219, 278, 46);
+		textNombre.setBounds(157, 202, 278, 46);
 		PadminCancion.add(textNombre);
 		
 		JLabel lblNewLabel_1_1_1 = new JLabel("Album  :");
@@ -143,7 +138,7 @@ public class VverAdmin extends JDialog implements ActionListener{
 		JLabel lblNewLabel_1_1_1_1 = new JLabel("Artistas  :");
 		lblNewLabel_1_1_1_1.setForeground(Color.WHITE);
 		lblNewLabel_1_1_1_1.setFont(new Font("Arial", Font.PLAIN, 27));
-		lblNewLabel_1_1_1_1.setBounds(715, 316, 197, 51);
+		lblNewLabel_1_1_1_1.setBounds(666, 137, 197, 51);
 		PadminCancion.add(lblNewLabel_1_1_1_1);
 		
 		table = new JTable();
@@ -158,7 +153,7 @@ public class VverAdmin extends JDialog implements ActionListener{
 		PadminCancion.add(table);
 		
 		JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setBounds(715, 377, 407, 139);
+        scrollPane.setBounds(652, 202, 407, 139);
         PadminCancion.add(scrollPane);
         
         comboAlbumC = new JComboBox();
@@ -257,6 +252,10 @@ public class VverAdmin extends JDialog implements ActionListener{
 		btnIntroducir.addActionListener(this);
 		btnBorrar.addActionListener(this);
 	
+		btnModificarA = new JButton("modificar");
+		btnModificarA.setBounds(278, 583, 85, 21);
+		palbum.add(btnModificarA);
+		btnModificar.addActionListener(this);
 		
 		cargarComboAlbum();
 		cargarComboCancion();
@@ -290,6 +289,12 @@ public class VverAdmin extends JDialog implements ActionListener{
 		if(e.getSource().equals(btnIntroducir)) {
 			meterAlbum();
 		}
+		if(e.getSource().equals(comboAlbumA)) {
+			cargarDatos();
+		}
+		if(e.getSource().equals(btnModificarA)) {
+			modificarAlbum();
+		}
 		if(e.getSource().equals(btnBorrar)) {
 			borrarAlbum();
 		}
@@ -309,10 +314,12 @@ public class VverAdmin extends JDialog implements ActionListener{
 		int codCancion = dao.crearCodigoCancion();
 		String cod = comboAlbumC.getSelectedItem().toString();
 		int pos = cod.indexOf(" |");
+	
 		int codAlbum = Integer.parseInt((String) cod.subSequence(0, pos));
 		
+        
 		if(validar()) {
-			dao.añadirCancion(codCancion, Integer.parseInt(textDuracion.getText()), textNombre.getText(), textAudio.getText(),codAlbum );
+			dao.añadirCancion(codCancion, sacarDuracionC(), textNombre.getText(), textAudio.getText(),codAlbum );
 			
 			for (Artista art:cogerArtistas()) {
 				dao.insertarCanta(art.getDni(),codCancion );
@@ -324,27 +331,43 @@ public class VverAdmin extends JDialog implements ActionListener{
 	}
 	
 	
+	private int sacarDuracionC() {
+		// TODO Auto-generated method stub
+		File audioFile = new File(textAudio.getText());
+		Clip clip;
+		int durationInSeconds=0;
+		try {
+			clip = AudioSystem.getClip();
+			clip.open(AudioSystem.getAudioInputStream(audioFile));
+			long clipLengthInFrames = clip.getFrameLength();
+            float frameRate = clip.getFormat().getFrameRate();
+			durationInSeconds =(int)(clipLengthInFrames / frameRate);
+		} catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return durationInSeconds;
+	}
+
+
+
 	private void modificarCancion() {
 		// TODO Auto-generated method stub
 		cogerArtistas();
 		ArrayList<Cancion> canciones = dao.sacarCanciones();
-		String can = comboCanciones.getSelectedItem().toString();
-		int donde = can.indexOf(" |");
-		can = can.substring(0, donde);
-		String cod = comboAlbumC.getSelectedItem().toString();
-		int pos = cod.indexOf(" |");
-		int codAlbum = Integer.parseInt((String) cod.subSequence(0, pos));
+		ArrayList<Album> albumes = dao.sacarAlbumes();
+		int posi = comboAlbumC.getSelectedIndex();
+		int pos = comboCanciones.getSelectedIndex();
 		
 		if(validar()) {
-			dao.modificarCancion(Integer.parseInt(can),Integer.parseInt(textDuracion.getText()) , textNombre.getText(), textAudio.getText(),codAlbum);
-			dao.eliminarCanta(Integer.parseInt(can));
+			dao.modificarCancion(canciones.get(pos).getCodCancion(),sacarDuracionC() , textNombre.getText(), textAudio.getText(),albumes.get(posi).getCodAlbum());
+			dao.eliminarCanta(canciones.get(pos).getCodCancion());
 			for (Artista art:cogerArtistas()) {
-				dao.insertarCanta(art.getDni(),Integer.parseInt(can));
+				dao.insertarCanta(art.getDni(),canciones.get(pos).getCodCancion());
 			}
-			cargarComboCancion();
-			comboCanciones.setSelectedIndex(-1);
+			
 		}
-		
+		comboCanciones.setSelectedIndex(-1);
 	}
 	
 	
@@ -395,6 +418,42 @@ public class VverAdmin extends JDialog implements ActionListener{
 		
 	}
 	
+	private void modificarAlbum() {
+		// TODO Auto-generated method stub
+		int donde=comboAlbumA.getSelectedItem().toString().indexOf(" |");
+		this.dispose();
+		dao.modificarAlbum(comboAlbumA.getSelectedItem().toString().substring(0, donde),textNombre.getText(),textFoto.getText(),textFecha.getText());
+		JOptionPane.showMessageDialog(null, "MODIFICADO  CORRERCAMENTE");
+		
+	}
+
+	private void cargarDatosAlbum() {
+		// TODO Auto-generated method stub
+		if(comboAlbumA.getSelectedIndex()!=-1) {
+			int pos = comboAlbumA.getSelectedIndex();
+			ArrayList<Album> albumes = dao.sacarAlbumes();
+			String can = comboAlbumA.getSelectedItem().toString();
+			int donde = can.indexOf(" |");
+			can = can.substring(0, donde);
+			Album album=null;
+			for(Album a:albumes) {
+				if(a.getCodAlbum()==Integer.parseInt(can))
+					album=a;
+			}
+			btnIntroducir.setEnabled(false);		
+			textNombre.setText(albumes.get(pos).getNombreAlbum());
+			textFoto.setText(albumes.get(pos).getFotoAlbum());
+			textFecha.setText(""+(albumes.get(pos).getFechaLan()));
+			
+			
+		}else {
+			btnIntroducir.setEnabled(true);
+			textNombre.setText(null);
+			textFoto.setText(null);
+			textFecha.setText(null);
+			comboAlbumA.setSelectedIndex(-1);
+		}
+	}
 	
 	
 	private void cargarDatos() {
@@ -424,7 +483,7 @@ public class VverAdmin extends JDialog implements ActionListener{
 			btnEliminar.setEnabled(true);
 			btnModificar.setEnabled(true);
 			textAudio.setText(canciones.get(pos).getAudio());
-			textDuracion.setText(String.valueOf(canciones.get(pos).getDuracion()));
+			
 			textNombre.setText(canciones.get(pos).getNombreCancion());
 			seleccionarArtistas();		
 		}else {
@@ -432,7 +491,6 @@ public class VverAdmin extends JDialog implements ActionListener{
 			btnModificar.setEnabled(false);
 			btnCrear.setEnabled(true);
 			textAudio.setText("..\\FinalChalenge\\Audio\\");
-			textDuracion.setText(null);
 			textNombre.setText(null);
 			comboAlbumC.setSelectedIndex(-1);
 			table.clearSelection();
@@ -488,10 +546,6 @@ public class VverAdmin extends JDialog implements ActionListener{
 			JOptionPane.showMessageDialog(null, "Tienes que escoger minimo un artista","ERROR",JOptionPane.ERROR_MESSAGE);
 			bien=false;
 		}
-		if(textDuracion.getText()==null) {
-			JOptionPane.showMessageDialog(null, "Tienes que poner la duracion","ERROR",JOptionPane.ERROR_MESSAGE);
-			bien=false;
-		}
 		if(textNombre.getText()==null) {
 			JOptionPane.showMessageDialog(null, "Tienes que poner un nombre","ERROR",JOptionPane.ERROR_MESSAGE);
 			bien=false;
@@ -545,6 +599,7 @@ public class VverAdmin extends JDialog implements ActionListener{
 	
 	private void cargarComboCancion() {
 		// TODO Auto-generated method stub
+		
 		ArrayList<Cancion> canciones = dao.sacarCanciones();
 		for(Cancion c:canciones) {
 			comboCanciones.addItem(c.getCodCancion()+" | "+c.getNombreCancion());
