@@ -8,6 +8,7 @@ public class Playlist {
 	private int codPlaylist;
 	private String nombrePlaylist;
 	private String fotoPlaylist;
+	private String dni;
 	private Map <Integer, Cancion> listaCanciones;
 
 	
@@ -35,5 +36,11 @@ public class Playlist {
 	}
 	public void setListaCanciones(Map <Integer, Cancion> listaCanciones) {
 		this.listaCanciones = listaCanciones;
+	}
+	public String getDni() {
+		return dni;
+	}
+	public void setDni(String dni) {
+		this.dni = dni;
 	}
 }

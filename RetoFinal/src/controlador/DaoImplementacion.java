@@ -27,34 +27,50 @@ public class DaoImplementacion implements Dao{
 	
 	
 	//consultas usuarios
-	private final String CONSULTA_PLAYLIST = "select * from playlist where codPlayList=?";
-	private final String NUMERO_ALBUM = "select count(*) from album";
-	private final String NUMERO_PLAYLIST = "select count(*) from playlist";
 	private final String CONSULTA_USUARIO = "select * from Usuario where  Contraseina=? and NombreUsuario=?";
-	private final String CONSULTA_NUMALBUM = "select count(codAlbum) from album";
 	private final String INSERT_PERSONA =  "insert into persona(Dni,nombrePersona,apellidoPersona,pais,edad) values (?,?,?,?,?)";
 	private final String INSERT_USUARIO =  "insert into usuario(Dni,contraseina,NombreUsuario) values (?,?,?)";
-	private final String INSERT_ALBUM = "insert into album(codAlbum,nombreAlbum,fotoAlbum,fechaLan) values (?,?,?,?)";
+	
+
 	
 	//consultas canciones
 	private final String SACAR_CANCIONES = "select * from Cancion";
 	private final String BORRAR_CANCIONES = "delete from Cancion where codCancion=?";
+	private final String CODIGO_CANCION = "select crearCodigoCancion() AS cod";
 	private final String MODIFICAR_CANCIONES = "update cancion set  Duracion = ? , nombreCancion = ?, Audio = ?,codAlbum = ? where codCancion=?";
 	private final String INSERT_CANCIONES =  "insert into cancion(codCancion,Duracion,nombreCancion, Audio,codAlbum) values (?,?,?,?,?)";
 	private final String INSERT_CANTA =  "insert into canta(dni,codCancion) values (?,?)";
 	private final String BORRAR_CANTA =  "delete from canta where codCancion=?";
 	private final String CANCIONES_PLAYLIST = "select c.* from cancion c, pertenece p where c.codCancion=p.codCancion and p.codPlayList = ?";
-	private final String TODAS_PLAYLIST = "select * from playlist where codPlayList = ?";
-	private final String TODAS_ALBUM = "select * from album where codAlbum = ?";
+	
+	
 	private final String SACAR_FOTO = "select fotoAlbum from Album where codAlbum = (select codAlbum from Cancion where codAlbum=?)";
 	
+	
+	//Consulta Playlist
+	private final String INSERT_PLAYLIST = "insert into PlayList(codPlayList,nombrePlayList,fotoPlayList,dni) values(?,?,?,?)";
+	private final String CONSULTA_PLAYLIST = "select * from playlist where codPlayList=?";
+	private final String TODAS_PLAYLIST = "select * from playlist where codPlayList = ?";
+	private final String INSERT_PERTENECE = "insert into Pertenece(codPlayList,dni) values(?,?)";
+	private final String CODIGO_PALYLIST = "select crearCodigoPlaylist AS cod";
+	private final String NUMERO_PLAYLIST = "select count(*) from playlist";
+
+
 	//CONSULTA ALBUM
+	private final String NUMERO_ALBUM = "select count(*) from album";
+	private final String CONSULTA_NUMALBUM = "select count(codAlbum) from album";
 	private final String SACAR_ALBUM = "select * from album where codAlbum = ?";
 	private final String SACAR_ALBUMES = "select * from album ";
+	private final String BORRAR_ALBUM = "delete from album where codAlbum=?";
+	private final String INSERT_ALBUM = "insert into album(codAlbum,nombreAlbum,fotoAlbum,fechaLan) values(?,?,?,?)";
+	private final String MODIFICAR_ALBUM = "update album set  codAlbum = ? , nombreAlbum = ?, fotoAlbum = ?,fechaLan = ? where codAlbum=?";
+	private final String CODIGO_ALBUM = "select crearCodigoCancion() AS cod";
 	
 	//consultas artista
 	private final String SACAR_ARTISTA_CANCION = "select a.* from Artista a , Canta c where a.dni=c.dni and codCancion=?";
 	private final String SACAR_ARTISTAS = "select * from Artista ";
+	private final String FUNCION_ART_CA = "select artistaPorCancion(?) AS result";
+
 	
 	
 	//abrir la conexion con la base de datos
@@ -85,6 +101,127 @@ public class DaoImplementacion implements Dao{
 			e.printStackTrace();
 		}
 	}
+	
+	public int crearCodigoCancion() {
+		int cod = 0;
+		
+		this.openConnection();
+		try {
+
+			stmt = con.prepareStatement(CODIGO_CANCION);
+			ResultSet rs = stmt.executeQuery();
+
+			if (rs.next()) {
+				cod=rs.getInt("cod");
+			}else {
+				cod=-1;
+			}
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+		return cod;
+	}
+	
+	
+	public int crearCodigoAlbum() {
+		int cod = 0;
+		
+		this.openConnection();
+		try {
+
+			stmt = con.prepareStatement(CODIGO_ALBUM);
+			ResultSet rs = stmt.executeQuery();
+
+			if (rs.next()) {
+				cod=rs.getInt("cod");
+			}else {
+				cod=-1;
+			}
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+		return cod;
+	}
+	
+	public int crearCodigoPlaylist() {
+		int cod = 0;
+		
+		this.openConnection();
+		try {
+
+			stmt = con.prepareStatement(CODIGO_ALBUM);
+			ResultSet rs = stmt.executeQuery();
+
+			if (rs.next()) {
+				cod=rs.getInt("cod");
+			}else {
+				cod=-1;
+			}
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+		return cod;
+	}
+	
+	public String funcionArtistas(int cod) {
+		String mensaje="";
+		
+		this.openConnection();
+		try {
+
+			stmt = con.prepareStatement(FUNCION_ART_CA);
+			
+			stmt.setInt(1, cod);
+			ResultSet rs = stmt.executeQuery();
+
+			if (rs.next()) {
+				mensaje=rs.getString("result");
+			}else {
+				mensaje="";
+			}
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+		return mensaje;
+	}
+	
+	
 	
 	public Usuario comprobarUsuario(String nombre, String contraseña) {
 		
@@ -310,6 +447,68 @@ public class DaoImplementacion implements Dao{
 					
 	}
 		
+	@Override
+	public void borrarAlbum(int codAlbum) {
+		// TODO Auto-generated method stub
+
+		this.openConnection();
+		
+		try {
+
+			stmt = con.prepareStatement(BORRAR_ALBUM);
+			stmt.setInt(1, codAlbum);
+			
+			
+			stmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+		
+	}
+	
+
+	@Override
+	public void modificarAlbum(String cod, String nombre, String foto, String fecha) {
+		// TODO Auto-generated method stub
+		
+		
+		this.openConnection();
+		
+		try {
+
+			stmt = con.prepareStatement(MODIFICAR_ALBUM);
+			
+			stmt.setInt(1, Integer.valueOf(cod));
+			stmt.setString(2, nombre);
+			stmt.setString(3, foto);
+			stmt.setDate(4, Date.valueOf(fecha));
+			stmt.setInt(5, Integer.valueOf(cod));
+			stmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+		
+	}		
 	
 	// saca las canciones de una playlist
 	public ArrayList<Cancion> sacarCancionesPlaylist(int codPlaylist) {
@@ -490,7 +689,47 @@ public class DaoImplementacion implements Dao{
 	}
 	
 	@Override
-	public void crearAlbum(int codAlbum, String fecha, String foto, String nombre) {
+	public ArrayList<Cancion> sacarCancionesAlbum(int cod) {
+		// TODO Auto-generated method stub
+		ArrayList<Cancion> canciones = new ArrayList<Cancion>();
+		Cancion ca ;
+
+		this.openConnection();
+
+		try {
+
+			stmt = con.prepareStatement(SACAR_CANCIONES);
+			
+			ResultSet rs = stmt.executeQuery();
+
+			while (rs.next()) {
+				ca = new Cancion();
+				ca.setCodCancion(rs.getInt("codCancion"));
+				ca.setNombreCancion(rs.getString("nombreCancion"));
+				ca.setDuracion(rs.getInt("Duracion"));
+				ca.setAudio(rs.getString("Audio"));
+				ca.setCodAlbum(rs.getInt("codAlbum"));
+				
+				canciones.add(ca);
+			}
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+		return canciones;
+	}
+	
+	
+	@Override
+	public void meterAlbum(int codAlbum, String nombre, String foto, String fecha) {
 		// TODO Auto-generated method stub
 		this.openConnection();
 
@@ -738,6 +977,95 @@ public class DaoImplementacion implements Dao{
 		return albumes;
 	}
 
+	public void insertarPlaylist(int cod,String nombre,String foto,String dni){
+		
+		this.openConnection();
+		
+		try {
+			stmt = con.prepareStatement(INSERT_PLAYLIST);
+			stmt.setInt(1, cod);
+			stmt.setString(2, nombre);
+			stmt.setString(3, foto);
+			stmt.setString(4, dni);
+			
+			stmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+		
+	}
+	
+
+	public ArrayList<Playlist> sacararPlaylists() {
+		// TODO Auto-generated method stub
+		ArrayList<Playlist> plays = new  ArrayList<>();
+		Playlist play ;
+
+		this.openConnection();
+
+		try {
+
+			stmt = con.prepareStatement(SACAR_ARTISTAS);
+			ResultSet rs = stmt.executeQuery();
+
+			while (rs.next()) {
+				play = new Playlist();
+				play.setNombrePlaylist(rs.getString("nombrePlayList"));
+				play.setFotoPlaylist(rs.getString("fotoPlayLis"));
+				play.setDni(rs.getString("dni"));
+				plays.add(play);
+			}
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+		return plays;
+	}
+	//Añadir canciones a una playlist 
+	public void insertarPertenece(int cod,String dni){
+		
+		this.openConnection();
+		
+		try {
+
+			stmt = con.prepareStatement(INSERT_PLAYLIST);
+			stmt.setInt(1, cod);
+			stmt.setString(2, dni);
+			
+			stmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+		
+	}
 
 	
 	

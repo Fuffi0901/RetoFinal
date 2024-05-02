@@ -42,7 +42,7 @@ public class Inicio_Sesion extends JFrame implements ActionListener{
 	private JLabel lblLogo;
 	private Dao dao;
 	private JLabel lblNewLabel_1;
-	private JButton btnLogo;
+	private JButton btnLogo, btnNewButton;
 
 	/**
 	 * Create the frame.
@@ -53,7 +53,7 @@ public class Inicio_Sesion extends JFrame implements ActionListener{
 	 */
 	public Inicio_Sesion (Dao dao) {
 		setTitle("BEATDAM");
-		setIconImage(Toolkit.getDefaultToolkit().getImage("C:\\Users\\1dam\\Desktop\\PGR\\3ª Eva\\RetoFinal\\Img\\logoPequeña.png"));
+		setIconImage(Toolkit.getDefaultToolkit().getImage("..\\RetoFinal\\Img\\logoPequeña.png"));
 		Pantallas(dao);
 	}
 	
@@ -176,6 +176,11 @@ public class Inicio_Sesion extends JFrame implements ActionListener{
 		};
 		fondo.setBounds(0, 0, 1256, 724);
 		contentPane.add(fondo);
+		
+		btnNewButton = new JButton("");
+		btnNewButton.setBounds(52, 40, 85, 45);
+		btnNewButton.addActionListener(this);
+		contentPane.add(btnNewButton);
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -186,7 +191,17 @@ public class Inicio_Sesion extends JFrame implements ActionListener{
 		if(e.getSource().equals(btnRegistrarse)) {
 			registrarseAplicacion();
 		}
+		if(e.getSource().equals(btnNewButton)) {
+			irAVerAdmin();
+		}
 	
+	}
+
+	private void irAVerAdmin() {
+		// TODO Auto-generated method stub
+		this.dispose();
+		VverAdmin ven = new VverAdmin(this, true, dao);
+		ven.setVisible(true);
 	}
 
 	private void abrirExtra() {

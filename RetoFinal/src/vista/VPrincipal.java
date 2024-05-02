@@ -89,7 +89,7 @@ public class VPrincipal extends JDialog implements ActionListener {
 	
 	public VPrincipal(Inicio_Sesion inicio_Sesion, boolean modal, Dao dao) {
 		super(inicio_Sesion);
-		setIconImage(Toolkit.getDefaultToolkit().getImage("..\\RetoFinal\\Img\\Real_Hasta_la_Muerte.png"));
+		setIconImage(Toolkit.getDefaultToolkit().getImage("C:\\Users\\1dam\\Desktop\\PGR\\3ª Eva\\RetoFinal\\Img\\logoPequeña.png"));
 		setModal(modal);
 		pantalla(dao);
 	}
@@ -136,13 +136,7 @@ public class VPrincipal extends JDialog implements ActionListener {
         btnSecreto.setBounds(0, 0, 1, 1);
     
         contentPanel.add(btnSecreto);
-        
-        panelAlbum = new JPanel();
-        panelAlbum.setBounds(31, 430, 1037, 143);
-        panelAlbum.setOpaque(false);
-		contentPanel.add(panelAlbum);        
-		panelAlbum.setLayout(null);
-		
+       
 		panelPlay = new JPanel();
 		panelPlay.setOpaque(false);
 		panelPlay.setBounds(31, 181, 1037, 143);
@@ -167,18 +161,12 @@ public class VPrincipal extends JDialog implements ActionListener {
                 BotonesPlaylist();
         	}
         });
-		btnSiguientePlay.setBounds(1089, 181, 100, 100);
+		btnSiguientePlay.setBounds(1089, 181, 100, 143);
 		contentPanel.add(btnSiguientePlay);
 		
 		btnSiguienteAlbum = new JButton("New button");
-		btnSiguienteAlbum.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				numListAlbum++;
-				LimpiarAlbumes();
-		        BotonesAlbum();
-			}
-		});
-		btnSiguienteAlbum.setBounds(1089, 430, 100, 100);
+		btnSiguienteAlbum.addActionListener(this);
+		btnSiguienteAlbum.setBounds(1089, 430, 100, 143);
 		contentPanel.add(btnSiguienteAlbum);
 
         scrollPane = new JScrollPane(list);
@@ -307,12 +295,20 @@ public class VPrincipal extends JDialog implements ActionListener {
 			stop();
 		}
     }
-    private void BotonesPlaylist() {
+    private void crearPanelAlbum() {
+    	 panelAlbum = new JPanel();
+         panelAlbum.setBounds(31, 430, 1037, 143);
+         panelAlbum.setOpaque(false);
+ 		 contentPanel.add(panelAlbum);        
+ 	 	 panelAlbum.setLayout(null);		
+	}
+
+	private void BotonesPlaylist() {
         int[] playListButtonX = { 20, 160, 300, 440, 580, 720, 860, 1000 };
         num = dao.sacarNumeroDePlayList();
         plays = new ArrayList<>();
         for (int i = 0; i < num; i++) {
-            Playlist play = dao.sacarPlaylist(i+1);
+            Playlist play = dao.consultaPlaylist(i+1);
             plays.add(play);
         }
         
@@ -322,8 +318,12 @@ public class VPrincipal extends JDialog implements ActionListener {
                 btnFotoPlay = CrearBoton("", plays.get(i).getFotoPlaylist(), playListButtonX[i], 0);
                 panelPlay.add(btnFotoPlay);
                 Playlist play = plays.get(i);
-                btnFotoPlay.addActionListener(this);
-
+                btnFotoPlay.addActionListener(new ActionListener() {
+	                @Override
+	            	public void actionPerformed(ActionEvent e) {
+	                    menuPlay(play); // Acción específica para este botón
+	                }
+            	});
                 lblLista = new JLabel(plays.get(i).getNombrePlaylist());
             } else {
                 btnFotoPlay = CrearBoton("", "", playListButtonX[i], 200);
@@ -337,21 +337,28 @@ public class VPrincipal extends JDialog implements ActionListener {
         }
     }
     private void BotonesAlbum() {
+    	crearPanelAlbum();
     	int[] albumButtonX = { 20, 160, 300, 440, 580, 720, 860, 1000 };        
-    	num = dao.sacarNumeroDeAlbum();
-        albums = new ArrayList<>();
-        for (int i = 0; i < num; i++) {
-            Album album = dao.sacarAlbum(i+1);
-            albums.add(album);
-        }
-        
-        for (int i = 0; i < Math.min(numAlbum, 8); i++) {
+    	if(this.albums == null) {
+        	num = dao.sacarNumeroDeAlbum();
+            albums = new ArrayList<>();
+            for (int i = 0; i < albumButtonX.length; i++) {
+                Album album = dao.sacarAlbum(i+1);
+                albums.add(album);
+            }	
+    	}
+        for (int i = 0; i < Math.min(numAlbum, 7); i++) {
             JLabel lblAlbum;
             if (i < albums.size()) {
             	btnFotoAlbum = CrearBoton("", albums.get(i).getFotoAlbum(), albumButtonX[i], 0);
             	panelAlbum.add(btnFotoAlbum);
             	Album album = albums.get(i);
-                btnFotoAlbum.addActionListener(this);
+            	btnFotoAlbum.addActionListener(new ActionListener() {
+	                @Override
+	            	public void actionPerformed(ActionEvent e) {
+	                    menuAlbum(album); // Acción específica para este botón
+	                }
+            	});
 
                 lblAlbum = new JLabel(albums.get(i).getNombreAlbum());
             } else {
@@ -369,16 +376,12 @@ public class VPrincipal extends JDialog implements ActionListener {
       
     private void LimpiarAlbumes () {
     	for (Component component : contentPanel.getComponents()) {
-            if (component instanceof JPanel) {
-                JPanel panel = (JPanel) component;
-                if (panel.getComponentCount() > 0 && panel.getComponent(0) instanceof JButton) {
-                    contentPanel.remove(panel);
-                    break;
-                }
+            if (component.equals(panelAlbum) ){
+            	contentPanel.remove(component);
             }
         }
-        contentPanel.revalidate();
-        contentPanel.repaint();
+    	contentPanel.revalidate();
+    	contentPanel.repaint();
     }
     
     protected void escucharCancion() {
@@ -448,11 +451,15 @@ public class VPrincipal extends JDialog implements ActionListener {
     	if(e.getSource().equals(btnStop)) {
     		stop();	
     	}
-    	if(e.getSource().equals(btnFotoPlay)) {
-    		menuPlay(playlist);
+    	if(e.getSource().equals(btnSiguientePlay)) {
+    		numListAlbum++;
+			//LimpiarPlays();
+	        BotonesPlaylist();
     	}
-    	if(e.getSource().equals(btnFotoAlbum)) {
-    		menuAlbum(album);
+    	if(e.getSource().equals(btnSiguienteAlbum)) {
+			LimpiarAlbumes();
+	    	
+	        BotonesAlbum();
     	}
     }
     
@@ -497,7 +504,7 @@ public class VPrincipal extends JDialog implements ActionListener {
 	}
     
 	private void menuAlbum(Album album) {
-		this.setVisible(false);
+		this.dispose();
 		VListaCanciones ven = new VListaCanciones(album, this,  true, dao);
         ven.setVisible(true);		
 	}

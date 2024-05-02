@@ -107,7 +107,7 @@ public class VCrearAlbum extends JDialog implements ActionListener{
 			NumAlbum++;
 		}
 		
-		dao.crearAlbum(NumAlbum,textFecha.getText(),textFoto.getText(),textNombre.getText());
+		dao.meterAlbum(NumAlbum,textFecha.getText(),textFoto.getText(),textNombre.getText());
 	}
 
 }

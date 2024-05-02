@@ -7,9 +7,12 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import controlador.Dao;
 import modelo.Album;
+import modelo.Artista;
 import modelo.Cancion;
 import modelo.Canta;
 import modelo.Playlist;
@@ -22,8 +25,11 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.SwingConstants;
 import javax.swing.JList;
@@ -33,10 +39,13 @@ public class VListaCanciones extends JDialog implements ActionListener{
 	private final JPanel contentPanel = new JPanel();
 	private JLabel lblTitulo, lblFoto;
 	private JButton btnLogo, btnPlay, btnAleatorio, btnAtras;
-	private JList list;
 	private Dao dao;
 	private Cancion cancion;
+	private Album album;
 	private String ruta;
+	private JList list;
+    private ArrayList<Cancion> canciones = new ArrayList<Cancion>();
+
 	
 	/**
 	 * @wbp.parser.constructor
@@ -44,6 +53,7 @@ public class VListaCanciones extends JDialog implements ActionListener{
 	public VListaCanciones(Album album, VPrincipal ven, boolean modal, Dao dao) {
 		super(ven);
 		setModal(modal);
+		this.album = album;
 		VListaCanciones(album.getListaCanciones(), album.getNombreAlbum(), album.getFotoAlbum(), dao);
 	}
 	
@@ -98,10 +108,6 @@ public class VListaCanciones extends JDialog implements ActionListener{
 		btnLogo.addActionListener(this);
 		contentPanel.add(btnLogo);
 		
-		list = new JList();
-		list.setBounds(80, 162, 1077, 476);
-		contentPanel.add(list);
-		
 		btnPlay = new JButton("");
 		btnPlay.setIcon(new ImageIcon("..\\RetoFinal\\Img\\playChiquito.png"));
 		btnPlay.setBounds(940, 10, 70, 70);
@@ -116,7 +122,6 @@ public class VListaCanciones extends JDialog implements ActionListener{
 		btnAleatorio.setBounds(1091, 10, 70, 70);
 		btnAleatorio.setOpaque(false);
 		btnAleatorio.setBorderPainted(false);
-		btnAleatorio.setFocusable(false);
 		btnAleatorio.addActionListener(this);
 		contentPanel.add(btnAleatorio);
 		
@@ -130,9 +135,27 @@ public class VListaCanciones extends JDialog implements ActionListener{
 		contentPanel.add(btnAtras);
 		btnAtras.addActionListener(this);
 		
+		list = new JList<>();
+        list.setFont(new Font("Felix Titling", Font.PLAIN, 32));
+        list.setVisible(false);
+        list.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                escucharCancion();
+            }
+        });
+        contentPanel.add(list);
+		
+        cargarLista();
+        
 		//crearLista(lista);
 		
 		JLabel fondo = new JLabel("") {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
 			protected void paintComponent(Graphics g) {
 				super.paintComponent(g);
 				Graphics2D g2d = (Graphics2D) g.create();
@@ -149,7 +172,7 @@ public class VListaCanciones extends JDialog implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 		if (e.getSource() == btnPlay) {
-            play();
+            escucharCancion();
         }
 		if(e.getSource().equals(btnLogo)) {
 			volverVPrincipal();
@@ -172,23 +195,49 @@ public class VListaCanciones extends JDialog implements ActionListener{
         ven.setVisible(true);
 	}
 
-	private void crearLista(Map<Integer, Cancion> lista) {
-		JButton boton = new JButton();
-		String artista;
-		Canta canta = new Canta();
-	    for (Map.Entry<Integer, Cancion> can : lista.entrySet()) {
-	    	if(cancion.getCodCancion() == canta.getCodCancion()) {
-	    		
-	    	}
-	    	boton.setText(can.getValue().getNombreCancion());
-	    	list.add(boton);
+	 private void cargarLista() {
+			// TODO Auto-generated method stub
+			canciones = dao.sacarCancionesAlbum(album.getCodAlbum());
+			DefaultListModel<String> listModel = new DefaultListModel<>();
+			
+			//introducir primero los que empiezen igual
+			for (Cancion can : canciones) {
+				listModel.addElement("<html><font size=7>"+"  "+can.getNombreCancion() + "   |     " + "<html><font size=5>"+saberArtistas(can.getCodCancion()));
+				list.setModel(listModel);
+			}
+			//introducir las que tengan letras en comun
+			for (Cancion can : canciones) {
+				listModel.addElement("<html><font size=7>"+"  "+can.getNombreCancion() + "   |     " + "<html><font size=5>"+saberArtistas(can.getCodCancion()));
+				list.setModel(listModel);
+			}
 		}
-		
-	}
+	 
+	 private String saberArtistas(int cod) {
+			// TODO Auto-generated method stub
+			ArrayList<Artista> artistas = dao.artistasPorCancion(cod);
+			String artista = artistas.get(0).getNombreArtistico();
+			
+			if(artistas.size()>1) {
+				for(int i = 1; i < artistas.size(); i++) {
+					artista  = artista +", "+artistas.get(i).getNombreArtistico();
+				}
+			}
+			return artista;
+		}
 
-	  private void play() {
-		this.setVisible(false);
-	    VentanaPlay ven = new VentanaPlay(this, cancion, true, dao);
-	    ven.setVisible(true);		
-	}
+	 protected void escucharCancion() {
+	        Cancion can = new Cancion();
+	        String nombre = list.getSelectedValue().toString();
+	        int pos = nombre.indexOf("  ");
+	        int posicion = nombre.indexOf("   |");
+	        nombre = nombre.substring(pos + 2, posicion);
+	        for (Cancion c : canciones) {
+	            if (c.getNombreCancion().equalsIgnoreCase(nombre)) {
+	                can = c;
+	            }
+	        }
+	        this.dispose();
+			VentanaPlay play = new VentanaPlay(this, can, nombre, true, dao);
+			play.setVisible(true);
+	    }
 }

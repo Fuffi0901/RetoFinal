@@ -63,18 +63,21 @@ public class VentanaPlay extends JDialog implements ActionListener{
 	 */
 	public VentanaPlay(VPrincipal vPrincipal, Cancion cancion, String nombre, boolean modal, Dao dao) {
 		super(vPrincipal);
-		setIconImage(Toolkit.getDefaultToolkit().getImage("C:\\Users\\1dam\\Desktop\\PGR\\3ª Eva\\RetoFinal\\Img\\logoPequeña.png"));
+		setIconImage(Toolkit.getDefaultToolkit().getImage("..\\RetoFinal\\Img\\logoPequeña.png"));
 		this.can = cancion;
 		setModal(modal);
 		Pantalla(dao, cancion);
 	}
 
-	public VentanaPlay(VListaCanciones vListaCanciones, Cancion cancion, boolean modal, Dao dao) {
+	public VentanaPlay(VListaCanciones vListaCanciones, Cancion cancion, String nombre, boolean modal, Dao dao) {
 		super(vListaCanciones);
+		setIconImage(Toolkit.getDefaultToolkit().getImage("..\\RetoFinal\\Img\\logoPequeña.png"));
 		this.can = cancion;
 		setModal(modal);
 		Pantalla(dao, cancion);	
 	}
+
+
 
 	public void Pantalla(Dao dao, Cancion cancion) {
 		this.dao = dao;
