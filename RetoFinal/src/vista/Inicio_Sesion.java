@@ -29,6 +29,7 @@ import javax.swing.JButton;
 import java.awt.Color;
 import javax.swing.ImageIcon;
 import javax.swing.SwingConstants;
+import java.awt.Toolkit;
 
 public class Inicio_Sesion extends JFrame implements ActionListener{
 
@@ -41,7 +42,7 @@ public class Inicio_Sesion extends JFrame implements ActionListener{
 	private JLabel lblLogo;
 	private Dao dao;
 	private JLabel lblNewLabel_1;
-	private JButton btnLogo;
+	private JButton btnLogo, btnNewButton;
 
 	/**
 	 * Create the frame.
@@ -51,6 +52,8 @@ public class Inicio_Sesion extends JFrame implements ActionListener{
 	 * @param vRegistrarse 
 	 */
 	public Inicio_Sesion (Dao dao) {
+		setTitle("BEATDAM");
+		setIconImage(Toolkit.getDefaultToolkit().getImage("..\\RetoFinal\\Img\\logoPequeña.png"));
 		Pantallas(dao);
 	}
 	
@@ -133,6 +136,7 @@ public class Inicio_Sesion extends JFrame implements ActionListener{
 		btnRegistrarse.setBorderPainted(false);
 		btnRegistrarse.setFocusable(false);
 		contentPane.add(btnRegistrarse);
+		btnRegistrarse.addActionListener(this);
 		
 		lblLogo = new JLabel("");
 		lblLogo.setIcon(new ImageIcon("..\\RetoFinal\\Img\\logoPequeña.png"));
@@ -161,15 +165,6 @@ public class Inicio_Sesion extends JFrame implements ActionListener{
 		btnLogo.setBounds(1181, 10, 56, 75);
 		contentPane.add(btnLogo);
 		
-		JButton btnNewButton = new JButton("New button");
-		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				irVentanaPlay();
-			}
-		});
-		btnNewButton.setBounds(28, 247, 85, 21);
-		contentPane.add(btnNewButton);
-		
 		JLabel fondo = new JLabel("") {
 			protected void paintComponent(Graphics g) {
 				super.paintComponent(g);
@@ -182,27 +177,11 @@ public class Inicio_Sesion extends JFrame implements ActionListener{
 		fondo.setBounds(0, 0, 1256, 724);
 		contentPane.add(fondo);
 		
-		btnRegistrarse.addActionListener(this);
-		
-		
+		btnNewButton = new JButton("");
+		btnNewButton.setBounds(52, 40, 85, 45);
+		btnNewButton.addActionListener(this);
+		contentPane.add(btnNewButton);
 	}
-	private void irVentanaPlay() {
-        Cancion cancion = new Cancion();
-        Album album = new Album();
-        album.setCodAlbum(1);
-        album.setFotoAlbum("..\\RetoFinal\\Img\\DondeQuiero.jpg");
-        album.setNombreAlbum("Donde Quiero Estar");
-        cancion.setDuracion(220);
-        cancion.setCodCancion(1);
-        cancion.setNombreCancion("WANDA");
-        cancion.setAudio("..\\RetoFinal\\Audio\\Wanda.wav");
-        cancion.setCodAlbum(1);
-
-        this.setVisible(false);
-        VentanaPlay ven = new VentanaPlay(this, cancion, album.getFotoAlbum(), true, dao);
-        ven.setVisible(true);
-    }
-
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
@@ -212,7 +191,17 @@ public class Inicio_Sesion extends JFrame implements ActionListener{
 		if(e.getSource().equals(btnRegistrarse)) {
 			registrarseAplicacion();
 		}
+		if(e.getSource().equals(btnNewButton)) {
+			irAVerAdmin();
+		}
 	
+	}
+
+	private void irAVerAdmin() {
+		// TODO Auto-generated method stub
+		this.dispose();
+		VverAdmin ven = new VverAdmin(this, true, dao);
+		ven.setVisible(true);
 	}
 
 	private void abrirExtra() {

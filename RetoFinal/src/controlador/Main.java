@@ -9,6 +9,7 @@ public class Main {
 			 * Launch the application.
 			 */
 			Dao dao = new DaoImplementacion();
+			
 			Inicio_Sesion ven = new Inicio_Sesion(dao);
 			ven.setVisible(true);
 		}
