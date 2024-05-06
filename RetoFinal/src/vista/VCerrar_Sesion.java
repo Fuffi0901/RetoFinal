@@ -4,16 +4,16 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-
 import controlador.Dao;
-
 import javax.swing.JLabel;
 import java.awt.Font;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Color;
 import javax.swing.ImageIcon;
 
@@ -44,12 +44,7 @@ public class VCerrar_Sesion extends JDialog implements ActionListener{
 		pantalla(dao);
 	}
 
-	public VCerrar_Sesion(VBuscar vBuscar, boolean modal, Dao dao) {
-		super(vBuscar);
-		setModal(modal);
-		pantalla(dao);	}
-
-	public VCerrar_Sesion(VListaCanciones vListaCanciones, boolean modal, Dao dao2) {
+	public VCerrar_Sesion(VListaCanciones vListaCanciones, boolean modal, Dao dao) {
 		super(vListaCanciones);
 		setModal(modal);
 		pantalla(dao);	}
@@ -67,7 +62,7 @@ public class VCerrar_Sesion extends JDialog implements ActionListener{
 		contentPanel.setLayout(null);
 		{
 			JLabel lbTitulo = new JLabel("Cerrar Sesión");
-			lbTitulo.setForeground(new Color(255, 255, 255));
+			lbTitulo.setForeground(new Color(75, 75, 75));
 			lbTitulo.setBounds(323, 10, 657, 88);
 			lbTitulo.setFont(new Font("Stencil", Font.PLAIN, 87));
 			contentPanel.add(lbTitulo);
@@ -101,6 +96,18 @@ public class VCerrar_Sesion extends JDialog implements ActionListener{
 			btnNo.setFocusable(false);
 			contentPanel.add(btnNo);
 			btnNo.addActionListener(this);
+			
+			JLabel fondo = new JLabel("") {
+				protected void paintComponent(Graphics g) {
+					super.paintComponent(g);
+					Graphics2D g2d = (Graphics2D) g.create();
+					g2d.setPaint(new GradientPaint(0, 0, new Color(73, 197, 250), 0, getHeight(), new Color(78, 78, 78)));
+					g2d.fillRect(0, 0, getWidth(), getHeight());
+					g2d.dispose();
+				}
+			};
+			fondo.setBounds(0, 0, 1256, 724);
+			contentPanel.add(fondo);
 	}
 
 	@Override
