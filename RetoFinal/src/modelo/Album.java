@@ -1,13 +1,17 @@
 package modelo;
 
+import java.sql.Date;
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Album {
 	//Atributos.
 	private int codAlbum;
 	private String nombreAlbum;
 	private String fotoAlbum;
-	private LocalDate fechaLan;
+	private Date fechaLan;
+	private Map <Integer, Cancion> listaCanciones;
 	
 	//Getters y Setters.
 	public int getCodAlbum() {
@@ -28,10 +32,16 @@ public class Album {
 	public void setFotoAlbum(String fotoAlbum) {
 		this.fotoAlbum = fotoAlbum;
 	}
-	public LocalDate getFechaLan() {
+	public Date getFechaLan() {
 		return fechaLan;
 	}
-	public void setFechaLan(LocalDate fechaLan) {
-		this.fechaLan = fechaLan;
+	public void setFechaLan(Date date) {
+		this.fechaLan = date;
+	}
+	public Map<Integer, Cancion> getListaCanciones() {
+		return listaCanciones;
+	}
+	public void setListaCanciones(Map<Integer, Cancion> listaCanciones) {
+		this.listaCanciones = listaCanciones;
 	}
 }

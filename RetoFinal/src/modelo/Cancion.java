@@ -2,7 +2,8 @@ package modelo;
 
 public class Cancion {
 	//Atributos.
-	private int codCancion, codAlbum;
+	private int codCancion;
+	private int codAlbum;
 	private String nombreCancion;
 	private int duracion;
 	private String audio;
