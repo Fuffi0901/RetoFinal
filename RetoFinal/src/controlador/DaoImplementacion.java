@@ -70,6 +70,8 @@ public class DaoImplementacion implements Dao{
 	private final String INSERT_ALBUM = "insert into album(codAlbum,nombreAlbum,fotoAlbum,fechaLan) values(?,?,?,?)";
 	private final String MODIFICAR_ALBUM = "update album set  codAlbum = ? , nombreAlbum = ?, fotoAlbum = ?,fechaLan = ? where codAlbum=?;";
 	private final String CODIGO_ALBUM = "select crearCodigoCancion() AS cod";
+	private final String CANCIONES_POR_ALBUM = "select * from cancion where codAlbum=?";
+
 	
 	//consultas artista
 	private final String SACAR_ARTISTA_CANCION = "select a.* from Artista a , Canta c where a.dni=c.dni and codCancion=?";
@@ -1428,6 +1430,44 @@ public class DaoImplementacion implements Dao{
 
 		}
 		return plays;
+	}
+
+	public ArrayList<Cancion> CancionesDeAlbum(int cod) {
+		// TODO Auto-generated method stub
+		ArrayList<Cancion> canciones = new ArrayList<Cancion>();
+		Cancion ca ;
+
+		this.openConnection();
+
+		try {
+
+			stmt = con.prepareStatement(CANCIONES_POR_ALBUM);
+			stmt.setInt(1, cod);
+			ResultSet rs = stmt.executeQuery();
+
+			while (rs.next()) {
+				ca = new Cancion();
+				ca.setCodCancion(rs.getInt("codCancion"));
+				ca.setNombreCancion(rs.getString("nombreCancion"));
+				ca.setDuracion(rs.getInt("Duracion"));
+				ca.setAudio(rs.getString("Audio"));
+				ca.setCodAlbum(rs.getInt("codAlbum"));
+				
+				canciones.add(ca);
+			}
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+		return canciones;
 	}
 
 }

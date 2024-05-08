@@ -74,8 +74,8 @@ public class VAñadirPlaylist extends JDialog implements ActionListener{
 	 * Create the dialog.
 	 */
 	@SuppressWarnings("rawtypes")
-	public VAñadirPlaylist(Inicio_Sesion inicio_Sesion,boolean b, Dao dao,Usuario usu) {
-		super(inicio_Sesion);
+	public VAñadirPlaylist(VPrincipal vPrincipal,boolean b, Dao dao,Usuario usu) {
+		super(vPrincipal);
 		this.setModal(b);
 		this.dao=dao;
 		this.usu=usu;

@@ -75,5 +75,7 @@ public interface Dao {
 	public ArrayList<Playlist> sacarPlaylists();
 
 	public ArrayList<Cancion> CancionesDePlaylist(int codPlaylist);
+
+	public ArrayList<Cancion> CancionesDeAlbum(int codAlbum);
 	
 }

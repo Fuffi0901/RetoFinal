@@ -68,7 +68,7 @@ public class VentanaPlay extends JDialog implements ActionListener{
 		Pantalla(dao, cancion);
 	}
 
-	public VentanaPlay(VListaCanciones vListaCanciones, Cancion cancion, String nombre, boolean modal, Dao dao) {
+	public VentanaPlay(VListaCanciones vListaCanciones, Cancion cancion, boolean modal, Dao dao) {
 		super(vListaCanciones);
 		setIconImage(Toolkit.getDefaultToolkit().getImage("..\\RetoFinal\\Img\\logoPequeña.png"));
 		this.can = cancion;
@@ -290,13 +290,6 @@ public class VentanaPlay extends JDialog implements ActionListener{
 	        btnStop.setVisible(true);	
 	        play = true;
 		}
-	}
-	
-	private Album sacarAlbum() {
-		// TODO Auto-generated method stub
-		Album al = dao.sacarAlbum(can.getCodAlbum());
-		
-		return al;
 	}
 	
 	@Override
