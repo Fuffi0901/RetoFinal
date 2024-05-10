@@ -33,8 +33,6 @@ public class DaoImplementacion implements Dao{
 	private final String INSERT_PERSONA =  "insert into persona(Dni,nombrePersona,apellidoPersona,pais,edad) values (?,?,?,?,?)";
 	private final String INSERT_USUARIO =  "insert into usuario(Dni,contraseina,NombreUsuario) values (?,?,?)";
 	
-
-	
 	//consultas canciones
 	private final String SACAR_CANCIONES = "select * from Cancion";
 	private final String BORRAR_CANCIONES = "delete from Cancion where codCancion=?";
@@ -485,40 +483,6 @@ public class DaoImplementacion implements Dao{
 		}
 		
 	}
-	
-
-	@Override
-	public void modificarAlbum(String cod, String nombre, String foto, String fecha) {
-		// TODO Auto-generated method stub
-		
-		
-		this.openConnection();
-		
-		try {
-
-			stmt = con.prepareStatement(MODIFICAR_ALBUM);
-			
-			stmt.setInt(1, Integer.valueOf(cod));
-			stmt.setString(2, nombre);
-			stmt.setString(3, foto);
-			stmt.setDate(4, Date.valueOf(fecha));
-			stmt.setInt(5, Integer.valueOf(cod));
-			stmt.executeUpdate();
-			
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		try {
-			closeConnection();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-
-		}
-		
-	}		
 	
 	// saca las canciones de una playlist
 	public ArrayList<Cancion> sacarCancionesPlaylist(int codPlaylist) {
@@ -1468,6 +1432,36 @@ public class DaoImplementacion implements Dao{
 
 		}
 		return canciones;
+	}
+
+	@Override
+	public void modificarAlbum(String cod, String nombre, String foto, Date date) {
+
+		this.openConnection();
+		
+		try {
+
+			stmt = con.prepareStatement(MODIFICAR_ALBUM);
+			
+			stmt.setInt(1, Integer.valueOf(cod));
+			stmt.setString(2, nombre);
+			stmt.setString(3, foto);
+			stmt.setDate(4, (Date) date);
+			stmt.setInt(5, Integer.valueOf(cod));
+			stmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}				
 	}
 
 }

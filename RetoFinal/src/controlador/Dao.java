@@ -1,6 +1,7 @@
 package controlador;
 
 import java.util.ArrayList;
+import java.sql.Date;
 import java.util.List;
 import excepciones.CreateException;
 import modelo.Album;
@@ -45,7 +46,6 @@ public interface Dao {
 	public ArrayList<Album> sacarAlbumes();
 	public void borrarAlbum(int codAlbum);
 	public void meterAlbum(int cod, String nombre, String foto, String fecha) ;
-	public void modificarAlbum(String cod, String nombre, String foto, String fecha);
 	public int crearCodigoAlbum() ;
 	public int consultarNumAlbum();
 	ArrayList<Cancion> sacarCancionesAlbum(int cod);
@@ -77,5 +77,7 @@ public interface Dao {
 	public ArrayList<Cancion> CancionesDePlaylist(int codPlaylist);
 
 	public ArrayList<Cancion> CancionesDeAlbum(int codAlbum);
+
+	public void modificarAlbum(String substring, String text, String textoModificado, Date date);
 	
 }
