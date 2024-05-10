@@ -15,6 +15,10 @@ public interface Dao {
 	//Usuario
 	public Usuario comprobarUsuario(String nombre, String contraseña);
 	
+	public Persona  comprobarPersona(String dni) ;
+	
+	public Artista comprobarArtista(String dni);
+	
 	public void registrarPersona(String dni, String nombreP, String apellido, String pais, int edad) ;
 	
 	public void registrarUsuario(String dni, String nombreU, String contraseña );
@@ -30,11 +34,14 @@ public interface Dao {
 	public void insertarCanta(String dni,int codCancion);
 	public void eliminarCanta(int codCancion);
 	public void añadirCancion(int cod,int duracion, String nombreCancion, String audio,int codAlbum );
+	public Album sacarUltimaAlbum(String dni);
+	public ArrayList<Cancion> sacarCancionesArtista(String dni);
 
 	//Playlist
 	public void insertarPlaylist(int cod,String nombre,String foto,String dni);
 	public void eliminarplaylist(int cod);
 	public Playlist sacarPlaylist(int cod, String dni) ;
+	public ArrayList<Playlist> sacarPlaylistUsuario(String dni) ;
 	public void modificarPlaylist(int cod,String nombre,String foto);
 	public void insertarPertenece(int codP,int codC);
 	public int crearCodigoPlaylist();
@@ -57,11 +64,15 @@ public interface Dao {
 
 	
 	//Artista
+	public void modificarPersona(String dni, String nombre, String apellido, String pais, int edad);
+	public void modificarArtista(String dni, String nombre, String estilo, boolean cantaAutor);
 	public ArrayList<Artista> artistasPorCancion(int cod);
 	public ArrayList<Artista> sacarartistas();
 	public String funcionArtistas(int cod);
 	public void borrarArtista(String dni);
 	public void registrarArtista(String text, String text2, boolean cantaAutor, String string);
+	public ArrayList<Artista> sacarArtista();
+	public ArrayList<Persona> sacarPersonas();
 
 	
 }

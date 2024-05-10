@@ -33,6 +33,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
@@ -83,10 +84,13 @@ public class VPrincipal extends JDialog implements ActionListener {
     private JPanel panelPlay;
     private Playlist playlist;
     private Album album;
-    private int numeroA = 1;
-    private int numeroC = 1;;
+    private int numeroA = 0;
+    private int numeroP = 0;
     private JButton btnAnteriorAlbum;
-    private Usuario usu = new Usuario();
+    private static Usuario usu;
+    private JButton btnAnteriorPlaylist;
+    private JButton btnCrearPlaylist;
+    private ArrayList<Artista> artistas = new ArrayList<Artista>();
     /**
 	 * @param play2 
      * @wbp.parser.constructor
@@ -96,8 +100,8 @@ public class VPrincipal extends JDialog implements ActionListener {
 		super(inicio_Sesion);
 		setIconImage(Toolkit.getDefaultToolkit().getImage("C:\\Users\\1dam\\Desktop\\PGR\\3ª Eva\\RetoFinal\\Img\\logoPequeña.png"));
 		setModal(modal);
-		pantalla(dao);
-		this.usu=usuario;
+		pantalla(dao, usuario);
+		
 	}
 	
 	public VPrincipal(VentanaPlay ventanaPlay, boolean modal, Dao dao, boolean play, Cancion cancion, int pos2) {
@@ -106,22 +110,38 @@ public class VPrincipal extends JDialog implements ActionListener {
 		this.play = play;
 		this.pos = pos2;
 		this.cancion = cancion;
-		pantalla(dao);
+		pantalla(dao, null);
+	}
+	
+	public VPrincipal(VverArtista verArtista, boolean modal, Dao dao) {
+		super(verArtista);
+		setModal(modal);
+		pantalla(dao, null);
 	}
 	
 	public VPrincipal(VListaCanciones VlistaCanciones, boolean modal, Dao dao) {
 		super(VlistaCanciones);
 		setModal(modal);
-		pantalla(dao);
+		pantalla(dao, null);
 	}
-
+	
+	public VPrincipal(VAñadirPlaylist playlist,  boolean modal, Dao dao,Usuario usuario) {
+		super(playlist);
+		setModal(modal);
+		pantalla(dao, usuario);
+	}
+	
 	public VPrincipal(VCerrar_Sesion vCerrar_Sesion, boolean modal, Dao dao) {
 		super(vCerrar_Sesion);
 		setModal(modal);
-		pantalla(dao);	}
+		pantalla(dao, null);	}
 
-	public void pantalla(Dao dao) {
+	public void pantalla(Dao dao, Usuario usuario) {
     	this.dao = dao;
+    	artistas = dao.sacarartistas();
+    	if(usuario!=null) {
+    		this.usu = usuario;
+    	}
         setBackground(new Color(214, 214, 214));
         setBounds(100, 100, 1259, 749);
         getContentPane().setLayout(new BorderLayout());
@@ -143,43 +163,51 @@ public class VPrincipal extends JDialog implements ActionListener {
     
         contentPanel.add(btnSecreto);
        
-		panelPlay = new JPanel();
-		panelPlay.setOpaque(false);
-		panelPlay.setBounds(31, 181, 1037, 143);
-		contentPanel.add(panelPlay);
-		panelPlay.setLayout(null);
+    	
+		
+		
         
         list = new JList<>();
         list.setFont(new Font("Felix Titling", Font.PLAIN, 32));
         list.setVisible(false);
+        list.setFixedCellHeight(45);
         list.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                escucharCancion();
+            	escogerLista();      
             }
+			
         });
         contentPanel.add(list);
-		
-        btnSiguientePlay = new JButton("New button");
-        btnSiguientePlay.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        		numListPlay++;
-               // BotonesPlaylist();
-        	}
-        });
-		btnSiguientePlay.setBounds(1089, 181, 100, 143);
-		contentPanel.add(btnSiguientePlay);
-		
-		btnSiguienteAlbum = new JButton(">");
-		btnSiguienteAlbum.setBounds(1089, 430, 100, 143);
-		btnSiguienteAlbum.addActionListener(this);
-		contentPanel.add(btnSiguienteAlbum);
-
+        
         scrollPane = new JScrollPane(list);
         scrollPane.setBounds(208, 99, 846, 368);
         scrollPane.setVisible(false);
         contentPanel.add(scrollPane);
+		
+        btnSiguientePlay = new JButton(">");
+        btnSiguientePlay.setFont(new Font("Tahoma", Font.PLAIN, 28));
+        btnSiguientePlay.addActionListener(this);
+        	
+		btnSiguientePlay.setBounds(1089, 181, 85, 69);
+		contentPanel.add(btnSiguientePlay);
+		
+		btnSiguienteAlbum = new JButton(">");
+		btnSiguienteAlbum.setFont(new Font("Tahoma", Font.PLAIN, 45));
+		btnSiguienteAlbum.setBounds(1089, 430, 85, 100);
+		btnSiguienteAlbum.setOpaque(false);
+		btnSiguienteAlbum.addActionListener(this);
+		contentPanel.add(btnSiguienteAlbum);
+
         
+        
+        panelPlay = new JPanel();
+		panelPlay.setOpaque(false);
+		panelPlay.setBounds(126, 181, 942, 143);
+		contentPanel.add(panelPlay);
+		panelPlay.setLayout(null);
+		
+		
         txtBuscar = new JTextField();
         txtBuscar.setText("Buscar");
         txtBuscar.setForeground(new Color(192, 192, 192));
@@ -198,6 +226,7 @@ public class VPrincipal extends JDialog implements ActionListener {
 
             @Override
             public void changedUpdate(DocumentEvent e) {
+            	 cargarLista();
             }
         });
         contentPanel.add(txtBuscar);
@@ -222,7 +251,13 @@ public class VPrincipal extends JDialog implements ActionListener {
 
         numPlay = dao.sacarNumeroDePlayList();
         numAlbum = dao.sacarNumeroDeAlbum();
-
+        
+        
+        btnCrearPlaylist = new JButton("+");
+		btnCrearPlaylist.setBounds(320, 127, 85, 44);
+		btnCrearPlaylist.addActionListener(this);
+		contentPanel.add(btnCrearPlaylist);
+		
         lblPlayList = new JLabel("PlayLists");
         lblPlayList.setForeground(new Color(75, 75, 75));
         lblPlayList.setFont(new Font("Stencil", Font.PLAIN, 44));
@@ -234,7 +269,8 @@ public class VPrincipal extends JDialog implements ActionListener {
         lblAlbumes.setFont(new Font("Stencil", Font.PLAIN, 44));
         lblAlbumes.setBounds(70, 376, 242, 50);
         contentPanel.add(lblAlbumes);
-
+        
+        
         btnLogo = new JButton("");
 		btnLogo.setBackground(new Color(64, 128, 128));
 		btnLogo.setBounds(1181, 10, 56, 75);
@@ -266,12 +302,21 @@ public class VPrincipal extends JDialog implements ActionListener {
 		
         
 		btnAnteriorAlbum = new JButton("<");
-		btnAnteriorAlbum.setBounds(10, 430, 100, 143);
+		btnAnteriorAlbum.setFont(new Font("Tahoma", Font.PLAIN, 28));
+		btnAnteriorAlbum.setBounds(10, 430, 85, 69);
 		btnAnteriorAlbum.addActionListener(this);
 		contentPanel.add(btnAnteriorAlbum);
 		
+		btnAnteriorPlaylist = new JButton("<");
+		btnAnteriorPlaylist.setFont(new Font("Tahoma", Font.PLAIN, 28));
+		btnAnteriorPlaylist.setBounds(31, 205, 85, 69);
+		btnAnteriorPlaylist.addActionListener(this);
+		contentPanel.add(btnAnteriorPlaylist);
+		
+		
 		BotonesAlbum();
 		BotonesPlaylist();
+		
 		   JLabel fondo = new JLabel("") {
 				/*
 				 * 
@@ -290,11 +335,8 @@ public class VPrincipal extends JDialog implements ActionListener {
 			fondo.setBounds(0, 0, 1275, 724);
 			contentPanel.add(fondo);
 			
+		
 			
-		
-		
-		
-		
 		
 		if(play) {
 			 File archivoSonido = new File(cancion.getAudio());
@@ -330,10 +372,13 @@ public class VPrincipal extends JDialog implements ActionListener {
 	    	if(e.getSource().equals(btnStop)) {
 	    		stop();	
 	    	}
+	    	if(e.getSource().equals(btnCrearPlaylist)) {
+	    		irAñadirPlaylist();	
+	    	}
 	    	if(e.getSource().equals(btnSiguientePlay)) {
-	    		numListAlbum++;
-				//LimpiarPlays();
-		        //BotonesPlaylist();
+	    		numeroP++;
+				LimpiarPlaylist();
+	    		BotonesPlaylist();
 	    	}
 	    	if(e.getSource().equals(btnSiguienteAlbum)) {
 	    		numeroA++;
@@ -350,38 +395,46 @@ public class VPrincipal extends JDialog implements ActionListener {
 
 	
 	
+	public Usuario devolverUsuario() {
+		return this.usu;
+	}
 	
-  
+	
+
+	private void irAñadirPlaylist() {
+		// TODO Auto-generated method stub
+		this.dispose();
+		VAñadirPlaylist ven = new VAñadirPlaylist(this, play, dao, usu);
+		ven.setVisible(true);
+	}
 
 	private void BotonesPlaylist() {
-        int[] playListButtonX = { 20, 160, 300, 440, 580, 720, 860, 1000 };
-        
-        if(this.plays == null) {
-        	num = dao.sacarNumeroDePlayList();
-            plays = new ArrayList<>();
-            for (int i = 0; i < num; i++) {
-                Playlist play = dao.sacarPlaylist(i+numeroC,usu.getDni());
-                plays.add(play);
-            }
-        }
-        
-        if(!plays.isEmpty()) {
-        	 for (int i = 0; i < Math.min(numPlay, 8); i++) {
+		
+        int[] playListButtonX = {20, 180, 340, 500, 660, 820};
+        if(numeroA==0) {
+    		btnAnteriorPlaylist.setVisible(false);
+    	}else {
+    		btnAnteriorPlaylist.setVisible(true);
+    	}
+        plays = dao.sacarPlaylistUsuario(usu.getDni());
+        //if(!plays.isEmpty()) {
+        	 for (int i = 0; i <  6; i++) {
                  JLabel lblLista;
                  if (i < plays.size()) {
-                     btnFotoPlay = CrearBoton("", plays.get(i).getFotoPlaylist(), playListButtonX[i], 0);
+                	 btnSiguientePlay.setVisible(true);
+                     btnFotoPlay = CrearBoton("", plays.get(i+numeroP).getFotoPlaylist(), playListButtonX[i], 0);
                      panelPlay.add(btnFotoPlay);
-                     Playlist play = plays.get(i);
+                     Playlist play = plays.get(i+numeroP);
                      btnFotoPlay.addActionListener(new ActionListener() {
      	                @Override
      	            	public void actionPerformed(ActionEvent e) {
      	                    menuPlay(play); // Acción específica para este botón
      	                }
                  	});
-                     lblLista = new JLabel(plays.get(i).getNombrePlaylist());
+                     lblLista = new JLabel(plays.get(i+numeroP).getNombrePlaylist());
                  } else {
-                     btnFotoPlay = CrearBoton("", "", playListButtonX[i], 200);
-                     lblLista = new JLabel("Nombre Playlist");
+                	 btnSiguientePlay.setVisible(false);
+                     lblLista = new JLabel();
                  }
                  lblLista.setFont(new Font("Calibri", Font.PLAIN, 17));
                  lblLista.setHorizontalAlignment(SwingConstants.CENTER);
@@ -389,42 +442,31 @@ public class VPrincipal extends JDialog implements ActionListener {
                  lblLista.setForeground(Color.WHITE);
                  panelPlay.add(lblLista);
              }
-        }
+        //}
        
     }
 	
 	  
-	  private void crearPanelAlbum() {
-	    	 panelAlbum = new JPanel();
-	         panelAlbum.setBounds(31, 430, 1037, 143);
-	         panelAlbum.setOpaque(false);
-	 		 contentPanel.add(panelAlbum);        
-	 	 	 panelAlbum.setLayout(null);		
-		}
+	  
+	 
 	  
     private void BotonesAlbum() {
     	//crearPanelAlbum();
-    	if(numeroA==1) {
-    		btnAnteriorAlbum.setEnabled(false);
+    	if(numeroA==0) {
+    		btnAnteriorAlbum.setVisible(false);
     	}else {
-    		btnAnteriorAlbum.setEnabled(true);
+    		btnAnteriorAlbum.setVisible(true);
     	}
-    	int[] albumButtonX = { 20, 160, 300, 440, 580, 720, 860, 1000 };        
-    	if(this.albums == null) {
-        	num = dao.sacarNumeroDeAlbum();
-            albums = new ArrayList<>();
-            for (int i = 0; i < num; i++) {
-                Album album = dao.sacarAlbum(i+numeroA);
-                albums.add(album);
-            }	
-    	}
+    	int[] albumButtonX = { 20, 180, 340, 500, 660, 820};        
+    	albums = dao.sacarAlbumes();
     	
-        for (int i = 0; i <  7; i++) {
+        for (int i = 0; i <  6; i++) {
             JLabel lblAlbum;
-            if (i < albums.size()) {
-            	btnFotoAlbum = CrearBoton("", albums.get(i).getFotoAlbum(), albumButtonX[i], 0);
+            if (i +numeroA < albums.size()) {
+            	btnSiguienteAlbum.setVisible(true);
+            	btnFotoAlbum = CrearBoton("", albums.get(i+numeroA).getFotoAlbum(), albumButtonX[i], 0);
             	panelAlbum.add(btnFotoAlbum);
-            	Album album = albums.get(i);
+            	Album album = albums.get(i+numeroA);
             	btnFotoAlbum.addActionListener(new ActionListener() {
 	                @Override
 	            	public void actionPerformed(ActionEvent e) {
@@ -432,10 +474,10 @@ public class VPrincipal extends JDialog implements ActionListener {
 	                }
             	});
 
-                lblAlbum = new JLabel(albums.get(i).getNombreAlbum());
+                lblAlbum = new JLabel(albums.get(i+numeroA).getNombreAlbum());
             } else {
-            	btnFotoAlbum = CrearBoton("", "", albumButtonX[i], 430);
-                lblAlbum = new JLabel("Nombre Album");
+            	btnSiguienteAlbum.setVisible(false);
+                lblAlbum = new JLabel();
             }
             lblAlbum.setFont(new Font("Calibri", Font.PLAIN, 17));
             lblAlbum.setHorizontalAlignment(SwingConstants.CENTER);
@@ -449,18 +491,50 @@ public class VPrincipal extends JDialog implements ActionListener {
     private void LimpiarAlbumes () {
     	panelAlbum.removeAll();
     	this.albums=null;
-    	/*for (Component component : contentPanel.getComponents()) {
-            if (component.equals(panelAlbum) ){
-            	contentPanel.remove(component);
-            }
-        }*/
     	contentPanel.revalidate();
     	contentPanel.repaint();
     }
     
-    protected void escucharCancion() {
+    private void LimpiarPlaylist() {
+    	panelPlay.removeAll();
+    	this.plays=null;
+    	contentPanel.revalidate();
+    	contentPanel.repaint();
+    }
+    
+    protected void escogerLista() {
+		// TODO Auto-generated method stub
+    	Artista art = new Artista();
+    	artistas = dao.sacarartistas();
+    	if(list.getSelectedIndex()!=-1) {
+    		String nombre = list.getSelectedValue().toString();
+        	if(nombre.contains("|")) {	
+        		escucharCancion(nombre);
+        	}else if(nombre.equalsIgnoreCase(" ") || nombre.equalsIgnoreCase("↓Artistas")  || nombre.equalsIgnoreCase("Canciones") ) {
+        		
+        	}else if(!nombre.contains("|")){
+        		
+        		for(Artista a: artistas) {
+        			if(nombre.contains(a.getNombreArtistico())) {
+        				pantallaArtista(a);
+        			}
+        		}
+        		
+        	}
+        	
+    	}
+    
+	}
+    
+    protected void pantallaArtista(Artista a) {
+    	this.dispose();
+		VverArtista ven = new VverArtista(this,true,dao,a);
+		ven.setVisible(true);
+    }
+    
+    protected void escucharCancion(String nom) {
         Cancion can = new Cancion();
-        String nombre = list.getSelectedValue().toString();
+        String nombre = nom;
         int pos = nombre.indexOf("  ");
         int posicion = nombre.indexOf("   |");
         nombre = nombre.substring(pos + 2, posicion);
@@ -519,13 +593,17 @@ public class VPrincipal extends JDialog implements ActionListener {
     private void cargarLista() {
 		// TODO Auto-generated method stub
 		canciones = dao.sacarCanciones();
-		DefaultListModel<String> listModel = new DefaultListModel<>();
 		
+		DefaultListModel<String> listModel = new DefaultListModel<>();
+		boolean exi = false;
+	
+		listModel.addElement("<html><font size=8 face='Arial'>"+"Canciones");
 		//introducir primero los que empiezen igual
 		for (Cancion can : canciones) {
 			if (can.getNombreCancion().toLowerCase().startsWith(txtBuscar.getText().toLowerCase()) ) {
 				listModel.addElement("<html><font size=7>"+"  "+can.getNombreCancion() + "   |     " + "<html><font size=5>"+dao.funcionArtistas(can.getCodCancion()));
 				list.setModel(listModel);
+				exi = true;
 			}
 		}
 		//introducir las que tengan letras en comun
@@ -533,7 +611,30 @@ public class VPrincipal extends JDialog implements ActionListener {
 			if(can.getNombreCancion().toLowerCase().contains(txtBuscar.getText().toLowerCase()) && !can.getNombreCancion().toLowerCase().startsWith(txtBuscar.getText().toLowerCase()) ) {
 				listModel.addElement("<html><font size=7>"+"  "+can.getNombreCancion() + "   |     " + "<html><font size=5>"+dao.funcionArtistas(can.getCodCancion()));
 				list.setModel(listModel);
+				exi = true;
 			}
+		}
+		listModel.addElement(" ");
+		listModel.addElement("<html><font size=8 face='Arial'>"+"↓Artistas");
+
+		for (Artista art : artistas) {
+			if (art.getNombreArtistico().toLowerCase().startsWith(txtBuscar.getText().toLowerCase()) ) {
+				listModel.addElement("<html><font size=7>"+art.getNombreArtistico());
+				list.setModel(listModel);
+				exi = true;
+			}
+		}
+		//introducir las que tengan letras en comun
+		for (Artista art : artistas) {
+			if(art.getNombreArtistico().toLowerCase().contains(txtBuscar.getText().toLowerCase()) && !art.getNombreArtistico().toLowerCase().startsWith(txtBuscar.getText().toLowerCase()) ) {
+				listModel.addElement("<html><font size=7>"+art.getNombreArtistico());
+				list.setModel(listModel);
+				exi = true;
+			}
+		}
+		
+		if (!exi) {
+			list.setModel(listModel);
 		}
 	}
 
@@ -547,7 +648,7 @@ public class VPrincipal extends JDialog implements ActionListener {
     
 	private void menuAlbum(Album album) {
 		this.dispose();
-		VListaCanciones ven = new VListaCanciones(album, this,  true, dao);
+		VListaCanciones ven = new VListaCanciones(album, this,  true, dao,usu);
         ven.setVisible(true);		
 	}
 

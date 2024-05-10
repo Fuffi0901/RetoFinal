@@ -13,6 +13,7 @@ import controlador.Dao;
 import modelo.Album;
 import modelo.Artista;
 import modelo.Cancion;
+import modelo.Usuario;
 
 import javax.swing.JLabel;
 import javax.sound.sampled.AudioInputStream;
@@ -68,7 +69,15 @@ public class VentanaPlay extends JDialog implements ActionListener{
 		setModal(modal);
 		Pantalla(dao, cancion);
 	}
-
+	
+	public VentanaPlay(VverArtista verArtista, Cancion cancion, boolean modal, Dao dao) {
+		super(verArtista);
+		setIconImage(Toolkit.getDefaultToolkit().getImage("..\\RetoFinal\\Img\\logoPequeña.png"));
+		this.can = cancion;
+		setModal(modal);
+		Pantalla(dao, cancion);
+	}
+	
 	public VentanaPlay(VListaCanciones vListaCanciones, Cancion cancion,boolean modal, Dao dao) {
 		super(vListaCanciones);
 		setIconImage(Toolkit.getDefaultToolkit().getImage("..\\RetoFinal\\Img\\logoPequeña.png"));

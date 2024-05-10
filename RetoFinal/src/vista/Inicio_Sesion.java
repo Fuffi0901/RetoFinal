@@ -210,7 +210,7 @@ public class Inicio_Sesion extends JFrame implements ActionListener{
 			
 		}else {
 			this.dispose();
-			VPrincipal ven = new VPrincipal(this, true, dao,usu);
+			VPrincipal ven = new VPrincipal(this, true, dao, usu);
 			ven.setVisible(true);
 		}
 	}

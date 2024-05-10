@@ -17,6 +17,7 @@ import modelo.Artista;
 import modelo.Cancion;
 import modelo.Canta;
 import modelo.Playlist;
+import modelo.Usuario;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -58,8 +59,15 @@ public class VListaCanciones extends JDialog implements ActionListener{
 	/**
 	 * @wbp.parser.constructor
 	 */
-	public VListaCanciones(Album album, VPrincipal ven, boolean modal, Dao dao) {
+	public VListaCanciones(Album album, VPrincipal ven, boolean modal, Dao dao,Usuario usuario) {
 		super(ven);
+		setModal(modal);
+		this.album = album;
+		VListaCanciones(album, null, album.getNombreAlbum(), album.getFotoAlbum(), dao);
+	}
+	
+	public VListaCanciones(Album album, VverArtista verArtista, boolean modal, Dao dao) {
+		super(verArtista);
 		setModal(modal);
 		this.album = album;
 		VListaCanciones(album, null, album.getNombreAlbum(), album.getFotoAlbum(), dao);
@@ -101,7 +109,7 @@ public class VListaCanciones extends JDialog implements ActionListener{
 		}else {
 			canciones = dao.CancionesDePlaylist(play.getCodPlaylist());
 			
-			ImageIcon icono = new ImageIcon(album.getFotoAlbum());
+			ImageIcon icono = new ImageIcon(play.getFotoPlaylist());
 			Image imagen = icono.getImage();
 			Image imagenRedimensionada = imagen.getScaledInstance(lblFoto.getWidth(),lblFoto.getHeight(), Image.SCALE_SMOOTH);
 			iconoRedimensionado = new ImageIcon(imagenRedimensionada);
@@ -176,7 +184,7 @@ public class VListaCanciones extends JDialog implements ActionListener{
 		list.setBounds(195, 121, 815, 553);
 		
 		list.setFont(new Font("Felix Titling", Font.PLAIN, 22));
-		list.setFixedCellHeight(90);
+		list.setFixedCellHeight(98);
 		
 		list.setCellRenderer(new CenteredTextRenderer());
 		  list.addListSelectionListener(new ListSelectionListener() {

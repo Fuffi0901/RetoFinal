@@ -15,6 +15,7 @@ import modelo.Album;
 import modelo.Artista;
 import modelo.Cancion;
 import modelo.Estilo;
+import modelo.Persona;
 import modelo.Playlist;
 import modelo.Usuario;
 
@@ -28,6 +29,8 @@ public class DaoImplementacion implements Dao{
 	
 	//consultas usuarios
 	private final String CONSULTA_USUARIO = "select * from Usuario where  Contraseina=? and NombreUsuario=?";
+	private final String CONSULTA_ARTISTA = "select * from Artista where  dni=?";
+	private final String CONSULTA_PERSONA= "select * from Persona where  Dni=?";
 	private final String INSERT_PERSONA =  "insert into persona(Dni,nombrePersona,apellidoPersona,pais,edad) values (?,?,?,?,?)";
 	private final String INSERT_USUARIO =  "insert into usuario(Dni,contraseina,NombreUsuario) values (?,?,?)";
 	
@@ -35,7 +38,9 @@ public class DaoImplementacion implements Dao{
 	
 	//consultas canciones
 	private final String SACAR_CANCIONES = "select * from Cancion";
+	private final String SACAR_ULTIMA_CANCION = "SELECT a.* FROM Cancion c, Album a, Canta ca where c.codAlbum = a.codAlbum and c.codCancion=ca.codCancion and ca.dni=? ORDER BY a.fechaLan DESC LIMIT 1";
 	private final String BORRAR_CANCIONES = "delete from Cancion where codCancion=?";
+	private final String CANCIONES_POR_ARTISTA = "select * from Cancion where codCancion in (select codCancion from canta where dni=?)";
 	private final String CODIGO_CANCION = "select crearCodigoCancion() AS cod";
 	private final String MODIFICAR_CANCIONES = "update cancion set  Duracion = ? , nombreCancion = ?, Audio = ?,codAlbum = ? where codCancion=?";
 	private final String INSERT_CANCIONES =  "insert into cancion(codCancion,Duracion,nombreCancion, Audio,codAlbum) values (?,?,?,?,?)";
@@ -50,12 +55,13 @@ public class DaoImplementacion implements Dao{
 	//Consulta Playlist
 	private final String INSERT_PLAYLIST = "insert into PlayList(codPlayList,nombrePlayList,fotoPlayList,dni) values(?,?,?,?)";
 	private final String CONSULTA_PLAYLIST = "select * from playlist where codPlayList=? and dni=?";
+	private final String PLAYLIST_POR_USUARIO = "select * from playlist where dni=?";
 	private final String MODIFICAR_PLAYLIST = "update PlayList set nombrePlayList=?, fotoPlayList=? where codPlayList=?";
 	private final String ELIMINAR_PLAYLIST = "delete from Playlist where codPlayList=?";
 	private final String TODAS_PLAYLIST = "select * from playlist where codPlayList = ?";
 	private final String INSERT_PERTENECE = "insert into Pertenece(codPlayList,codCancion) values(?,?)";
 	private final String ELIMINAR_PERTENECE = "delete from Pertenece where codPlayList=?";
-	private final String CODIGO_PALYLIST = "select crearCodigoPlaylist AS cod";
+	private final String CODIGO_PALYLIST = "select crearCodigoPlaylist() AS cod";
 	private final String NUMERO_PLAYLIST = "select count(*) from playlist";
 	private final String CANCIONES_POR_PLAYLIST = "select c.* from cancion c, pertenece p where c.codCancion=p.codCancion and codPlaylist=?";
 
@@ -77,10 +83,10 @@ public class DaoImplementacion implements Dao{
 	private final String FUNCION_ART_CA = "select artistaPorCancion(?) AS result";
 	private final String INSERT_ARTISTA =  "insert into artista(Dni,nombreArtistico,CantaAutor,estilo) values (?,?,?,?)";
 	private final String BORRAR_ARTISTA = "delete from persona where dni=?";
+	private final String SACAR_PERSONAS_ARTISTAS = "select * from Persona where dni in (select dni from artista) ";
+	private final String MODIFICAR_PERSONA = "update persona set  nombrePersona = ? , apellidoPersona = ?, pais = ?, edad = ?, dni = ? where dni=?";
+	private final String MODIFICAR_ARTISTA = "update artista set  nombreArtistico = ? , CantaAutor = ?, Estilo = ?, dni = ? where dni=?";
 
-
-
-	
 	
 	//abrir la conexion con la base de datos
 	private void openConnection() {
@@ -176,7 +182,7 @@ public class DaoImplementacion implements Dao{
 		this.openConnection();
 		try {
 
-			stmt = con.prepareStatement(CODIGO_ALBUM);
+			stmt = con.prepareStatement(CODIGO_PALYLIST);
 			ResultSet rs = stmt.executeQuery();
 
 			if (rs.next()) {
@@ -249,7 +255,7 @@ public class DaoImplementacion implements Dao{
 			if (rs.next()) {
 				usu.setDni(rs.getString("Dni"));
 				usu.setNombreUsuario(rs.getString("NombreUsuario"));
-				usu.setConstraseña("contraseina");
+				usu.setConstraseña(rs.getString("Contraseina"));
 				
 			}else {
 				usu=null;
@@ -269,6 +275,82 @@ public class DaoImplementacion implements Dao{
 		return usu;
 	}
 	
+	public Artista comprobarArtista(String dni) {
+		
+		Artista art = new Artista();
+		this.openConnection();
+		try {
+
+			stmt = con.prepareStatement(CONSULTA_ARTISTA);
+
+			
+			stmt.setString(1, dni);
+			
+
+			ResultSet rs = stmt.executeQuery();
+
+			if (rs.next()) {
+				art.setDni(rs.getString("Dni"));
+				art.setNombreArtistico(rs.getString("nombreArtistico"));
+				art.setCantaAutor(rs.getBoolean("CantaAutor"));
+				for(Estilo e: Estilo.values()) 
+					if (e.toString().equalsIgnoreCase(rs.getString("Estilo"))) 
+						art.setEstilo(e);
+				
+			}else {
+				art=null;
+			}
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+		return art;
+	}
+
+	public Persona comprobarPersona(String dni) {
+		
+		Persona Per = new Persona();
+		this.openConnection();
+		try {
+
+			stmt = con.prepareStatement(CONSULTA_PERSONA);
+
+			
+			stmt.setString(1, dni);
+			ResultSet rs = stmt.executeQuery();
+
+			if (rs.next()) {
+				Per.setDni(rs.getString("Dni"));
+				Per.setNombrePersona(rs.getString("nombrePersona"));
+				Per.setApellidoPersona(rs.getString("apellidoPersona"));
+				Per.setPais(rs.getString("pais"));
+				Per.setEdad(rs.getInt("edad"));
+				
+			}else {
+				Per=null;
+			}
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+		return Per;
+	}
 	
 	public void registrarPersona(String dni, String nombreP, String apellido, String pais, int edad) {
 
@@ -657,7 +739,9 @@ public class DaoImplementacion implements Dao{
 		return artistas;
 	}
 	
+	
 
+	
 	@Override
 	public ArrayList<Cancion> sacarCanciones() {
 		// TODO Auto-generated method stub
@@ -695,6 +779,81 @@ public class DaoImplementacion implements Dao{
 
 		}
 		return canciones;
+	}
+	
+	@Override
+	public ArrayList<Cancion> sacarCancionesArtista(String dni) {
+		// TODO Auto-generated method stub
+		ArrayList<Cancion> canciones = new ArrayList<Cancion>();
+		Cancion ca ;
+
+		this.openConnection();
+
+		try {
+
+			stmt = con.prepareStatement(CANCIONES_POR_ARTISTA);
+			stmt.setString(1, dni);
+			ResultSet rs = stmt.executeQuery();
+
+			while (rs.next()) {
+				ca = new Cancion();
+				ca.setCodCancion(rs.getInt("codCancion"));
+				ca.setNombreCancion(rs.getString("nombreCancion"));
+				ca.setDuracion(rs.getInt("Duracion"));
+				ca.setAudio(rs.getString("Audio"));
+				ca.setCodAlbum(rs.getInt("codAlbum"));
+				
+				canciones.add(ca);
+			}
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+		return canciones;
+	}
+	
+	@Override
+	public Album sacarUltimaAlbum(String dni) {
+		// TODO Auto-generated method stub
+		
+		Album album = new Album();
+
+		this.openConnection();
+
+		try {
+
+			stmt = con.prepareStatement(SACAR_ULTIMA_CANCION);
+			stmt.setString(1, dni);
+			ResultSet rs = stmt.executeQuery();
+
+			if(rs.next()) {
+			
+				album.setCodAlbum(rs.getInt("codAlbum"));
+				album.setNombreAlbum(rs.getString("nombreAlbum"));
+				album.setFotoAlbum(rs.getString("fotoAlbum"));
+				album.setFechaLan(rs.getDate("fechaLan"));
+				
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+		return album;
 	}
 	
 	@Override
@@ -879,6 +1038,40 @@ public class DaoImplementacion implements Dao{
 
 		}
 		return play;
+	}
+	
+
+	public ArrayList<Playlist> sacarPlaylistUsuario(String dni) {
+		ArrayList<Playlist> plays = new ArrayList<>();
+		Playlist play = null;
+
+		this.openConnection();
+
+		try {
+			stmt = con.prepareStatement(PLAYLIST_POR_USUARIO);
+			stmt.setString(1, dni);
+			ResultSet rs = stmt.executeQuery();
+			
+			while (rs.next()) {
+				play = new Playlist();
+				play.setCodPlaylist(rs.getInt("codPlayList"));
+				play.setNombrePlaylist(rs.getString("nombrePlayList"));
+				play.setFotoPlaylist(rs.getString("fotoPlayList"));
+				plays.add(play);
+			}
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+		return plays;
 	}
 	
 	@Override
@@ -1228,35 +1421,156 @@ public class DaoImplementacion implements Dao{
 		
 	}
 
-public void registrarArtista(String dni, String nombreArtistico, boolean cantaAutor, String estilo) {
+	public void registrarArtista(String dni, String nombreArtistico, boolean cantaAutor, String estilo) {
+			// TODO Auto-generated method stub
+			this.openConnection();
+	
+			try {
+	
+				stmt = con.prepareStatement(INSERT_ARTISTA);
+				stmt.setString(1, dni);
+				stmt.setString(2, nombreArtistico);
+				stmt.setBoolean(3, cantaAutor);
+				stmt.setString(4, estilo);
+	
+				stmt.executeUpdate();
+	
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	
+			try {
+				closeConnection();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+	
+			}
+	
+		}
+	
+	public ArrayList<Artista> sacarArtista(){
 		// TODO Auto-generated method stub
+		ArrayList<Artista> artistas = new ArrayList<>();
+		Artista artista ;
 		this.openConnection();
-
+	
 		try {
-
-			stmt = con.prepareStatement(INSERT_ARTISTA);
-			stmt.setString(1, dni);
-			stmt.setString(2, nombreArtistico);
-			stmt.setBoolean(3, cantaAutor);
-			stmt.setString(4, estilo);
-
-			stmt.executeUpdate();
-
+	
+			stmt = con.prepareStatement(SACAR_ARTISTAS);
+			ResultSet rs = stmt.executeQuery();
+					
+			while (rs.next()) {
+				artista = new Artista();
+				artista.setDni(rs.getString("Dni"));
+				artista.setNombreArtistico(rs.getString("nombreArtistico"));
+				artista.setCantaAutor(rs.getBoolean("CantaAutor"));
+				for(Estilo e: Estilo.values()) 
+					if (e.toString().equalsIgnoreCase(rs.getString("Estilo"))) 
+						artista.setEstilo(e);
+				artistas.add(artista);
+			}	
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 		try {
 			closeConnection();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-
 		}
-
+		return artistas;
 	}
-
-
 	
+	@Override
+	public ArrayList<Persona> sacarPersonas() {
+		// TODO Auto-generated method stub
+				ArrayList<Persona> personas = new ArrayList<>();
+				Persona persona ;
+				this.openConnection();
+	
+				try {
+	
+					stmt = con.prepareStatement(SACAR_PERSONAS_ARTISTAS);
+					ResultSet rs = stmt.executeQuery();
+							
+					while (rs.next()) {
+						persona = new Persona();
+						persona.setDni(rs.getString("Dni"));
+						persona.setNombrePersona(rs.getString("nombrePersona"));
+						persona.setApellidoPersona(rs.getString("apellidoPersona"));
+						persona.setPais(rs.getString("pais"));
+						persona.setEdad(rs.getInt("Edad"));
+						personas.add(persona);
+					}	
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				try {
+					closeConnection();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				return personas;
+	}
+	
+	@Override
+	public void modificarPersona(String dni, String nombre, String apellido, String pais, int edad) {
+		// TODO Auto-generated method stub
+		
+		
+		this.openConnection();
+				
+		try {
+			stmt = con.prepareStatement(MODIFICAR_PERSONA);
+			stmt.setString(1, nombre);
+			stmt.setString(2, apellido);
+			stmt.setString(3, pais);
+			stmt.setInt(4, Integer.valueOf(edad));
+			stmt.setString(5, dni);
+			stmt.setString(6, dni);
+			stmt.executeUpdate();
+					
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+	}
+	
+	@Override
+	public void modificarArtista(String dni, String nombre, String estilo, boolean cantaAutor) {
+		this.openConnection();
+		
+		try {
+			stmt = con.prepareStatement(MODIFICAR_ARTISTA);
+			stmt.setString(1, nombre);
+			stmt.setBoolean(2, cantaAutor);
+			stmt.setString(3, estilo);
+			stmt.setString(4, dni);
+			stmt.setString(5, dni);
+	
+			stmt.executeUpdate();
+					
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}				
+		
+	}
 }

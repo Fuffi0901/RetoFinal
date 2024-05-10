@@ -4,26 +4,52 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import controlador.Dao;
+import modelo.Persona;
+import modelo.Usuario;
+
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Color;
+
+import javax.swing.border.*;
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JTextField;
+import javax.swing.JPasswordField;
+import javax.swing.JRadioButton;
+import javax.swing.SwingConstants;
 
 public class VCerrar_Sesion extends JDialog implements ActionListener{
 	
-	private JButton btnSi;
-	private JButton btnNo;
+	private JButton btnCerrarSesion;
 	private Dao dao;
-
+	private Usuario usu;
 	private final JPanel contentPanel = new JPanel();
+	private JTextField textDni;
+	private JTextField textNombre;
+	private JTextField textApellido;
+	private JTextField textPais;
+	private JTextField textEdad;
+	private JTextField textNombreUsuario;
+	private JPasswordField pFConstraseña;
+	private JRadioButton rbMostrarConstraseña;
+	private JLabel lbTitulo;
+	private JLabel lblNewLabel_1;
+	private JButton btnModificar;
+	private JButton btnEliminar;
 
 	/**
 	 * Create the dialog.
@@ -51,6 +77,10 @@ public class VCerrar_Sesion extends JDialog implements ActionListener{
 
 	public void pantalla(Dao dao) {
 		this.dao = dao;
+		cogerUsuario();
+		
+		
+		Border border = BorderFactory.createMatteBorder(0, 0, 1, 0, Color.WHITE);
 		setBackground(new Color(78, 78, 78));
 		
 		setBackground(new Color(64, 128, 128));
@@ -61,41 +91,164 @@ public class VCerrar_Sesion extends JDialog implements ActionListener{
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(null);
 		{
-			JLabel lbTitulo = new JLabel("Cerrar Sesión");
-			lbTitulo.setForeground(new Color(75, 75, 75));
-			lbTitulo.setBounds(323, 10, 657, 88);
-			lbTitulo.setFont(new Font("Stencil", Font.PLAIN, 87));
+			lbTitulo = new JLabel("");
+			lbTitulo.setForeground(new Color(0, 0, 0));
+			lbTitulo.setBounds(40, 27, 657, 88);
+			lbTitulo.setFont(new Font("Stencil", Font.PLAIN, 87));			
 			contentPanel.add(lbTitulo);
 		}
-		{
-			JLabel lblTexto = new JLabel("¿QUIERES CERRAR SESIÓN?");
-			lblTexto.setForeground(new Color(255, 255, 255));
-			lblTexto.setFont(new Font("Eras Light ITC", Font.PLAIN, 61));
-			lblTexto.setBounds(261, 198, 730, 160);
-			contentPanel.add(lblTexto);
-		}
 		
-			btnSi = new JButton("SI");
-			btnSi.setForeground(new Color(255, 255, 255));
-			btnSi.setBackground(new Color(64, 128, 128));
-			btnSi.setFont(new Font("Imprint MT Shadow", Font.PLAIN, 46));
-			btnSi.setBounds(402, 430, 122, 97);
-			btnSi.setOpaque(false);
-			btnSi.setBorderPainted(false);
-			btnSi.setFocusable(false);
-			contentPanel.add(btnSi);
-			btnSi.addActionListener(this);
+			btnCerrarSesion = new JButton("CERRAR SESION");
+			btnCerrarSesion.setForeground(new Color(255, 255, 255));
+			btnCerrarSesion.setBackground(new Color(64, 128, 128));
+			btnCerrarSesion.setFont(new Font("Imprint MT Shadow", Font.PLAIN, 35));
+			btnCerrarSesion.setBounds(845, 544, 353, 79);
+			btnCerrarSesion.setOpaque(false);
+			btnCerrarSesion.setBorderPainted(false);
+			btnCerrarSesion.setFocusable(false);
+			contentPanel.add(btnCerrarSesion);
+			btnCerrarSesion.addActionListener(this);
 			
-			btnNo = new JButton("NO");
-			btnNo.setForeground(new Color(255, 255, 255));
-			btnNo.setBackground(new Color(64, 128, 128));
-			btnNo.setFont(new Font("Imprint MT Shadow", Font.PLAIN, 46));
-			btnNo.setBounds(697, 430, 122, 97);
-			btnNo.setOpaque(false);
-			btnNo.setBorderPainted(false);
-			btnNo.setFocusable(false);
-			contentPanel.add(btnNo);
-			btnNo.addActionListener(this);
+			JLabel lblNewLabel = new JLabel("DNI :");
+			lblNewLabel.setForeground(new Color(255, 255, 255));
+			lblNewLabel.setFont(new Font("Imprint MT Shadow", Font.PLAIN, 25));
+			lblNewLabel.setBounds(69, 137, 175, 44);
+			contentPanel.add(lblNewLabel);
+			
+			textDni = new JTextField();
+			textDni.setForeground(new Color(255, 255, 255));
+			textDni.setBounds(69, 187, 255, 31);
+			textDni.setOpaque(false);
+	        textDni.setBorder(border);
+			textDni.setColumns(10);
+			contentPanel.add(textDni);
+			
+			JLabel lblNombre = new JLabel("Nombre");
+			lblNombre.setForeground(Color.WHITE);
+			lblNombre.setFont(new Font("Imprint MT Shadow", Font.PLAIN, 25));
+			lblNombre.setBounds(69, 265, 175, 44);
+			contentPanel.add(lblNombre);
+			
+			textNombre = new JTextField();
+			textNombre.setOpaque(false);
+			textNombre.setBorder(border);
+			textNombre.setForeground(Color.WHITE);
+			textNombre.setColumns(10);
+			textNombre.setBounds(69, 315, 255, 31);
+			contentPanel.add(textNombre);
+			
+			JLabel lblApellido = new JLabel("Apellido");
+			lblApellido.setForeground(Color.WHITE);
+			lblApellido.setFont(new Font("Imprint MT Shadow", Font.PLAIN, 25));
+			lblApellido.setBounds(402, 265, 175, 44);
+			contentPanel.add(lblApellido);
+			
+			textApellido = new JTextField();
+			textApellido.setOpaque(false);
+			textApellido.setForeground(Color.WHITE);
+			textApellido.setBorder(border);
+			textApellido.setColumns(10);
+			textApellido.setBounds(402, 320, 255, 31);
+			contentPanel.add(textApellido);
+			
+			JLabel lblPais = new JLabel("Pais");
+			lblPais.setForeground(Color.WHITE);
+			lblPais.setFont(new Font("Imprint MT Shadow", Font.PLAIN, 25));
+			lblPais.setBounds(69, 403, 175, 44);
+			contentPanel.add(lblPais);
+			
+			textPais = new JTextField();
+			textPais.setOpaque(false);
+			textPais.setForeground(Color.WHITE);
+			textPais.setBorder(border);
+			textPais.setColumns(10);
+			textPais.setBounds(69, 453, 255, 31);
+			contentPanel.add(textPais);
+			
+			JLabel lblEdad = new JLabel("Edad");
+			lblEdad.setForeground(Color.WHITE);
+			lblEdad.setFont(new Font("Imprint MT Shadow", Font.PLAIN, 25));
+			lblEdad.setBounds(402, 401, 175, 44);
+			contentPanel.add(lblEdad);
+			
+			textEdad = new JTextField();
+			textEdad.setOpaque(false);
+			textEdad.setForeground(Color.WHITE);
+			textEdad.setBorder(border);
+			textEdad.setColumns(10);
+			textEdad.setBounds(402, 453, 255, 31);
+			contentPanel.add(textEdad);
+			
+			JLabel lblNombreUsuario = new JLabel("Nombre Usuario");
+			lblNombreUsuario.setForeground(Color.WHITE);
+			lblNombreUsuario.setFont(new Font("Imprint MT Shadow", Font.PLAIN, 25));
+			lblNombreUsuario.setBounds(1017, 139, 201, 44);
+			contentPanel.add(lblNombreUsuario);
+			
+			textNombreUsuario = new JTextField();
+			textNombreUsuario.setOpaque(false);
+			textNombreUsuario.setForeground(Color.WHITE);
+			textNombreUsuario.setBorder(border);
+			textNombreUsuario.setColumns(10);
+			textNombreUsuario.setBounds(943, 187, 255, 31);
+			contentPanel.add(textNombreUsuario);
+			
+			JLabel lblContrasea = new JLabel("Contraseña");
+			lblContrasea.setForeground(Color.WHITE);
+			lblContrasea.setFont(new Font("Imprint MT Shadow", Font.PLAIN, 25));
+			lblContrasea.setBounds(1070, 265, 135, 44);
+			contentPanel.add(lblContrasea);
+			
+			pFConstraseña = new JPasswordField();
+			pFConstraseña.setForeground(new Color(255, 255, 255));
+			pFConstraseña.setOpaque(false);
+			pFConstraseña.setBorder(border);
+			pFConstraseña.setBounds(943, 315, 255, 31);
+			contentPanel.add(pFConstraseña);
+			
+			
+			
+	        
+			rbMostrarConstraseña = new JRadioButton();
+			rbMostrarConstraseña.setOpaque(false);
+			rbMostrarConstraseña.setBounds(1181, 352, 28, 35);
+			rbMostrarConstraseña.addItemListener(new ItemListener(){
+				public void itemStateChanged(ItemEvent e) {
+					mostrarConstraseña();
+				}
+			});
+			contentPanel.add(rbMostrarConstraseña);
+			
+			lblNewLabel_1 = new JLabel("Mostrar Contraseña");
+			lblNewLabel_1.setHorizontalAlignment(SwingConstants.RIGHT);
+			lblNewLabel_1.setFont(new Font("Times New Roman", Font.PLAIN, 15));
+			lblNewLabel_1.setForeground(Color.WHITE);
+			lblNewLabel_1.setBounds(1017, 356, 158, 23);
+			contentPanel.add(lblNewLabel_1);
+			
+			btnModificar = new JButton("MODIFICAR");
+			btnModificar.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+				}
+			});
+			btnModificar.setOpaque(false);
+			btnModificar.setForeground(Color.WHITE);
+			btnModificar.setFont(new Font("Imprint MT Shadow", Font.PLAIN, 16));
+			btnModificar.setFocusable(false);
+			btnModificar.setBorderPainted(false);
+			btnModificar.setBackground(new Color(64, 128, 128));
+			btnModificar.setBounds(869, 625, 169, 44);
+			contentPanel.add(btnModificar);
+			
+			btnEliminar = new JButton("ELIMINAR");
+			btnEliminar.setOpaque(false);
+			btnEliminar.setForeground(Color.WHITE);
+			btnEliminar.setFont(new Font("Imprint MT Shadow", Font.PLAIN, 16));
+			btnEliminar.setFocusable(false);
+			btnEliminar.setBorderPainted(false);
+			btnEliminar.setBackground(new Color(64, 128, 128));
+			btnEliminar.setBounds(1017, 625, 159, 44);
+			contentPanel.add(btnEliminar);
 			
 			JLabel fondo = new JLabel("") {
 				protected void paintComponent(Graphics g) {
@@ -108,29 +261,63 @@ public class VCerrar_Sesion extends JDialog implements ActionListener{
 			};
 			fondo.setBounds(0, 0, 1256, 724);
 			contentPanel.add(fondo);
+			
+			cargarDatos();
+	}
+
+	
+
+	private void cogerUsuario() {
+		// TODO Auto-generated method stub
+		VPrincipal prin= new VPrincipal(this, true, dao);
+		usu=(Usuario) dao.comprobarPersona(prin.devolverUsuario().getDni());
+		usu.setNombreUsuario(prin.devolverUsuario().getNombreUsuario());
+		usu.setConstraseña(prin.devolverUsuario().getConstraseña());
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
-		if(e.getSource().equals(btnSi)) {
+		if(e.getSource().equals(btnCerrarSesion)) {
 			volverInicio_Sesion();
 		}
-		if(e.getSource().equals(btnNo)) {
-			volverVPrincipal();
-		}
+	}
+	
+	private void cargarDatos() {
+		// TODO Auto-generated method stub
+		lbTitulo.setText(usu.getNombreUsuario());
+		textDni.setText(usu.getDni());
+		textNombre.setText(usu.getNombrePersona());
+		textApellido.setText(usu.getApellidoPersona());
+		textEdad.setText(String.valueOf(usu.getEdad()));
+		textPais.setText(usu.getPais());
+		textNombreUsuario.setText(usu.getNombreUsuario());
+		pFConstraseña.setText(usu.getConstraseña());
 	}
 
 	private void volverInicio_Sesion() {
-		this.setVisible(false);
-		Inicio_Sesion ven = new Inicio_Sesion(dao);
-		ven.setVisible(true);
+		int opcion = JOptionPane.showConfirmDialog(null, "¿Seguro que quiere cerrar sesion?", "Confirmación", JOptionPane.YES_NO_OPTION);
+		if (opcion == JOptionPane.YES_OPTION) {
+			this.setVisible(false);
+			Inicio_Sesion ven = new Inicio_Sesion(dao);
+			ven.setVisible(true);
+		}
+		
 	}
-
+	
+	private void mostrarConstraseña() {
+		if (rbMostrarConstraseña.isSelected()) {
+            // Mostrar contraseña
+			pFConstraseña.setEchoChar((char) 0);
+        } else {
+            // Ocultar contraseña
+        	pFConstraseña.setEchoChar('\u2022');
+        }
+	}
+		
 	private void volverVPrincipal() {
 		this.setVisible(false);
 		VPrincipal ven = new VPrincipal(this, true, dao);
 		ven.setVisible(true);
 	}
-
 }

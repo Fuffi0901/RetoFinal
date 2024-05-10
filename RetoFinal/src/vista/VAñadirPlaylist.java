@@ -68,9 +68,10 @@ public class VAñadirPlaylist extends JDialog implements ActionListener{
 	private JButton btnQuitarCancion;
 	private JTextField textFoto;
 	private JButton btnArchivos;
+	private JButton btnAtras;
 	private JFileChooser fc;
 	private File file;
-	private String carpetaFinal = "..\\FinalChalenge\\Img\\";
+	private String carpetaFinal = "..\\RetoFinal\\Img\\";
 	private JFrame ven;
 	/**
 	 * Launch the application.
@@ -79,8 +80,8 @@ public class VAñadirPlaylist extends JDialog implements ActionListener{
 	/**
 	 * Create the dialog.
 	 */
-	public VAñadirPlaylist(Inicio_Sesion inicio_Sesion,boolean b, Dao dao,Usuario usu) {
-		super(inicio_Sesion);
+	public VAñadirPlaylist(VPrincipal vPrincipal,boolean b, Dao dao,Usuario usu) {
+		super(vPrincipal);
 		this.setModal(b);
 		this.dao=dao;
 		this.usu=usu;
@@ -91,6 +92,18 @@ public class VAñadirPlaylist extends JDialog implements ActionListener{
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(null);
+		
+		
+		btnAtras = new JButton("");
+		btnAtras.setBackground(new Color(75, 75, 75));
+		btnAtras.setIcon(new ImageIcon("..\\RetoFinal\\Img\\flechaAtras.png"));
+		btnAtras.setBounds(10, 10, 36, 32);
+		btnAtras.setOpaque(false);
+		btnAtras.setBorderPainted(false);
+		btnAtras.setFocusable(false);
+		contentPanel.add(btnAtras);
+		btnAtras.addActionListener(this);
+		
 		
 		JLabel lblNewLabel = new JLabel("PLAYLIST");
 		lblNewLabel.setForeground(new Color(255, 255, 255));
@@ -272,9 +285,18 @@ public class VAñadirPlaylist extends JDialog implements ActionListener{
 		if(e.getSource().equals(comboP)) {
 			cargarDatos();
 		}
+		if(e.getSource().equals(btnAtras)) {
+			volverAtras();
+		}
 	}
 	
 
+	private void volverAtras() {
+		// TODO Auto-generated method stub
+		this.dispose();
+		VPrincipal ven = new VPrincipal(this, true, dao,usu);
+		ven.setVisible(true);
+	}
 
 
 	private void añadirPlaylist() {
@@ -314,7 +336,7 @@ public class VAñadirPlaylist extends JDialog implements ActionListener{
 	}
 	
 	private Playlist sacarSeleccionado() {
-		ArrayList<Playlist> playl = dao.sacarPlaylists();
+		ArrayList<Playlist> playl = dao.sacarPlaylistUsuario(usu.getDni());
 		int pos = comboP.getSelectedIndex();
 		Playlist seleccionado = playl.get(pos);
 		return seleccionado;
@@ -346,7 +368,7 @@ public class VAñadirPlaylist extends JDialog implements ActionListener{
 
 	private void cargarComboPlaylist() {
 		// TODO Auto-generated method stub
-		ArrayList<Playlist> playl = dao.sacarPlaylists();
+		ArrayList<Playlist> playl = dao.sacarPlaylistUsuario(usu.getDni());
 		for(Playlist p:playl) {
 			comboP.addItem(p.getNombrePlaylist());
 		}
