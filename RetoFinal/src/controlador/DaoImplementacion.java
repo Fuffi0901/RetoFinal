@@ -31,6 +31,8 @@ public class DaoImplementacion implements Dao{
 	private final String CONSULTA_USUARIO = "select * from Usuario where  Contraseina=? and NombreUsuario=?";
 	private final String CONSULTA_ARTISTA = "select * from Artista where  dni=?";
 	private final String CONSULTA_PERSONA= "select * from Persona where  Dni=?";
+	private final String MODIFICAR_USUARIO="call modificacionUsuario(?,?,?,?,?,?,?)";
+	private final String ELIMINAR_USUARIO="call eliminarUsuario(?)";
 	private final String INSERT_PERSONA =  "insert into persona(Dni,nombrePersona,apellidoPersona,pais,edad) values (?,?,?,?,?)";
 	private final String INSERT_USUARIO =  "insert into usuario(Dni,contraseina,NombreUsuario) values (?,?,?)";
 	
@@ -236,8 +238,60 @@ public class DaoImplementacion implements Dao{
 		return mensaje;
 	}
 	
+	public void modificarUsuario(Usuario usu) {
+		
+		this.openConnection();
+		try {
+
+			stmt = con.prepareStatement(MODIFICAR_USUARIO);
+
+			
+			stmt.setString(1, usu.getDni());
+			stmt.setString(2, usu.getNombrePersona());
+			stmt.setString(3, usu.getApellidoPersona());
+			stmt.setString(4, usu.getPais());
+			stmt.setInt(5, usu.getEdad());
+			stmt.setString(6, usu.getNombreUsuario());
+			stmt.setString(7, usu.getConstraseña());
+			stmt.executeUpdate();
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+	}
 	
-	
+	public void eliminarUsuario(String dni) {
+		
+		this.openConnection();
+		try {
+
+			stmt = con.prepareStatement(ELIMINAR_USUARIO);
+
+			
+			stmt.setString(1, dni);
+			stmt.executeUpdate();
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+	}
+
 	public Usuario comprobarUsuario(String nombre, String contraseña) {
 		
 		Usuario usu = new Usuario();
@@ -569,7 +623,7 @@ public class DaoImplementacion implements Dao{
 	
 
 	@Override
-	public void modificarAlbum(String cod, String nombre, String foto, String fecha) {
+	public void modificarAlbum(String cod, String nombre, String foto, Date fecha) {
 		// TODO Auto-generated method stub
 		
 		
@@ -582,7 +636,7 @@ public class DaoImplementacion implements Dao{
 			stmt.setInt(1, Integer.valueOf(cod));
 			stmt.setString(2, nombre);
 			stmt.setString(3, foto);
-			stmt.setDate(4, Date.valueOf(fecha));
+			stmt.setDate(4, fecha);
 			stmt.setInt(5, Integer.valueOf(cod));
 			stmt.executeUpdate();
 			

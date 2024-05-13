@@ -43,7 +43,7 @@ public class Inicio_Sesion extends JFrame implements ActionListener{
 	private Dao dao;
 	private JLabel lblNewLabel_1;
 	private JButton btnLogo;
-
+	private static Usuario usu;
 	/**
 	 * Create the frame.
 	 * @param dao2 
@@ -55,6 +55,7 @@ public class Inicio_Sesion extends JFrame implements ActionListener{
 		setTitle("BEATDAM");
 		setIconImage(Toolkit.getDefaultToolkit().getImage("..\\RetoFinal\\Img\\logoPequeña.png"));
 		Pantallas(dao);
+		setLocationRelativeTo(null);
 	}
 	
 	public void Pantallas(Dao dao) {
@@ -200,21 +201,26 @@ public class Inicio_Sesion extends JFrame implements ActionListener{
 	private void entrarAplicacion() {
 		@SuppressWarnings("deprecation")
 		Usuario usu = dao.comprobarUsuario(tFUsuario.getText(),pFConstraseña.getText());
+		this.usu=usu;
 		if(null == usu) {
 			JOptionPane.showMessageDialog(null, "NOMBRE O CONTRASEÑA INCORRECTO","ERROR",JOptionPane.ERROR_MESSAGE);
 		}else if(tFUsuario.getText().equalsIgnoreCase("admin") && pFConstraseña.getText().equalsIgnoreCase("admin")){
 			this.dispose();
 			VverAdmin ven =new VverAdmin(this,true,dao);
+			ven.setLocationRelativeTo(null);
 			ven.setVisible(true);
 			
 			
 		}else {
 			this.dispose();
-			VPrincipal ven = new VPrincipal(this, true, dao, usu);
+			VPrincipal ven = new VPrincipal(this, true, dao);
 			ven.setVisible(true);
 		}
 	}
 
+	public Usuario devolverUsuario() {
+		return this.usu;
+	}
 	
 	private void registrarseAplicacion() {
 		this.setVisible(false);

@@ -78,8 +78,6 @@ public class VPrincipal extends JDialog implements ActionListener {
     private JPanel panelAlbum = new JPanel();
     private Cancion cancion;
     private Clip clip;
-    private JButton btnStop;
-    private JButton btnPlay;
     private boolean play = false;
     private JPanel panelPlay;
     private Playlist playlist;
@@ -96,12 +94,12 @@ public class VPrincipal extends JDialog implements ActionListener {
      * @wbp.parser.constructor
 	 */
 	
-	public VPrincipal(Inicio_Sesion inicio_Sesion, boolean modal, Dao dao, Usuario usuario) {
+	public VPrincipal(Inicio_Sesion inicio_Sesion, boolean modal, Dao dao) {
 		super(inicio_Sesion);
 		setIconImage(Toolkit.getDefaultToolkit().getImage("C:\\Users\\1dam\\Desktop\\PGR\\3ª Eva\\RetoFinal\\Img\\logoPequeña.png"));
 		setModal(modal);
-		pantalla(dao, usuario);
-		
+		pantalla(dao);
+		setLocationRelativeTo(null);
 	}
 	
 	public VPrincipal(VentanaPlay ventanaPlay, boolean modal, Dao dao, boolean play, Cancion cancion, int pos2) {
@@ -110,38 +108,44 @@ public class VPrincipal extends JDialog implements ActionListener {
 		this.play = play;
 		this.pos = pos2;
 		this.cancion = cancion;
-		pantalla(dao, null);
+		pantalla(dao);
+		setLocationRelativeTo(null);
 	}
 	
 	public VPrincipal(VverArtista verArtista, boolean modal, Dao dao) {
 		super(verArtista);
 		setModal(modal);
-		pantalla(dao, null);
+		pantalla(dao);
+		setLocationRelativeTo(null);
 	}
 	
 	public VPrincipal(VListaCanciones VlistaCanciones, boolean modal, Dao dao) {
 		super(VlistaCanciones);
 		setModal(modal);
-		pantalla(dao, null);
+		pantalla(dao);
+		setLocationRelativeTo(null);
 	}
 	
-	public VPrincipal(VAñadirPlaylist playlist,  boolean modal, Dao dao,Usuario usuario) {
+	public VPrincipal(VAñadirPlaylist playlist,  boolean modal, Dao dao) {
 		super(playlist);
 		setModal(modal);
-		pantalla(dao, usuario);
+		pantalla(dao);
+		setLocationRelativeTo(null);
 	}
 	
 	public VPrincipal(VCerrar_Sesion vCerrar_Sesion, boolean modal, Dao dao) {
 		super(vCerrar_Sesion);
 		setModal(modal);
-		pantalla(dao, null);	}
+		pantalla(dao);
+		setLocationRelativeTo(null);
+	}
 
-	public void pantalla(Dao dao, Usuario usuario) {
+	public void pantalla(Dao dao) {
     	this.dao = dao;
     	artistas = dao.sacarartistas();
-    	if(usuario!=null) {
-    		this.usu = usuario;
-    	}
+    	cogerUsuario();
+    	
+    	
         setBackground(new Color(214, 214, 214));
         setBounds(100, 100, 1259, 749);
         getContentPane().setLayout(new BorderLayout());
@@ -185,16 +189,31 @@ public class VPrincipal extends JDialog implements ActionListener {
         scrollPane.setVisible(false);
         contentPanel.add(scrollPane);
 		
-        btnSiguientePlay = new JButton(">");
+        
+        btnSiguientePlay = new JButton("");
+        btnSiguientePlay.setBackground(new Color(255, 255, 255));
+        btnSiguientePlay.setBounds(1110, 217, 85, 100);
+        btnSiguientePlay.setOpaque(false);
+        btnSiguientePlay.setBorderPainted(false);
+        btnSiguientePlay.setFocusable(false);
+        ImageIcon icon = new ImageIcon("..\\RetoFinal\\Img\\btnSiguiente.png"); 
+		Image image = icon.getImage();
+		Image imageRedimensionada = image.getScaledInstance(btnSiguientePlay.getWidth(),btnSiguientePlay.getHeight(), Image.SCALE_SMOOTH);
+		ImageIcon iconRedimensionado = new ImageIcon(imageRedimensionada);
+        btnSiguientePlay.setIcon(iconRedimensionado);
         btnSiguientePlay.setFont(new Font("Tahoma", Font.PLAIN, 28));
-        btnSiguientePlay.addActionListener(this);
-        	
-		btnSiguientePlay.setBounds(1089, 181, 85, 69);
+        btnSiguientePlay.addActionListener(this); 	
+		
 		contentPanel.add(btnSiguientePlay);
 		
-		btnSiguienteAlbum = new JButton(">");
+		btnSiguienteAlbum = new JButton("");
+		btnSiguienteAlbum.setBackground(new Color(255, 255, 255));
+		btnSiguienteAlbum.setOpaque(false);
+		btnSiguienteAlbum.setBorderPainted(false);
+		btnSiguienteAlbum.setFocusable(false);
+		btnSiguienteAlbum.setIcon(iconRedimensionado);
 		btnSiguienteAlbum.setFont(new Font("Tahoma", Font.PLAIN, 45));
-		btnSiguienteAlbum.setBounds(1089, 430, 85, 100);
+		btnSiguienteAlbum.setBounds(1110, 460, 85, 100);
 		btnSiguienteAlbum.setOpaque(false);
 		btnSiguienteAlbum.addActionListener(this);
 		contentPanel.add(btnSiguienteAlbum);
@@ -203,7 +222,7 @@ public class VPrincipal extends JDialog implements ActionListener {
         
         panelPlay = new JPanel();
 		panelPlay.setOpaque(false);
-		panelPlay.setBounds(126, 181, 942, 143);
+		panelPlay.setBounds(147, 203, 942, 143);
 		contentPanel.add(panelPlay);
 		panelPlay.setLayout(null);
 		
@@ -254,20 +273,20 @@ public class VPrincipal extends JDialog implements ActionListener {
         
         
         btnCrearPlaylist = new JButton("+");
-		btnCrearPlaylist.setBounds(320, 127, 85, 44);
+		btnCrearPlaylist.setBounds(320, 139, 85, 44);
 		btnCrearPlaylist.addActionListener(this);
 		contentPanel.add(btnCrearPlaylist);
 		
         lblPlayList = new JLabel("PlayLists");
         lblPlayList.setForeground(new Color(75, 75, 75));
         lblPlayList.setFont(new Font("Stencil", Font.PLAIN, 44));
-        lblPlayList.setBounds(70, 127, 242, 50);
+        lblPlayList.setBounds(70, 139, 242, 50);
         contentPanel.add(lblPlayList);
 
         lblAlbumes = new JLabel("Albumes");
         lblAlbumes.setForeground(new Color(75, 75, 75));
         lblAlbumes.setFont(new Font("Stencil", Font.PLAIN, 44));
-        lblAlbumes.setBounds(70, 376, 242, 50);
+        lblAlbumes.setBounds(70, 388, 242, 50);
         contentPanel.add(lblAlbumes);
         
         
@@ -284,35 +303,40 @@ public class VPrincipal extends JDialog implements ActionListener {
 		btnLogo.setIcon(iconoRedimensionado);
 		contentPanel.add(btnLogo);
 		btnLogo.addActionListener(this);
-       
-        btnStop = new JButton("");
-		btnStop.setBounds(969, 613, 80, 80);
-		contentPanel.add(btnStop);
-		
-		btnPlay = new JButton("");
-		btnPlay.setBounds(969, 613, 80, 80);
-		contentPanel.add(btnPlay);
 		
         //BotonesPlaylist();
 		 panelAlbum = new JPanel();
-         panelAlbum.setBounds(126, 430, 942, 143);
+         panelAlbum.setBounds(147, 452, 942, 143);
          panelAlbum.setOpaque(false);
  		 contentPanel.add(panelAlbum);        
  	 	 panelAlbum.setLayout(null);
 		
-        
-		btnAnteriorAlbum = new JButton("<");
-		btnAnteriorAlbum.setFont(new Font("Tahoma", Font.PLAIN, 28));
-		btnAnteriorAlbum.setBounds(10, 430, 85, 69);
-		btnAnteriorAlbum.addActionListener(this);
-		contentPanel.add(btnAnteriorAlbum);
-		
-		btnAnteriorPlaylist = new JButton("<");
+		btnAnteriorPlaylist = new JButton("");
+		btnAnteriorPlaylist.setBackground(new Color(255, 255, 255));
+		btnAnteriorPlaylist.setBounds(52, 217, 85, 100);
+		btnAnteriorPlaylist.setOpaque(false);
+		btnAnteriorPlaylist.setBorderPainted(false);
+		btnAnteriorPlaylist.setFocusable(false);
+		ImageIcon icn = new ImageIcon("..\\RetoFinal\\Img\\btnAnterior.png");
+		Image img = icn.getImage();
+		Image imgeRedimensionada = img.getScaledInstance(btnAnteriorPlaylist.getWidth(),btnAnteriorPlaylist.getHeight(), Image.SCALE_SMOOTH);
+		ImageIcon icnRedimensionado = new ImageIcon(imgeRedimensionada);
 		btnAnteriorPlaylist.setFont(new Font("Tahoma", Font.PLAIN, 28));
-		btnAnteriorPlaylist.setBounds(31, 205, 85, 69);
+		btnAnteriorPlaylist.setIcon(icnRedimensionado);
+		
 		btnAnteriorPlaylist.addActionListener(this);
 		contentPanel.add(btnAnteriorPlaylist);
 		
+		btnAnteriorAlbum = new JButton("");
+		btnAnteriorAlbum.setBackground(new Color(255, 255, 255));
+		btnAnteriorAlbum.setFont(new Font("Tahoma", Font.PLAIN, 28));
+		btnAnteriorAlbum.setIcon(icnRedimensionado);
+		btnAnteriorAlbum.setBounds(52, 460, 85, 100);
+		btnAnteriorAlbum.setBorderPainted(false);
+		btnAnteriorAlbum.setFocusable(false);
+		btnAnteriorAlbum.setOpaque(false);
+		btnAnteriorAlbum.addActionListener(this);
+		contentPanel.add(btnAnteriorAlbum);
 		
 		BotonesAlbum();
 		BotonesPlaylist();
@@ -337,41 +361,19 @@ public class VPrincipal extends JDialog implements ActionListener {
 			
 		
 			
-		
-		if(play) {
-			 File archivoSonido = new File(cancion.getAudio());
-		       AudioInputStream audio;
-				try {
-					audio = AudioSystem.getAudioInputStream(archivoSonido);
-					clip  = AudioSystem.getClip();
-			    	clip.open(audio);
-				} catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			btnPlay.setVisible(false);
-			btnStop.setVisible(true);
-			play();
-		} else { 
-			btnPlay.setVisible(true);
-			btnStop.setVisible(false);
-			stop();
-		}
-		
-		
-    }
+	}
 	
-	  @Override
+	  private void cogerUsuario() {
+		// TODO Auto-generated method stub
+		  Inicio_Sesion ini = new Inicio_Sesion(dao);
+		  this.usu = ini.devolverUsuario();
+	}
+
+	@Override
 	    public void actionPerformed(ActionEvent e) {
 	        if (e.getSource().equals(btnLogo)) {
 	            irCerrar_Sesion();
 	        }
-	        if(e.getSource().equals(btnPlay)) {
-	    		play();	
-	    	}
-	    	if(e.getSource().equals(btnStop)) {
-	    		stop();	
-	    	}
 	    	if(e.getSource().equals(btnCrearPlaylist)) {
 	    		irAñadirPlaylist();	
 	    	}
@@ -395,16 +397,12 @@ public class VPrincipal extends JDialog implements ActionListener {
 
 	
 	
-	public Usuario devolverUsuario() {
-		return this.usu;
-	}
-	
-	
 
 	private void irAñadirPlaylist() {
 		// TODO Auto-generated method stub
 		this.dispose();
 		VAñadirPlaylist ven = new VAñadirPlaylist(this, play, dao, usu);
+		ven.setLocationRelativeTo(null);
 		ven.setVisible(true);
 	}
 
@@ -510,7 +508,7 @@ public class VPrincipal extends JDialog implements ActionListener {
     		String nombre = list.getSelectedValue().toString();
         	if(nombre.contains("|")) {	
         		escucharCancion(nombre);
-        	}else if(nombre.equalsIgnoreCase(" ") || nombre.equalsIgnoreCase("↓Artistas")  || nombre.equalsIgnoreCase("Canciones") ) {
+        	}else if(nombre.equalsIgnoreCase(" ") || nombre.equalsIgnoreCase("↓Artistas")  || nombre.equalsIgnoreCase("↓Canciones") ) {
         		
         	}else if(!nombre.contains("|")){
         		
@@ -529,6 +527,7 @@ public class VPrincipal extends JDialog implements ActionListener {
     protected void pantallaArtista(Artista a) {
     	this.dispose();
 		VverArtista ven = new VverArtista(this,true,dao,a);
+		ven.setLocationRelativeTo(null);
 		ven.setVisible(true);
     }
     
@@ -548,28 +547,6 @@ public class VPrincipal extends JDialog implements ActionListener {
 		play.setVisible(true);
     }
     
-    protected void stop() {
-		// TODO Auto-generated method stub
-		if (clip != null && clip.isRunning()) {
-            clip.stop();
-            num = 0;
-	       	btnPlay.setVisible(true);
-	       	btnStop.setVisible(false);
-	        pos = clip.getFramePosition();
-	        play = false;
-		}
-	}
-	public void play() {
-		// TODO Auto-generated method stub
-		if (num == 0) {
-			clip.setFramePosition(pos);
-	        clip.start();
-	        num++;
-	        btnPlay.setVisible(false);
-	        btnStop.setVisible(true);	
-	        play = true;
-		}
-	}
 
     private JButton CrearBoton(String text, String imagePath, int x, int y) {
         JButton button = new JButton("");
@@ -597,7 +574,7 @@ public class VPrincipal extends JDialog implements ActionListener {
 		DefaultListModel<String> listModel = new DefaultListModel<>();
 		boolean exi = false;
 	
-		listModel.addElement("<html><font size=8 face='Arial'>"+"Canciones");
+		listModel.addElement("<html><font size=9 face='Arial'>"+"↓Canciones");
 		//introducir primero los que empiezen igual
 		for (Cancion can : canciones) {
 			if (can.getNombreCancion().toLowerCase().startsWith(txtBuscar.getText().toLowerCase()) ) {
@@ -615,7 +592,7 @@ public class VPrincipal extends JDialog implements ActionListener {
 			}
 		}
 		listModel.addElement(" ");
-		listModel.addElement("<html><font size=8 face='Arial'>"+"↓Artistas");
+		listModel.addElement("<html><font size=9 face='Arial'>"+"↓Artistas");
 
 		for (Artista art : artistas) {
 			if (art.getNombreArtistico().toLowerCase().startsWith(txtBuscar.getText().toLowerCase()) ) {

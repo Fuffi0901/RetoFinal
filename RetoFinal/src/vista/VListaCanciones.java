@@ -64,6 +64,7 @@ public class VListaCanciones extends JDialog implements ActionListener{
 		setModal(modal);
 		this.album = album;
 		VListaCanciones(album, null, album.getNombreAlbum(), album.getFotoAlbum(), dao);
+		setLocationRelativeTo(null);
 	}
 	
 	public VListaCanciones(Album album, VverArtista verArtista, boolean modal, Dao dao) {
@@ -71,12 +72,14 @@ public class VListaCanciones extends JDialog implements ActionListener{
 		setModal(modal);
 		this.album = album;
 		VListaCanciones(album, null, album.getNombreAlbum(), album.getFotoAlbum(), dao);
+		setLocationRelativeTo(null);
 	}
 	
 	public VListaCanciones(Playlist play, VPrincipal ven, boolean modal, Dao dao) {
 		super(ven);
 		setModal(modal);
 		VListaCanciones(null,play,play.getNombrePlaylist(), play.getFotoPlaylist(), dao);
+		setLocationRelativeTo(null);
 	}
 	
 	/**
