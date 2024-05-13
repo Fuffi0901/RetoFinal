@@ -68,6 +68,7 @@ public class VentanaPlay extends JDialog implements ActionListener{
 		this.can = cancion;
 		setModal(modal);
 		Pantalla(dao, cancion);
+		setLocationRelativeTo(null);
 	}
 	
 	public VentanaPlay(VverArtista verArtista, Cancion cancion, boolean modal, Dao dao) {
@@ -76,6 +77,7 @@ public class VentanaPlay extends JDialog implements ActionListener{
 		this.can = cancion;
 		setModal(modal);
 		Pantalla(dao, cancion);
+		setLocationRelativeTo(null);
 	}
 	
 	public VentanaPlay(VListaCanciones vListaCanciones, Cancion cancion,boolean modal, Dao dao) {
@@ -84,6 +86,7 @@ public class VentanaPlay extends JDialog implements ActionListener{
 		this.can = cancion;
 		setModal(modal);
 		Pantalla(dao, cancion);	
+		setLocationRelativeTo(null);
 	}
 
 
@@ -133,7 +136,7 @@ public class VentanaPlay extends JDialog implements ActionListener{
 		lblnombreCancion.setHorizontalAlignment(SwingConstants.CENTER);
 		lblnombreCancion.setForeground(new Color(255, 255, 255));
 		lblnombreCancion.setFont(new Font("Eras Light ITC", Font.BOLD, 52));
-		lblnombreCancion.setBounds(443, 393, 373, 47);
+		lblnombreCancion.setBounds(374, 394, 525, 47);
 		contentPanel.add(lblnombreCancion);
 		
 		lblnombreArtista = new JLabel(saberArtistas(cancion.getCodCancion()));
@@ -168,7 +171,7 @@ public class VentanaPlay extends JDialog implements ActionListener{
 		btnRebobinar = new JButton("");		
 		btnRebobinar.setBackground(new Color(255, 255, 255));
 		btnRebobinar.setIcon(new ImageIcon("..\\RetoFinal\\Img\\rebobinar.png"));
-		btnRebobinar.setBounds(405, 536, 81, 80);
+		btnRebobinar.setBounds(1111, 494, 101, 68);
 		btnRebobinar.setOpaque(false);
 		btnRebobinar.setBorderPainted(false);
 		btnRebobinar.setFocusable(false);
@@ -300,6 +303,7 @@ public class VentanaPlay extends JDialog implements ActionListener{
 	        btnStop.setVisible(true);	
 	        play = true;
 		}
+		
 	}
 	
 	private Album sacarAlbum() {

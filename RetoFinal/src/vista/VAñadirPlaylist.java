@@ -29,6 +29,9 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 
 import java.awt.Font;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -73,6 +76,7 @@ public class VAñadirPlaylist extends JDialog implements ActionListener{
 	private File file;
 	private String carpetaFinal = "..\\RetoFinal\\Img\\";
 	private JFrame ven;
+	private JButton btnXp;
 	/**
 	 * Launch the application.
 	 */
@@ -106,9 +110,9 @@ public class VAñadirPlaylist extends JDialog implements ActionListener{
 		
 		
 		JLabel lblNewLabel = new JLabel("PLAYLIST");
-		lblNewLabel.setForeground(new Color(255, 255, 255));
-		lblNewLabel.setFont(new Font("Arial", Font.BOLD, 40));
-		lblNewLabel.setBounds(43, 27, 214, 55);
+		lblNewLabel.setForeground(new Color(0, 0, 0));
+		lblNewLabel.setFont(new Font("Stencil", Font.BOLD, 50));
+		lblNewLabel.setBounds(119, 25, 258, 55);
 		contentPanel.add(lblNewLabel);
 		
 		JLabel lblNewLabel_1 = new JLabel("Nombre : ");
@@ -137,7 +141,7 @@ public class VAñadirPlaylist extends JDialog implements ActionListener{
 		
 		listCanP = new JList();
 		listCanP.setFont(new Font("Felix Titling", Font.PLAIN, 22));
-		listCanP.setBounds(93, 402, 846, 368);
+		listCanP.setBounds(20, 10, 846, 368);
 		contentPanel.add(listCanP);
 		
 		JScrollPane scrollPaneCanP;
@@ -148,7 +152,7 @@ public class VAñadirPlaylist extends JDialog implements ActionListener{
 		comboP = new JComboBox();
 		comboP.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		comboP.addActionListener(this);
-		comboP.setBounds(866, 27, 193, 55);
+		comboP.setBounds(795, 31, 203, 51);
 		contentPanel.add(comboP);
 		
 		btnModificar = new JButton("Modificar");
@@ -227,13 +231,10 @@ public class VAñadirPlaylist extends JDialog implements ActionListener{
 		scrollPane.setBounds(140, 380, 400, 158);
 		contentPanel.add(scrollPane);
 		
-		btnSecreto = new JButton("");
-		btnSecreto.setBackground(new Color(64, 128, 128));
-		btnSecreto.setBounds(0, 0, 11, 9);
-		contentPanel.add(btnSecreto);
+		
 		
 		btnañadirCancion = new JButton("+");
-		btnañadirCancion.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		btnañadirCancion.setFont(new Font("Tahoma", Font.PLAIN, 33));
 		btnañadirCancion.setBounds(572, 386, 85, 47);
 		btnañadirCancion.addActionListener(this);
 		contentPanel.add(btnañadirCancion);
@@ -254,6 +255,24 @@ public class VAñadirPlaylist extends JDialog implements ActionListener{
 		btnArchivos.setBounds(561, 608, 85, 47);
 		btnArchivos.addActionListener(this);
 		contentPanel.add(btnArchivos);
+		
+		btnXp = new JButton("X");
+		btnXp.setFont(new Font("Tahoma", Font.PLAIN, 20));
+		btnXp.setBounds(1008, 31, 51, 51);
+		btnXp.addActionListener(this);
+		contentPanel.add(btnXp);
+		
+		JLabel fondo = new JLabel("") {
+			protected void paintComponent(Graphics g) {
+				super.paintComponent(g);
+				Graphics2D g2d = (Graphics2D) g.create();
+				g2d.setPaint(new GradientPaint(0, 0, new Color(73, 197, 250), 0, getHeight(), new Color(78, 78, 78)));
+				g2d.fillRect(0, 0, getWidth(), getHeight());
+				g2d.dispose();
+			}
+		};
+		fondo.setBounds(0, 0, 1256, 724);
+		contentPanel.add(fondo);
 		
 		
 		
@@ -288,13 +307,16 @@ public class VAñadirPlaylist extends JDialog implements ActionListener{
 		if(e.getSource().equals(btnAtras)) {
 			volverAtras();
 		}
+		if(e.getSource().equals(btnXp)) {
+			comboP.setSelectedIndex(-1);
+		}
 	}
 	
 
 	private void volverAtras() {
 		// TODO Auto-generated method stub
 		this.dispose();
-		VPrincipal ven = new VPrincipal(this, true, dao,usu);
+		VPrincipal ven = new VPrincipal(this, true, dao);
 		ven.setVisible(true);
 	}
 
@@ -470,9 +492,8 @@ public class VAñadirPlaylist extends JDialog implements ActionListener{
 			cancionesPlaylist.add(cancionSeleccionada);
 			cargarlisCan();
 		}else {
-			JOptionPane.showMessageDialog(null, "Esa Cancion ya esta","Repetida",JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Esa Cancion ya esta","Repetida",JOptionPane.ERROR_MESSAGE);
 		}
 		
 	}
-	
 }

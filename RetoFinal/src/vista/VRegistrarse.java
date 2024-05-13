@@ -49,6 +49,7 @@ public class VRegistrarse extends JDialog implements ActionListener{
 	 */
 	public VRegistrarse(Inicio_Sesion inicio_Sesion, boolean modal, Dao dao) {
 		super(inicio_Sesion);
+		setLocationRelativeTo(null);
 		setIconImage(Toolkit.getDefaultToolkit().getImage("C:\\Users\\1dam\\Desktop\\PGR\\3ª Eva\\RetoFinal\\Img\\logoPequeña.png"));
 		this.dao = dao;
 		setBackground(new Color(78, 78, 78));
