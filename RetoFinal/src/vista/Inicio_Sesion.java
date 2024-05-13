@@ -202,7 +202,7 @@ public class Inicio_Sesion extends JFrame implements ActionListener{
 		@SuppressWarnings("deprecation")
 		Usuario usu = dao.comprobarUsuario(tFUsuario.getText(),pFConstraseña.getText());
 		this.usu=usu;
-		if(null == usu) {
+		if(null == usu || tFUsuario.getText().equalsIgnoreCase("") || pFConstraseña.getText().equalsIgnoreCase("")) {
 			JOptionPane.showMessageDialog(null, "NOMBRE O CONTRASEÑA INCORRECTO","ERROR",JOptionPane.ERROR_MESSAGE);
 		}else if(tFUsuario.getText().equalsIgnoreCase("admin") && pFConstraseña.getText().equalsIgnoreCase("admin")){
 			this.dispose();
