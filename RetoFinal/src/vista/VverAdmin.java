@@ -256,7 +256,7 @@ public class VverAdmin extends JDialog implements ActionListener{
 				fc = new JFileChooser();
 				fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 				
-				FileNameExtensionFilter filtro = new FileNameExtensionFilter("Archivo de imagenes","jpg");
+				FileNameExtensionFilter filtro = new FileNameExtensionFilter("Archivo de imagenes", "jpg", "png");
 				fc.setFileFilter(filtro);
 				
 				int res = fc.showOpenDialog(ven);				
@@ -855,7 +855,8 @@ public class VverAdmin extends JDialog implements ActionListener{
 		
 		String textoOriginal = textAudioCan.getText();
 		String textoModificado = textoOriginal.replaceAll(".*\\\\", "..\\\\RetoFinal\\\\Img\\\\");
-		dao.meterAlbum(dao.crearCodigoAlbum(),textNombreAlb.getText(),textoModificado,calendario.getDate().toString());
+		Date fechaSeleccionada = new Date(calendario.getDate().getTime());
+		dao.meterAlbum(dao.crearCodigoAlbum(),textNombreAlb.getText(),textoModificado,fechaSeleccionada);
 		JOptionPane.showMessageDialog(null, "INTRODUCIDO CORRECTAMENTE CON EL CODIGO  "+ dao.crearCodigoAlbum());
 		cargarComboAlbum();
 		

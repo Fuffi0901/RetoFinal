@@ -951,7 +951,7 @@ public class DaoImplementacion implements Dao{
 	
 	
 	@Override
-	public void meterAlbum(int codAlbum, String nombre, String foto, String fecha) {
+	public void meterAlbum(int codAlbum, String nombre, String foto, Date fecha) {
 	    this.openConnection();
 
 	    try {
@@ -962,7 +962,7 @@ public class DaoImplementacion implements Dao{
 	        
 	        // Parsear la fecha de String a Date
 	        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-	        java.util.Date fechaDate = sdf.parse(fecha);
+	        java.util.Date fechaDate = sdf.parse(fecha.toString());
 	        
 	        // Establecer la fecha en el PreparedStatement
 	        stmt.setDate(4, new java.sql.Date(fechaDate.getTime()));

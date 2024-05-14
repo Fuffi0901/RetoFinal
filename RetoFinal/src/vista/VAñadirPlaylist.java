@@ -111,19 +111,19 @@ public class VAñadirPlaylist extends JDialog implements ActionListener{
 		
 		JLabel lblNewLabel = new JLabel("PLAYLIST");
 		lblNewLabel.setForeground(new Color(0, 0, 0));
-		lblNewLabel.setFont(new Font("Stencil", Font.BOLD, 50));
-		lblNewLabel.setBounds(119, 25, 258, 55);
+		lblNewLabel.setFont(new Font("Stencil", Font.BOLD, 55));
+		lblNewLabel.setBounds(119, 25, 308, 55);
 		contentPanel.add(lblNewLabel);
 		
 		JLabel lblNewLabel_1 = new JLabel("Nombre : ");
-		lblNewLabel_1.setFont(new Font("Arial", Font.PLAIN, 30));
-		lblNewLabel_1.setForeground(new Color(255, 255, 255));
-		lblNewLabel_1.setBounds(140, 199, 193, 30);
+		lblNewLabel_1.setFont(new Font("Arial", Font.PLAIN, 32));
+		lblNewLabel_1.setForeground(new Color(0, 0, 0));
+		lblNewLabel_1.setBounds(122, 136, 193, 30);
 		contentPanel.add(lblNewLabel_1);
 		
 		textNombre = new JTextField("");
 		textNombre.setFont(new Font("Tahoma", Font.PLAIN, 20));
-		textNombre.setBounds(140, 239, 400, 47);
+		textNombre.setBounds(122, 176, 400, 47);
 		contentPanel.add(textNombre);
 		textNombre.setColumns(10);
 		
@@ -134,9 +134,9 @@ public class VAñadirPlaylist extends JDialog implements ActionListener{
 		contentPanel.add(btnAñadirP);
 		
 		lblNewLabel_2 = new JLabel("Canciones : ");
-		lblNewLabel_2.setForeground(Color.WHITE);
-		lblNewLabel_2.setFont(new Font("Arial", Font.PLAIN, 30));
-		lblNewLabel_2.setBounds(692, 340, 193, 30);
+		lblNewLabel_2.setForeground(new Color(0, 0, 0));
+		lblNewLabel_2.setFont(new Font("Arial", Font.PLAIN, 32));
+		lblNewLabel_2.setBounds(674, 277, 193, 30);
 		contentPanel.add(lblNewLabel_2);
 		
 		listCanP = new JList();
@@ -146,7 +146,7 @@ public class VAñadirPlaylist extends JDialog implements ActionListener{
 		
 		JScrollPane scrollPaneCanP;
 		scrollPaneCanP = new JScrollPane(listCanP);
-		scrollPaneCanP.setBounds(692, 380, 367, 158);
+		scrollPaneCanP.setBounds(674, 317, 367, 158);
 		contentPanel.add(scrollPaneCanP);
 		
 		comboP = new JComboBox();
@@ -171,7 +171,7 @@ public class VAñadirPlaylist extends JDialog implements ActionListener{
 		txtBuscar.setText("Buscar");
 		txtBuscar.setForeground(new Color(192, 192, 192));
 		txtBuscar.setFont(new Font("Tahoma", Font.PLAIN, 25));
-		txtBuscar.setBounds(140, 343, 400, 38);
+		txtBuscar.setBounds(122, 280, 400, 38);
 		txtBuscar.getDocument().addDocumentListener((DocumentListener) new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -228,31 +228,31 @@ public class VAñadirPlaylist extends JDialog implements ActionListener{
 		contentPanel.add(list);
 		
 		scrollPane = new JScrollPane(list);
-		scrollPane.setBounds(140, 380, 400, 158);
+		scrollPane.setBounds(122, 317, 400, 158);
 		contentPanel.add(scrollPane);
 		
 		
 		
 		btnañadirCancion = new JButton("+");
 		btnañadirCancion.setFont(new Font("Tahoma", Font.PLAIN, 33));
-		btnañadirCancion.setBounds(572, 386, 85, 47);
+		btnañadirCancion.setBounds(554, 323, 85, 47);
 		btnañadirCancion.addActionListener(this);
 		contentPanel.add(btnañadirCancion);
 		
 		btnQuitarCancion = new JButton("-");
 		btnQuitarCancion.setFont(new Font("Tahoma", Font.PLAIN, 30));
-		btnQuitarCancion.setBounds(572, 471, 85, 47);
+		btnQuitarCancion.setBounds(554, 408, 85, 47);
 		btnQuitarCancion.addActionListener(this);
 		contentPanel.add(btnQuitarCancion);
 		
 		textFoto = new JTextField();
 		textFoto.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		textFoto.setColumns(10);
-		textFoto.setBounds(140, 608, 400, 47);
+		textFoto.setBounds(122, 545, 400, 47);
 		contentPanel.add(textFoto);
 		
 		btnArchivos = new JButton(". . .");
-		btnArchivos.setBounds(561, 608, 85, 47);
+		btnArchivos.setBounds(543, 545, 85, 47);
 		btnArchivos.addActionListener(this);
 		contentPanel.add(btnArchivos);
 		
@@ -324,21 +324,27 @@ public class VAñadirPlaylist extends JDialog implements ActionListener{
 	private void añadirPlaylist() {
 		// TODO Auto-generated method stub
 		int cod = dao.crearCodigoPlaylist();
-		dao.insertarPlaylist(cod,  textNombre.getText(), textFoto.getText(), usu.getDni());
+		String textoOriginal = textFoto.getText();
+        String textoModificado = textoOriginal.replaceAll("^.+\\\\", "..\\\\RetoFinal\\\\Img\\\\");
+		dao.insertarPlaylist(cod,  textNombre.getText(), textoModificado, usu.getDni());
 		for(Cancion c:cancionesPlaylist) {
 			dao.insertarPertenece(cod,c.getCodCancion());
 		}
+		JOptionPane.showMessageDialog(null, "Se ha añadido la Playlist : "+textNombre.getText(),"Playlist",JOptionPane.INFORMATION_MESSAGE);
+		comboP.setSelectedIndex(-1);
 	}
 	
 
 	private void modificarPlaylist() {
 		// TODO Auto-generated method stub
-		
-		dao.modificarPlaylist(sacarSeleccionado().getCodPlaylist(), textNombre.getText(), textFoto.getText());
+		String textoOriginal = textFoto.getText();
+        String textoModificado = textoOriginal.replaceAll("^.+\\\\", "..\\\\RetoFinal\\\\Img\\\\");
+		dao.modificarPlaylist(sacarSeleccionado().getCodPlaylist(), textNombre.getText(), textoModificado);
 		dao.eliminarPertenece(sacarSeleccionado().getCodPlaylist());
 		for(Cancion c:cancionesPlaylist) {
 			dao.insertarPertenece(sacarSeleccionado().getCodPlaylist(),c.getCodCancion());
 		}
+		JOptionPane.showMessageDialog(null, "Se ha modificado la Playlist : "+textNombre.getText(),"Playlist",JOptionPane.INFORMATION_MESSAGE);
 		comboP.setSelectedIndex(-1);
 	}
 	

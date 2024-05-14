@@ -106,7 +106,7 @@ public class VverArtista extends JDialog implements ActionListener{
 		lblNewLabel_2.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 3, Color.WHITE));
 		lblNewLabel_2.setHorizontalAlignment(SwingConstants.TRAILING);
 		lblNewLabel_2.setForeground(new Color(0, 0, 0));
-		lblNewLabel_2.setFont(new Font("Tahoma", Font.BOLD, 33));
+		lblNewLabel_2.setFont(new Font("Tahoma", Font.BOLD, 32));
 		lblNewLabel_2.setBounds(801, 38, 417, 53);
 		contentPanel.add(lblNewLabel_2);
 		
@@ -118,7 +118,7 @@ public class VverArtista extends JDialog implements ActionListener{
 		btnUltimoAlbum.setOpaque(false);
 		btnUltimoAlbum.setBorderPainted(false);
 		btnUltimoAlbum.setFocusable(false);
-		btnUltimoAlbum.setFont(new Font("Century Schoolbook", Font.PLAIN, 59));
+		btnUltimoAlbum.setFont(new Font("Century Schoolbook", Font.PLAIN, 56));
 		btnUltimoAlbum.addActionListener(this);
 		contentPanel.add(btnUltimoAlbum);
 		

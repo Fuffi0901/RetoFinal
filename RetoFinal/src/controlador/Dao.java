@@ -59,7 +59,7 @@ public interface Dao {
 	public Album sacarAlbum(int cod);
 	public ArrayList<Album> sacarAlbumes();
 	public void borrarAlbum(int codAlbum);
-	public void meterAlbum(int cod, String nombre, String foto, String fecha) ;
+	public void meterAlbum(int cod, String nombre, String foto, java.sql.Date fechaSeleccionada) ;
 	//public void modificarAlbum(String cod, String nombre, String foto, Date fecha);
 	public void modificarAlbum(String cod, String nombre, String foto, java.sql.Date fecha);
 	public int crearCodigoAlbum() ;
