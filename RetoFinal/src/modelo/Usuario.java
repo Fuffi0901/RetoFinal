@@ -2,15 +2,15 @@ package modelo;
 
 public class Usuario extends Persona{
 	//Atributos.
-	private String constraseña;
+	private String constrasena;
 	private String nombreUsuario;
 	
 	//Getters y Setters.
-	public String getConstraseña() {
-		return constraseña;
+	public String getConstrasena() {
+		return constrasena;
 	}
-	public void setConstraseña(String constraseña) {
-		this.constraseña = constraseña;
+	public void setConstrasena(String constrasena) {
+		this.constrasena = constrasena;
 	}
 	public String getNombreUsuario() {
 		return nombreUsuario;

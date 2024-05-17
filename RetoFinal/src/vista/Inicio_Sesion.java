@@ -7,6 +7,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import controlador.Dao;
+import excepciones.CreateException;
 import modelo.Album;
 import modelo.Cancion;
 import modelo.Usuario;
@@ -35,15 +36,15 @@ public class Inicio_Sesion extends JFrame implements ActionListener{
 
 	private JPanel contentPane;
 	private JTextField tFUsuario;
-	private JPasswordField pFConstraseña;
-	private JRadioButton rbMostrarConstraseña;
+	private JPasswordField pFConstrasena;
+	private JRadioButton rbMostrarConstrasena;
 	private JButton btnEntrar;
 	private JButton btnRegistrarse;
 	private JLabel lblLogo;
 	private Dao dao;
 	private JLabel lblNewLabel_1;
 	private JButton btnLogo;
-
+	private static Usuario usu;
 	/**
 	 * Create the frame.
 	 * @param dao2 
@@ -55,6 +56,7 @@ public class Inicio_Sesion extends JFrame implements ActionListener{
 		setTitle("BEATDAM");
 		setIconImage(Toolkit.getDefaultToolkit().getImage("..\\RetoFinal\\Img\\logoPequeña.png"));
 		Pantallas(dao);
+		setLocationRelativeTo(null);
 	}
 	
 	public void Pantallas(Dao dao) {
@@ -83,11 +85,11 @@ public class Inicio_Sesion extends JFrame implements ActionListener{
 		lbUsuario.setBounds(209, 193, 252, 35);
 		contentPane.add(lbUsuario);
 		
-		JLabel lbConstraseña = new JLabel("Contraseña");
-		lbConstraseña.setForeground(new Color(255, 255, 255));
-		lbConstraseña.setFont(new Font("Eras Light ITC", Font.PLAIN, 30));
-		lbConstraseña.setBounds(209, 307, 159, 25);
-		contentPane.add(lbConstraseña);
+		JLabel lbConstrasena = new JLabel("Contraseña");
+		lbConstrasena.setForeground(new Color(255, 255, 255));
+		lbConstrasena.setFont(new Font("Eras Light ITC", Font.PLAIN, 30));
+		lbConstrasena.setBounds(209, 307, 159, 25);
+		contentPane.add(lbConstrasena);
 		
 		tFUsuario = new JTextField();
 		tFUsuario.setFont(new Font("Tahoma", Font.PLAIN, 43));
@@ -95,25 +97,25 @@ public class Inicio_Sesion extends JFrame implements ActionListener{
 		contentPane.add(tFUsuario);
 		tFUsuario.setColumns(10);
 		
-		rbMostrarConstraseña = new JRadioButton("Mostrar Constraseña");
-		rbMostrarConstraseña.setForeground(new Color(255, 255, 255));
-		rbMostrarConstraseña.setBackground(new Color(64, 128, 128));
-		rbMostrarConstraseña.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-		rbMostrarConstraseña.setBounds(209, 414, 193, 35);
-		rbMostrarConstraseña.setOpaque(false);
+		rbMostrarConstrasena = new JRadioButton("Mostrar Constraseña");
+		rbMostrarConstrasena.setForeground(new Color(255, 255, 255));
+		rbMostrarConstrasena.setBackground(new Color(64, 128, 128));
+		rbMostrarConstrasena.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+		rbMostrarConstrasena.setBounds(209, 414, 193, 35);
+		rbMostrarConstrasena.setOpaque(false);
 			
 		
-		rbMostrarConstraseña.addItemListener(new ItemListener(){
+		rbMostrarConstrasena.addItemListener(new ItemListener(){
 			public void itemStateChanged(ItemEvent e) {
-				mostrarConstraseña();
+				mostrarConstrasena();
 			}
 		});
-		contentPane.add(rbMostrarConstraseña);
+		contentPane.add(rbMostrarConstrasena);
 		
-		pFConstraseña = new JPasswordField();
-		pFConstraseña.setFont(new Font("Tahoma", Font.PLAIN, 43));
-		pFConstraseña.setBounds(209, 342, 839, 59);
-		contentPane.add(pFConstraseña);
+		pFConstrasena = new JPasswordField();
+		pFConstrasena.setFont(new Font("Tahoma", Font.PLAIN, 43));
+		pFConstrasena.setBounds(209, 342, 839, 59);
+		contentPane.add(pFConstrasena);
 		
 		btnEntrar = new JButton("Iniciar Sesion");
 		btnEntrar.setForeground(new Color(255, 255, 255));
@@ -181,7 +183,13 @@ public class Inicio_Sesion extends JFrame implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 		if(e.getSource().equals(btnEntrar)) {
-			entrarAplicacion();
+			try {
+				entrarAplicacion();
+			} catch (CreateException e1) {
+				// TODO Auto-generated catch block
+				e1.mostrarAviso();
+				e1.getMessage();
+			}
 		}
 		if(e.getSource().equals(btnRegistrarse)) {
 			registrarseAplicacion();
@@ -189,47 +197,45 @@ public class Inicio_Sesion extends JFrame implements ActionListener{
 	
 	}
 
-
-	/*private void abrirExtra() {
-		// TODO Auto-generated method stub
-		this.dispose();
-		VPrincipal ven = new VPrincipal(this, true, dao);
-		ven.setVisible(true);
-	}*/
-
-	private void entrarAplicacion() {
+	private void entrarAplicacion() throws CreateException {
 		@SuppressWarnings("deprecation")
-		Usuario usu = dao.comprobarUsuario(tFUsuario.getText(),pFConstraseña.getText());
-		if(null == usu) {
+		Usuario usu = dao.comprobarUsuario(tFUsuario.getText(),pFConstrasena.getText());
+		this.usu=usu;
+		if(null == usu || tFUsuario.getText().equalsIgnoreCase("") || pFConstrasena.getText().equalsIgnoreCase("")) {
 			JOptionPane.showMessageDialog(null, "NOMBRE O CONTRASEÑA INCORRECTO","ERROR",JOptionPane.ERROR_MESSAGE);
-		}else if(tFUsuario.getText().equalsIgnoreCase("admin") && pFConstraseña.getText().equalsIgnoreCase("admin")){
+		}else if(tFUsuario.getText().equalsIgnoreCase("admin") && pFConstrasena.getText().equalsIgnoreCase("admin")){
 			this.dispose();
 			VverAdmin ven =new VverAdmin(this,true,dao);
+			ven.setLocationRelativeTo(null);
 			ven.setVisible(true);
 			
 			
 		}else {
 			this.dispose();
-			VPrincipal ven = new VPrincipal(this, true, dao, usu);
+			VPrincipal ven = new VPrincipal(this, true, dao);
 			ven.setVisible(true);
 		}
 	}
 
+	public Usuario devolverUsuario() {
+		return this.usu;
+	}
 	
 	private void registrarseAplicacion() {
 		this.setVisible(false);
 		VRegistrarse ven = new VRegistrarse(this, true, dao);
+		ven.setLocationRelativeTo(null);
 		ven.setVisible(true);
 		
 	}
 	
-	private void mostrarConstraseña() {
-		if (rbMostrarConstraseña.isSelected()) {
+	private void mostrarConstrasena() {
+		if (rbMostrarConstrasena.isSelected()) {
             // Mostrar contraseña
-			pFConstraseña.setEchoChar((char) 0);
+			pFConstrasena.setEchoChar((char) 0);
         } else {
             // Ocultar contraseña
-        	pFConstraseña.setEchoChar('\u2022');
+        	pFConstrasena.setEchoChar('\u2022');
         }
 	}
 }

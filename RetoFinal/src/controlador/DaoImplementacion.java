@@ -11,6 +11,8 @@ import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+
+import excepciones.CreateException;
 import modelo.Album;
 import modelo.Artista;
 import modelo.Cancion;
@@ -18,7 +20,11 @@ import modelo.Estilo;
 import modelo.Persona;
 import modelo.Playlist;
 import modelo.Usuario;
-
+/**
+ * @author Grupo6
+ * 
+ * 
+ * */
 public class DaoImplementacion implements Dao{
 	
 	
@@ -31,6 +37,8 @@ public class DaoImplementacion implements Dao{
 	private final String CONSULTA_USUARIO = "select * from Usuario where  Contraseina=? and NombreUsuario=?";
 	private final String CONSULTA_ARTISTA = "select * from Artista where  dni=?";
 	private final String CONSULTA_PERSONA= "select * from Persona where  Dni=?";
+	private final String MODIFICAR_USUARIO="call modificacionUsuario(?,?,?,?,?,?,?)";
+	private final String ELIMINAR_USUARIO="call eliminarUsuario(?)";
 	private final String INSERT_PERSONA =  "insert into persona(Dni,nombrePersona,apellidoPersona,pais,edad) values (?,?,?,?,?)";
 	private final String INSERT_USUARIO =  "insert into usuario(Dni,contraseina,NombreUsuario) values (?,?,?)";
 	
@@ -38,7 +46,7 @@ public class DaoImplementacion implements Dao{
 	
 	//consultas canciones
 	private final String SACAR_CANCIONES = "select * from Cancion";
-	private final String SACAR_ULTIMA_CANCION = "SELECT a.* FROM Cancion c, Album a, Canta ca where c.codAlbum = a.codAlbum and c.codCancion=ca.codCancion and ca.dni=? ORDER BY a.fechaLan DESC LIMIT 1";
+	private final String SACAR_ULTIMA_CANCION = "SELECT c.* FROM Cancion c, Album a, Canta ca where c.codAlbum = a.codAlbum and c.codCancion=ca.codCancion and ca.dni=? ORDER BY a.fechaLan DESC;";
 	private final String BORRAR_CANCIONES = "delete from Cancion where codCancion=?";
 	private final String CANCIONES_POR_ARTISTA = "select * from Cancion where codCancion in (select codCancion from canta where dni=?)";
 	private final String CODIGO_CANCION = "select crearCodigoCancion() AS cod";
@@ -74,7 +82,7 @@ public class DaoImplementacion implements Dao{
 	private final String BORRAR_ALBUM = "delete from album where codAlbum=?";
 	private final String INSERT_ALBUM = "insert into album(codAlbum,nombreAlbum,fotoAlbum,fechaLan) values(?,?,?,?)";
 	private final String MODIFICAR_ALBUM = "update album set  codAlbum = ? , nombreAlbum = ?, fotoAlbum = ?,fechaLan = ? where codAlbum=?";
-	private final String CODIGO_ALBUM = "select crearCodigoCancion() AS cod";
+	private final String CODIGO_ALBUM = "select crearCodigoAlbum() AS cod";
 	private final String CANCIONES_POR_ALBUM = "select * from cancion where codAlbum=?";
 	
 	//consultas artista
@@ -236,9 +244,61 @@ public class DaoImplementacion implements Dao{
 		return mensaje;
 	}
 	
+	public void modificarUsuario(Usuario usu) {
+		
+		this.openConnection();
+		try {
+
+			stmt = con.prepareStatement(MODIFICAR_USUARIO);
+
+			
+			stmt.setString(1, usu.getDni());
+			stmt.setString(2, usu.getNombrePersona());
+			stmt.setString(3, usu.getApellidoPersona());
+			stmt.setString(4, usu.getPais());
+			stmt.setInt(5, usu.getEdad());
+			stmt.setString(6, usu.getNombreUsuario());
+			stmt.setString(7, usu.getConstrasena());
+			stmt.executeUpdate();
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+	}
 	
-	
-	public Usuario comprobarUsuario(String nombre, String contraseña) {
+	public void eliminarUsuario(String dni) {
+		
+		this.openConnection();
+		try {
+
+			stmt = con.prepareStatement(ELIMINAR_USUARIO);
+
+			
+			stmt.setString(1, dni);
+			stmt.executeUpdate();
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+	}
+
+	public Usuario comprobarUsuario(String nombre, String contrasena) throws CreateException {
 		
 		Usuario usu = new Usuario();
 		this.openConnection();
@@ -247,7 +307,7 @@ public class DaoImplementacion implements Dao{
 			stmt = con.prepareStatement(CONSULTA_USUARIO);
 
 			
-			stmt.setString(1, contraseña);
+			stmt.setString(1, contrasena);
 			stmt.setString(2, nombre);
 
 			ResultSet rs = stmt.executeQuery();
@@ -255,7 +315,7 @@ public class DaoImplementacion implements Dao{
 			if (rs.next()) {
 				usu.setDni(rs.getString("Dni"));
 				usu.setNombreUsuario(rs.getString("NombreUsuario"));
-				usu.setConstraseña(rs.getString("Contraseina"));
+				usu.setConstrasena(rs.getString("Contraseina"));
 				
 			}else {
 				usu=null;
@@ -264,7 +324,9 @@ public class DaoImplementacion implements Dao{
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			throw new CreateException("ERROR en los datos en rojo");
 		}
+		
 		try {
 			closeConnection();
 		} catch (SQLException e) {
@@ -382,7 +444,7 @@ public class DaoImplementacion implements Dao{
 	}
 	
 	//Añadir nuevos usuarios a la base de datos
-	public void registrarUsuario(String dni,String nombreU, String contraseña ){
+	public void registrarUsuario(String dni,String nombreU, String contrasena ){
 		
 		this.openConnection();
 		
@@ -390,7 +452,7 @@ public class DaoImplementacion implements Dao{
 
 			stmt = con.prepareStatement(INSERT_USUARIO);
 			stmt.setString(1, dni);
-			stmt.setString(2, contraseña);
+			stmt.setString(2, contrasena);
 			stmt.setString(3, nombreU);
 			
 			
@@ -412,7 +474,7 @@ public class DaoImplementacion implements Dao{
 	}
 	
 	//Añadir nuevos canciones la base de datos
-	public void añadirCancion(int cod, int duracion, String nombreCancion, String audio, int codAlbum){
+	public void anadirCancion(int cod, int duracion, String nombreCancion, String audio, int codAlbum){
 		this.openConnection();
 		try {
 			stmt = con.prepareStatement(INSERT_CANCIONES);
@@ -569,7 +631,7 @@ public class DaoImplementacion implements Dao{
 	
 
 	@Override
-	public void modificarAlbum(String cod, String nombre, String foto, String fecha) {
+	public void modificarAlbum(String cod, String nombre, String foto, Date fecha) {
 		// TODO Auto-generated method stub
 		
 		
@@ -582,7 +644,7 @@ public class DaoImplementacion implements Dao{
 			stmt.setInt(1, Integer.valueOf(cod));
 			stmt.setString(2, nombre);
 			stmt.setString(3, foto);
-			stmt.setDate(4, Date.valueOf(fecha));
+			stmt.setDate(4, fecha);
 			stmt.setInt(5, Integer.valueOf(cod));
 			stmt.executeUpdate();
 			
@@ -820,11 +882,13 @@ public class DaoImplementacion implements Dao{
 		return canciones;
 	}
 	
+
+	
 	@Override
-	public Album sacarUltimaAlbum(String dni) {
+	public ArrayList<Cancion> sacarCancionesOrdenadas(String dni) {
 		// TODO Auto-generated method stub
-		
-		Album album = new Album();
+		ArrayList<Cancion> canciones = new ArrayList<Cancion>();
+		Cancion ca ;
 
 		this.openConnection();
 
@@ -834,14 +898,17 @@ public class DaoImplementacion implements Dao{
 			stmt.setString(1, dni);
 			ResultSet rs = stmt.executeQuery();
 
-			if(rs.next()) {
-			
-				album.setCodAlbum(rs.getInt("codAlbum"));
-				album.setNombreAlbum(rs.getString("nombreAlbum"));
-				album.setFotoAlbum(rs.getString("fotoAlbum"));
-				album.setFechaLan(rs.getDate("fechaLan"));
+			while (rs.next()) {
+				ca = new Cancion();
+				ca.setCodCancion(rs.getInt("codCancion"));
+				ca.setNombreCancion(rs.getString("nombreCancion"));
+				ca.setDuracion(rs.getInt("Duracion"));
+				ca.setAudio(rs.getString("Audio"));
+				ca.setCodAlbum(rs.getInt("codAlbum"));
 				
+				canciones.add(ca);
 			}
+
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -853,7 +920,7 @@ public class DaoImplementacion implements Dao{
 			e.printStackTrace();
 
 		}
-		return album;
+		return canciones;
 	}
 	
 	@Override
@@ -897,7 +964,7 @@ public class DaoImplementacion implements Dao{
 	
 	
 	@Override
-	public void meterAlbum(int codAlbum, String nombre, String foto, String fecha) {
+	public void meterAlbum(int codAlbum, String nombre, String foto, Date fecha) {
 	    this.openConnection();
 
 	    try {
@@ -908,7 +975,7 @@ public class DaoImplementacion implements Dao{
 	        
 	        // Parsear la fecha de String a Date
 	        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-	        java.util.Date fechaDate = sdf.parse(fecha);
+	        java.util.Date fechaDate = sdf.parse(fecha.toString());
 	        
 	        // Establecer la fecha en el PreparedStatement
 	        stmt.setDate(4, new java.sql.Date(fechaDate.getTime()));
@@ -957,54 +1024,6 @@ public class DaoImplementacion implements Dao{
 		return NumAlbum;
 	}
 	
-	public int sacarNumeroDePlayList() {
-		int num = 0;
-		try {
-			this.openConnection();
-			stmt = con.prepareStatement(NUMERO_PLAYLIST);
-			ResultSet rs = stmt.executeQuery();
-			if (rs.next()) {
-	            num = rs.getInt(1); // Utiliza el índice de la columna en lugar del nombre
-			}
-			
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		try {
-			closeConnection();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return num;
-	}
-	
-	public int sacarNumeroDeAlbum() {
-		int num = 0;
-		try {
-			this.openConnection();
-			stmt = con.prepareStatement(NUMERO_ALBUM);
-			ResultSet rs = stmt.executeQuery();
-			if (rs.next()) {
-	            num = rs.getInt(1); // Utiliza el índice de la columna en lugar del nombre
-			}
-			
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
-			closeConnection();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	
-		return num;
-		
-	}
 	
 
 	public Playlist sacarPlaylist(int cod, String dni) {

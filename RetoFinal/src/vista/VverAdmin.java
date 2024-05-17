@@ -2,7 +2,6 @@ package vista;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
@@ -14,7 +13,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
@@ -23,7 +24,6 @@ import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -38,14 +38,19 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumnModel;
+
+import com.toedter.calendar.JCalendar;
+
 import controlador.Dao;
 import modelo.Album;
 import modelo.Artista;
 import modelo.Cancion;
 import modelo.Estilo;
 import modelo.Persona;
-
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -85,7 +90,6 @@ public class VverAdmin extends JDialog implements ActionListener{
 	private JLabel lblAudioCan;
 	private JTextField textNombreAlb;
 	private JTextField textFotoAlb;
-	private JTextField textFechaAlb;
 	private JButton btnIntroducirAlb;
 	private JComboBox comboAlb;
 	private JButton btnBorrarAlb, btnModificarAlb, btnVolverAlb;
@@ -109,6 +113,7 @@ public class VverAdmin extends JDialog implements ActionListener{
 	private JButton btnGestionArtistas;
 	private JButton btnXCan;
 	private JButton btnXArt;
+	private JCalendar calendario;
 	
 
 	/**
@@ -119,6 +124,7 @@ public class VverAdmin extends JDialog implements ActionListener{
 	 */
 	@SuppressWarnings("unchecked")
 	public VverAdmin(Inicio_Sesion inicio_Sesion, boolean b, Dao dao) {
+		setLocationRelativeTo(null);
 		this.setModal(b);
 		this.dao=dao;
 		setBackground(new Color(73, 197, 250));	
@@ -166,19 +172,16 @@ public class VverAdmin extends JDialog implements ActionListener{
 		
 		//MENU ALBUM
 		textNombreAlb= new JTextField();
+		textNombreAlb.setFont(new Font("Tahoma", Font.PLAIN, 17));
 		textNombreAlb.setBounds(157, 218, 278, 46);
 		padAlbum.add(textNombreAlb);
 		textNombreAlb.setColumns(10);
 		
 		textFotoAlb = new JTextField();
+		textFotoAlb.setFont(new Font("Tahoma", Font.PLAIN, 17));
 		textFotoAlb.setColumns(10);
-		textFotoAlb.setBounds(157, 356, 278, 46);
+		textFotoAlb.setBounds(157, 342, 278, 46);
 		padAlbum.add(textFotoAlb);
-		
-		textFechaAlb = new JTextField();
-		textFechaAlb.setColumns(10);
-		textFechaAlb.setBounds(157, 489, 278, 46);
-		padAlbum.add(textFechaAlb);
 		
 		btnXAlb = new JButton("X");
 		btnXAlb.addActionListener(this);
@@ -201,9 +204,11 @@ public class VverAdmin extends JDialog implements ActionListener{
 		btnIntroducirAlb = new JButton("Introducir");
 		btnIntroducirAlb.setFont(new Font("Arial", Font.BOLD, 20));
 		btnIntroducirAlb.setBounds(1039, 20, 187, 61);
+		btnIntroducirAlb.addActionListener(this);
 		padAlbum.add(btnIntroducirAlb);
 		
 		comboAlb = new JComboBox();
+		comboAlb.setFont(new Font("Tahoma", Font.PLAIN, 17));
 		comboAlb.setBounds(597, 218, 278, 46);
 		comboAlb.addActionListener(this);
 		padAlbum.add(comboAlb);
@@ -211,20 +216,26 @@ public class VverAdmin extends JDialog implements ActionListener{
 		btnBorrarAlb = new JButton("Borrar");
 		btnBorrarAlb.setFont(new Font("Arial", Font.BOLD, 20));
 		btnBorrarAlb.setBounds(1039, 164, 187, 61);
+		btnBorrarAlb.setEnabled(false);
 		padAlbum.add(btnBorrarAlb);
-		btnIntroducirAlb.addActionListener(this);
 		btnBorrarAlb.addActionListener(this);
 		
 		lblTituloAlb = new JLabel("GESTION ALBUMES");
-		lblTituloAlb.setForeground(Color.WHITE);
-		lblTituloAlb.setFont(new Font("Arial", Font.BOLD, 40));
+		lblTituloAlb.setForeground(new Color(0, 0, 0));
+		lblTituloAlb.setFont(new Font("Stencil", Font.BOLD, 45));
 		lblTituloAlb.setBounds(36, 20, 451, 61);
 		padAlbum.add(lblTituloAlb);
+		
+		calendario = new JCalendar();
+		calendario.setBounds(157, 473, 330, 127);
+		padAlbum.add(calendario);
+		
 		
 		btnModificarAlb = new JButton("Modificar");
 		btnModificarAlb.addActionListener(this);
 		btnModificarAlb.setFont(new Font("Arial", Font.BOLD, 20));
 		btnModificarAlb.setBounds(1039, 92, 187, 61);
+		btnModificarAlb.setEnabled(false);
 		padAlbum.add(btnModificarAlb);
 		
 		btnVolverAlb = new JButton("Volver");
@@ -245,7 +256,7 @@ public class VverAdmin extends JDialog implements ActionListener{
 				fc = new JFileChooser();
 				fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 				
-				FileNameExtensionFilter filtro = new FileNameExtensionFilter("Archivo de imagenes","jpg");
+				FileNameExtensionFilter filtro = new FileNameExtensionFilter("Archivo de imagenes", "jpg", "png");
 				fc.setFileFilter(filtro);
 				
 				int res = fc.showOpenDialog(ven);				
@@ -264,7 +275,7 @@ public class VverAdmin extends JDialog implements ActionListener{
 				}
 			}
 		});
-		btnArchivosAlb.setBounds(445, 356, 46, 46);
+		btnArchivosAlb.setBounds(445, 342, 46, 46);
 		padAlbum.add(btnArchivosAlb);
 		
 		JLabel lblAlbumAlb = new JLabel("Albumes  :");
@@ -298,36 +309,40 @@ public class VverAdmin extends JDialog implements ActionListener{
 			//CANCIONES	
 
 			JLabel lblTituloCan = new JLabel("GESTION CANCIONES");
-			lblTituloCan.setForeground(new Color(255, 255, 255));
-			lblTituloCan.setFont(new Font("Arial", Font.BOLD, 40));
-			lblTituloCan.setBounds(36, 20, 451, 61);
+			lblTituloCan.setForeground(new Color(0, 0, 0));
+			lblTituloCan.setFont(new Font("Stencil", Font.BOLD, 45));
+			lblTituloCan.setBounds(36, 20, 462, 61);
 			padCancion.add(lblTituloCan);
 			
 			JLabel lblNombreCan = new JLabel("Nombre  :");
 			lblNombreCan.setForeground(Color.WHITE);
 			lblNombreCan.setFont(new Font("Arial", Font.PLAIN, 27));
-			lblNombreCan.setBounds(157, 163, 197, 51);
+			lblNombreCan.setBounds(139, 197, 197, 51);
 			padCancion.add(lblNombreCan);
 			
 			textNombreCan = new JTextField();
+			textNombreCan.setFont(new Font("Tahoma", Font.PLAIN, 17));
 			textNombreCan.setColumns(10);
-			textNombreCan.setBounds(157, 223, 278, 46);
+			textNombreCan.setBounds(139, 257, 278, 46);
 			padCancion.add(textNombreCan);
 			
 			JLabel lblAlbumCan = new JLabel("Album  :");
 			lblAlbumCan.setForeground(Color.WHITE);
 			lblAlbumCan.setFont(new Font("Arial", Font.PLAIN, 27));
-			lblAlbumCan.setBounds(157, 293, 197, 51);
+			lblAlbumCan.setBounds(139, 327, 197, 51);
 			padCancion.add(lblAlbumCan);
 			
 			JLabel lblArtistaCan = new JLabel("Artistas  :");
 			lblArtistaCan.setForeground(Color.WHITE);
 			lblArtistaCan.setFont(new Font("Arial", Font.PLAIN, 27));
-			lblArtistaCan.setBounds(605, 160, 197, 51);
+			lblArtistaCan.setBounds(587, 194, 197, 51);
 			padCancion.add(lblArtistaCan);
 			
 			table = new JTable();
 			table.setBounds(159, 525, 431, 177);
+			table.setRowHeight(25);
+			table.setBorder(null);
+	        table.setFont(new Font("Tahoma", Font.PLAIN, 14));
 			table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {	
 				@Override
 				public void valueChanged(ListSelectionEvent e) {
@@ -337,13 +352,21 @@ public class VverAdmin extends JDialog implements ActionListener{
 			});
 			padCancion.add(table);
 			
+			JTableHeader header = table.getTableHeader();
+	        header.setBackground(java.awt.Color.gray);
+	        header.setFont(new Font("Stencil", Font.PLAIN, 18));
+	        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+	        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+	        table.setDefaultRenderer(Object.class, centerRenderer);
+	        
 			JScrollPane scrollPaneCan = new JScrollPane(table);
-			scrollPaneCan.setBounds(605, 221, 407, 123);
+			scrollPaneCan.setBounds(479, 257, 536, 150);
 			padCancion.add(scrollPaneCan);
 			
 			comboAlbumCan = new JComboBox();
+			comboAlbumCan.setFont(new Font("Tahoma", Font.PLAIN, 17));
 			comboAlbumCan.setMaximumRowCount(30);
-			comboAlbumCan.setBounds(157, 353, 278, 46);
+			comboAlbumCan.setBounds(139, 387, 278, 46);
 			padCancion.add(comboAlbumCan,BorderLayout.CENTER);
 			
 			btnIntroducirCan = new JButton("Introducir");
@@ -353,8 +376,9 @@ public class VverAdmin extends JDialog implements ActionListener{
 			btnIntroducirCan.addActionListener(this);
 			
 			textAudioCan = new JTextField();
+			textAudioCan.setFont(new Font("Tahoma", Font.PLAIN, 17));
 			textAudioCan.setText("");
-			textAudioCan.setBounds(157, 483, 278, 46);
+			textAudioCan.setBounds(139, 517, 278, 46);
 			padCancion.add(textAudioCan);
 			textAudioCan.setColumns(10);
 			
@@ -363,16 +387,18 @@ public class VverAdmin extends JDialog implements ActionListener{
 			btnBorrarCan = new JButton("Borrar");
 			btnBorrarCan.setFont(new Font("Arial", Font.BOLD, 20));
 			btnBorrarCan.setBounds(1039, 160, 187, 61);
+			btnBorrarCan.setEnabled(false);
 			btnBorrarCan.addActionListener(this);
 			padCancion.add(btnBorrarCan);
 			
 			JLabel lblCancionesCan = new JLabel("Canciones  :");
 			lblCancionesCan.setForeground(Color.WHITE);
 			lblCancionesCan.setFont(new Font("Arial", Font.PLAIN, 27));
-			lblCancionesCan.setBounds(497, 30, 197, 51);
+			lblCancionesCan.setBounds(524, 26, 180, 51);
 			padCancion.add(lblCancionesCan);
 			
 			comboCancionesCan = new JComboBox();
+			comboCancionesCan.setFont(new Font("Tahoma", Font.PLAIN, 17));
 			comboCancionesCan.setBounds(706, 28, 232, 51);
 			comboCancionesCan.addActionListener(this);
 			padCancion.add(comboCancionesCan);
@@ -380,13 +406,14 @@ public class VverAdmin extends JDialog implements ActionListener{
 		btnModificarCan = new JButton("Modificar");
 		btnModificarCan.setFont(new Font("Arial", Font.BOLD, 20));
 		btnModificarCan.setBounds(1039, 90, 187, 61);
+		btnModificarCan.setEnabled(false);
 		btnModificarCan.addActionListener(this);
 		padCancion.add(btnModificarCan);
 		
 		lblAudioCan = new JLabel("Audio :");
 		lblAudioCan.setForeground(Color.WHITE);
 		lblAudioCan.setFont(new Font("Arial", Font.PLAIN, 27));
-		lblAudioCan.setBounds(157, 423, 197, 51);
+		lblAudioCan.setBounds(139, 457, 197, 51);
 		padCancion.add(lblAudioCan);
 		
 		
@@ -416,7 +443,7 @@ public class VverAdmin extends JDialog implements ActionListener{
 				
 			}
 		});
-		btnArchivosCan.setBounds(441, 482, 46, 46);
+		btnArchivosCan.setBounds(423, 516, 46, 46);
 		padCancion.add(btnArchivosCan);
 		
 		padArtista = new JPanel();
@@ -485,31 +512,37 @@ public class VverAdmin extends JDialog implements ActionListener{
 		padArtista.add(checkboxArt);
 		
 		textDniArt = new JTextField();
+		textDniArt.setFont(new Font("Tahoma", Font.PLAIN, 17));
 		textDniArt.setBounds(101, 252, 278, 46);
 		padArtista.add(textDniArt);
 		textDniArt.setColumns(10);
 		
 		textNombreArt = new JTextField();
+		textNombreArt.setFont(new Font("Tahoma", Font.PLAIN, 17));
 		textNombreArt.setColumns(10);
 		textNombreArt.setBounds(101, 366, 278, 46);
 		padArtista.add(textNombreArt);
 		
 		textApellidoArt = new JTextField();
+		textApellidoArt.setFont(new Font("Tahoma", Font.PLAIN, 17));
 		textApellidoArt.setColumns(10);
 		textApellidoArt.setBounds(101, 478, 278, 46);
 		padArtista.add(textApellidoArt);
 		
 		textPaisArt = new JTextField();
+		textPaisArt.setFont(new Font("Tahoma", Font.PLAIN, 17));
 		textPaisArt.setColumns(10);
 		textPaisArt.setBounds(439, 252, 278, 46);
 		padArtista.add(textPaisArt);
 		
 		textEdadArt = new JTextField();
+		textEdadArt.setFont(new Font("Tahoma", Font.PLAIN, 17));
 		textEdadArt.setColumns(10);
 		textEdadArt.setBounds(439, 366, 278, 46);
 		padArtista.add(textEdadArt);
 		
 		textNombreArtisticoArt = new JTextField();
+		textNombreArtisticoArt.setFont(new Font("Tahoma", Font.PLAIN, 17));
 		textNombreArtisticoArt.setColumns(10);
 		textNombreArtisticoArt.setBounds(439, 477, 281, 47);
 		padArtista.add(textNombreArtisticoArt);
@@ -529,6 +562,7 @@ public class VverAdmin extends JDialog implements ActionListener{
 		padArtista.add(btnAltaArt);
 		
 		comboArt = new JComboBox();
+		comboArt.setFont(new Font("Tahoma", Font.PLAIN, 17));
 		comboArt.setBounds(706, 30, 232, 51);
 		comboArt.addActionListener(this);
 		padArtista.add(comboArt);
@@ -536,12 +570,13 @@ public class VverAdmin extends JDialog implements ActionListener{
 		btnBorrarArt = new JButton("Borrar");
 		btnBorrarArt.setFont(new Font("Arial", Font.BOLD, 20));
 		btnBorrarArt.setBounds(1039, 160, 187, 61);
+		btnBorrarArt.setEnabled(false);
 		padArtista.add(btnBorrarArt);
 		btnBorrarArt.addActionListener(this);
 		
 		lblTituloArt = new JLabel("GESTION ARTISTA");
-		lblTituloArt.setForeground(Color.WHITE);
-		lblTituloArt.setFont(new Font("Arial", Font.BOLD, 40));
+		lblTituloArt.setForeground(new Color(0, 0, 0));
+		lblTituloArt.setFont(new Font("Stencil", Font.BOLD, 45));
 		lblTituloArt.setBounds(36, 20, 451, 61);
 		padArtista.add(lblTituloArt);
 		
@@ -554,6 +589,7 @@ public class VverAdmin extends JDialog implements ActionListener{
 		btnModificarArt = new JButton("Modificar");
 		btnModificarArt.setFont(new Font("Arial", Font.BOLD, 20));
 		btnModificarArt.setBounds(1039, 90, 187, 61);
+		btnModificarArt.setEnabled(false);
 		padArtista.add(btnModificarArt);
 		btnModificarArt.addActionListener(this);
 		
@@ -657,7 +693,7 @@ public class VverAdmin extends JDialog implements ActionListener{
 			modificarCancion();
 		}
 		if(e.getSource().equals(comboCancionesCan)) {
-			cargarDatos();
+			cargarDatosCan();
 		}
 		if(e.getSource().equals(btnIntroducirAlb)) {
 			meterAlbum();
@@ -695,7 +731,7 @@ public class VverAdmin extends JDialog implements ActionListener{
 		}
 		if(e.getSource().equals(btnXCan)) {
 			comboCancionesCan.setSelectedIndex(-1);
-			cargarDatos();
+			cargarDatosCan();
 		}
 		if(e.getSource().equals(btnXArt)) {
 			comboArt.setSelectedIndex(-1);
@@ -704,54 +740,8 @@ public class VverAdmin extends JDialog implements ActionListener{
 	}
 
 
-	private void cargarDatosArtista() {
-		if(comboArt.getSelectedIndex()!=-1) {
-			int pos = comboArt.getSelectedIndex();
-			ArrayList<Persona> personas = dao.sacarPersonas();
-			ArrayList<Artista> artistas = dao.sacarArtista();
-			textDniArt.setText(artistas.get(pos).getDni());
-			textDniArt.setEnabled(false);
-			for (Persona p: personas) {
-				if (p.getDni().equalsIgnoreCase(artistas.get(pos).getDni())) {
-					textNombreArt.setText(p.getNombrePersona());
-					textApellidoArt.setText(p.getApellidoPersona());
-					textPaisArt.setText((p.getPais()));
-					textEdadArt.setText(""+(p.getEdad()));
-				}
-			}
-			textNombreArtisticoArt.setText((artistas.get(pos).getNombreArtistico()));
-			checkboxArt.setSelected(artistas.get(pos).isCantaAutor());
-			for (int i = 0; i < comboEstiloArt.getItemCount(); i++) {
-	            Estilo item = (Estilo) comboEstiloArt.getItemAt(i);
-	            if (item.toString().equalsIgnoreCase(String.valueOf(artistas.get(pos).getEstilo()))) {
-	            	comboEstiloArt.setSelectedIndex(i);
-	            }
-	         }
-			btnAltaArt.setEnabled(false);
-		}else {
-			btnAltaArt.setEnabled(true);
-			textDniArt.setEnabled(true);
-			textDniArt.setText("");
-			textNombreArt.setText("");
-			textApellidoArt.setText("");
-			textPaisArt.setText("");
-			textEdadArt.setText("");
-			textNombreArtisticoArt.setText("");
-			checkboxArt.setSelected(false);
-			comboEstiloArt.setSelectedIndex(-1);
-		}		
-	}
 
 
-	private void cargarComboArtista() {
-		// TODO Auto-generated method stub
-		comboArt.removeAllItems();
-		ArrayList<Artista> artistas = dao.sacarartistas();
-		for(Artista a:artistas) {
-			comboArt.addItem(a.getNombreArtistico());
-		}
-		comboArt.setSelectedIndex(-1);
-	}
 	
 	private void borrarArtista() {
 		// TODO Auto-generated method stub
@@ -761,6 +751,7 @@ public class VverAdmin extends JDialog implements ActionListener{
 		JOptionPane.showMessageDialog(null, "Se ha borrado la cancion : ","",JOptionPane.INFORMATION_MESSAGE);
 		comboArt.setSelectedIndex(-1);	
 		cargarComboArtista();
+		cargarTabla();
 	}
 
 
@@ -774,21 +765,14 @@ public class VverAdmin extends JDialog implements ActionListener{
 		}
 		dao.registrarPersona(textDniArt.getText(),textNombreArt.getText(),textApellidoArt.getText(),textPaisArt.getText(),Integer.valueOf(textEdadArt.getText()));
 		dao.registrarArtista(textDniArt.getText(),textNombreArtisticoArt.getText(),cantaAutor,comboEstiloArt.getSelectedItem().toString());
-		JOptionPane.showMessageDialog(null, "INTRODUCIDO CORRERCAMENTE");		
+		JOptionPane.showMessageDialog(null, "INTRODUCIDO CORRERCAMENTE");	
+		comboArt.setSelectedIndex(-1);
+		cargarComboArtista();
+		cargarTabla();
+		
 	}
 
 
-	
-
-	private void cargarComboAlbumA() {
-		// TODO Auto-generated method stub
-		comboAlb.removeAllItems();
-		ArrayList<Album> albumes = dao.sacarAlbumes();
-		for(Album a:albumes) {
-			comboAlb.addItem(a.getCodAlbum()+" | "+a.getNombreAlbum());
-		}
-		comboAlb.setSelectedIndex(-1);		
-	}
 
 
 	private void modificarCancion() {
@@ -803,7 +787,7 @@ public class VverAdmin extends JDialog implements ActionListener{
 		int codAlbum = Integer.parseInt((String) cod.subSequence(0, pos));
 		String textoOriginal = textAudioCan.getText();
         String textoModificado = textoOriginal.replaceAll("^.+\\\\", "..\\\\RetoFinal\\\\Audio\\\\");
-		if(validar()) {
+		if(validar(1)) {
 			dao.modificarCancion(Integer.parseInt(can), sacarDuracionC() , textNombreCan.getText(), textoModificado,codAlbum);
 			dao.eliminarCanta(Integer.parseInt(can));
 			for (Artista art:cogerArtistas()) {
@@ -820,6 +804,8 @@ public class VverAdmin extends JDialog implements ActionListener{
 		dao.modificarArtista(textDniArt.getText(), textNombreArtisticoArt.getText(), comboEstiloArt.getSelectedItem().toString(), checkboxArt.isSelected());
 		JOptionPane.showMessageDialog(null, "MODIFICADO  CORRECTAMENTE");
 		cargarComboArtista();
+		comboArt.setSelectedIndex(-1);
+		cargarTabla();
 	}
 
 	private void modificarAlbum() {
@@ -827,9 +813,12 @@ public class VverAdmin extends JDialog implements ActionListener{
 		int donde=comboAlb.getSelectedItem().toString().indexOf(" |");
 		String textoOriginal = textFotoAlb.getText();
         String textoModificado = textoOriginal.replaceAll("^.+\\\\", "..\\\\RetoFinal\\\\Img\\\\");
-		dao.modificarAlbum(comboAlb.getSelectedItem().toString().substring(0, donde),textNombreAlb.getText(),textoModificado,textFechaAlb.getText());
+        java.util.Date fechaUtil = calendario.getDate();
+        java.sql.Date fchaSql = new java.sql.Date(fechaUtil.getTime());
+		dao.modificarAlbum(comboAlb.getSelectedItem().toString().substring(0, donde),textNombreAlb.getText(),textoModificado, fchaSql);
 		JOptionPane.showMessageDialog(null, "MODIFICADO  CORRECTAMENTE");
-		cargarComboAlbumA();		
+		cargarComboAlbumA();
+		cargarComboAlbum();
 	}
 	
 	private int sacarDuracionC() {
@@ -851,44 +840,7 @@ public class VverAdmin extends JDialog implements ActionListener{
 	}
 
 
-	private void cargarDatos() {
-		// TODO Auto-generated method stub
-		
-		if(comboCancionesCan.getSelectedIndex()!=-1) {
-			ArrayList<Cancion> canciones = dao.sacarCanciones();
-			int pos = comboCancionesCan.getSelectedIndex();
-			String can = comboCancionesCan.getSelectedItem().toString();
-			int donde = can.indexOf(" |");
-			can = can.substring(0, donde);
-			Cancion cancion=null;
-			for(Cancion c:canciones) {
-				if(c.getCodCancion()==Integer.parseInt(can))
-					cancion=c;
-			}
-			for (int i = 0; i < comboAlbumCan.getItemCount(); i++) {
-	            String item = (String) comboAlbumCan.getItemAt(i);
-	            int p = item.indexOf(" |");
-	            item = item.substring(0, p);
-	            if (item.equalsIgnoreCase(String.valueOf(cancion.getCodAlbum()))) {
-	            	comboAlbumCan.setSelectedIndex(i);
-	            }
-	         }
-			btnIntroducirCan.setEnabled(false);
-		
-			textAudioCan.setText(canciones.get(pos).getAudio());
-			textNombreCan.setText(canciones.get(pos).getNombreCancion());
-			seleccionarArtistas();
-			
-			
-			
-		}else {
-			btnIntroducirCan.setEnabled(true);
-			textAudioCan.setText("");
-			textNombreCan.setText(null);
-			comboAlbumCan.setSelectedIndex(-1);
-			table.clearSelection();
-		}
-	}
+	
 	
 	private void borrarAlbum() {
 		// TODO Auto-generated method stub
@@ -903,41 +855,23 @@ public class VverAdmin extends JDialog implements ActionListener{
 		}else {
 			JOptionPane.showMessageDialog(null, "Se mantiene la cancion : "+textNombreAlb.getText(),"Cancion",JOptionPane.INFORMATION_MESSAGE);
 		}
+		cargarComboAlbumA();
 		cargarComboAlbum();
 	}
 
 	private void meterAlbum() {
 		// TODO Auto-generated method stub
 		
-		String textoOriginal = textAudioCan.getText();
+		String textoOriginal = textFotoAlb.getText();
 		String textoModificado = textoOriginal.replaceAll(".*\\\\", "..\\\\RetoFinal\\\\Img\\\\");
-		dao.meterAlbum(dao.crearCodigoAlbum(),textNombreAlb.getText(),textoModificado,textFechaAlb.getText());
-		JOptionPane.showMessageDialog(null, "INTRODUCIDO CORRECTAMENTE CON EL CODIGO  "+ dao.crearCodigoAlbum());
+		Date fechaSeleccionada = new Date(calendario.getDate().getTime());
+		int cod = dao.crearCodigoAlbum();
+		dao.meterAlbum(cod,textNombreAlb.getText(),textoModificado,fechaSeleccionada);
+		JOptionPane.showMessageDialog(null, "INTRODUCIDO CORRECTAMENTE CON EL CODIGO  "+ cod);
+		cargarComboAlbumA();
 		cargarComboAlbum();
-		
+		comboAlb.setSelectedIndex(-1);
 	}
-	
-	
-
-	private void cargarDatosAlbum() {		
-		if(comboAlb.getSelectedIndex()!=-1) {
-			int pos = comboAlb.getSelectedIndex();
-			ArrayList<Album> albumes = dao.sacarAlbumes();
-			btnIntroducirAlb.setEnabled(false);
-			textNombreAlb.setText(albumes.get(pos).getNombreAlbum());
-			textFotoAlb.setText(albumes.get(pos).getFotoAlbum());
-			textFechaAlb.setText(""+(albumes.get(pos).getFechaLan()));
-			
-		}else {
-			btnIntroducirAlb.setEnabled(true);
-			textNombreAlb.setText("");
-			textFotoAlb.setText("");
-			textFechaAlb.setText("");
-			comboAlb.setSelectedIndex(-1);
-		}
-	}
-	
-	
 
 	private void seleccionarArtistas() {
 		// TODO Auto-generated method stub
@@ -990,14 +924,14 @@ public class VverAdmin extends JDialog implements ActionListener{
 		// TODO Auto-generated method stub
 		cogerArtistas();
 		
-		int codCancion = crearCodigo();
+		int codCancion = dao.crearCodigoCancion();
 		String cod = comboAlbumCan.getSelectedItem().toString();
 		int pos = cod.indexOf(" |");
 		int codAlbum = Integer.parseInt((String) cod.subSequence(0, pos));
 		String textoOriginal = textAudioCan.getText();
         String textoModificado = textoOriginal.replaceAll("^.+\\\\", "..\\\\RetoFinal\\\\Audio\\\\");
-		if(validar()) {
-			dao.añadirCancion(codCancion, sacarDuracionC(), textNombreCan.getText(), textoModificado ,codAlbum );
+		if(validar(1)) {
+			dao.anadirCancion(codCancion, sacarDuracionC(), textNombreCan.getText(), textoModificado ,codAlbum );
 			
 			for (Artista art:cogerArtistas()) {
 				dao.insertarCanta(art.getDni(),codCancion );
@@ -1005,34 +939,98 @@ public class VverAdmin extends JDialog implements ActionListener{
 			JOptionPane.showMessageDialog(null, "Se ha creado la cancion : "+textNombreCan.getText(),"Cancion",JOptionPane.INFORMATION_MESSAGE);
 		}
 		cargarComboCancion();
+		cargarComboAlbum();
 	}
 
-
-	private boolean validar() {
+	//Validacion
+	
+	private boolean validar(int num) {
 		// TODO Auto-generated method stub
 		boolean bien = true;
-		if(!textAudioCan.getText().endsWith(".wav")) {
-			JOptionPane.showMessageDialog(null, "Audio tiene que ser tipo .wav","ERROR",JOptionPane.ERROR_MESSAGE);
-			bien=false;
+		if (num == 1) {
+			
+	
+			if(comboAlbumCan.getSelectedIndex()==-1) {
+				JOptionPane.showMessageDialog(null, "Tienes que escoger un album","ERROR",JOptionPane.ERROR_MESSAGE);
+				bien=false;
+			}
+			if(cogerArtistas().isEmpty()) {
+				JOptionPane.showMessageDialog(null, "Tienes que escoger minimo un artista","ERROR",JOptionPane.ERROR_MESSAGE);
+				bien=false;
+			}
+			if (textNombreCan.getText().isEmpty() || textNombreCan.getText().matches(".*\\d.*")) {
+			    JOptionPane.showMessageDialog(null, "El nombre no debe contener números", "ERROR", JOptionPane.ERROR_MESSAGE);
+			    bien = false;
+			}
+			if(table.getSelectedRow()==-1) {
+				JOptionPane.showMessageDialog(null, "Escoge minimo un artista","ERROR",JOptionPane.ERROR_MESSAGE);
+				bien=false;
+			}
 		}
-		if(comboAlbumCan.getSelectedIndex()==-1) {
-			JOptionPane.showMessageDialog(null, "Tienes que escoger un album","ERROR",JOptionPane.ERROR_MESSAGE);
-			bien=false;
+		if (num == 2) {
+			if(!textNombreAlb.getText().endsWith(".jpg")) {
+				JOptionPane.showMessageDialog(null, "Imagen tiene que ser tipo .jpg","ERROR",JOptionPane.ERROR_MESSAGE);
+				bien=false;
+			}
+			if(textNombreAlb.getText().isEmpty()) {
+				JOptionPane.showMessageDialog(null, "Tienes que poner un nombre","ERROR",JOptionPane.ERROR_MESSAGE);
+				bien=false;
+			}
 		}
-		if(cogerArtistas().isEmpty()) {
-			JOptionPane.showMessageDialog(null, "Tienes que escoger minimo un artista","ERROR",JOptionPane.ERROR_MESSAGE);
-			bien=false;
-		}
-		if(textNombreCan.getText()==null) {
-			JOptionPane.showMessageDialog(null, "Tienes que poner un nombre","ERROR",JOptionPane.ERROR_MESSAGE);
-			bien=false;
-		}
-		if(table.getSelectedRow()==-1) {
-			JOptionPane.showMessageDialog(null, "Escoge minimo un artista","ERROR",JOptionPane.ERROR_MESSAGE);
-			bien=false;
+		if (num == 3) {
+			if(!comprobarDni()) {
+				JOptionPane.showMessageDialog(null, "Tienes que poner un dni","ERROR",JOptionPane.ERROR_MESSAGE);
+				bien=false;
+			}
+			if(textNombreArt.getText().isEmpty() || textNombreArt.getText().matches(".*\\d.*")) {
+				JOptionPane.showMessageDialog(null, "Tienes que poner un nombre","ERROR",JOptionPane.ERROR_MESSAGE);
+				bien=false;
+			}
+			if(textApellidoArt.getText().isEmpty() || textApellidoArt.getText().matches(".*\\d.*")) {
+				JOptionPane.showMessageDialog(null, "Tienes que poner un apellido","ERROR",JOptionPane.ERROR_MESSAGE);
+				bien=false;
+			}
+			if(textEdadArt.getText().isEmpty() || !textEdadArt.getText().matches(".*\\d.*")) {
+				JOptionPane.showMessageDialog(null, "Tienes que poner una edad","ERROR",JOptionPane.ERROR_MESSAGE);
+				bien=false;
+			}
+			if(textPaisArt.getText().isEmpty() || textPaisArt.getText().matches(".*\\d.*")) {
+				JOptionPane.showMessageDialog(null, "Tienes que poner un pais","ERROR",JOptionPane.ERROR_MESSAGE);
+				bien=false;
+			}
+			if(textNombreArtisticoArt.getText().isEmpty() || textNombreArtisticoArt.getText().matches(".*\\d.*")) {
+				JOptionPane.showMessageDialog(null, "Tienes que poner un nombre artístico","ERROR",JOptionPane.ERROR_MESSAGE);
+				bien=false;
+			}
+			if(comboEstiloArt.getSelectedIndex()==-1) {
+				JOptionPane.showMessageDialog(null, "Tienes que escoger un estilo","ERROR",JOptionPane.ERROR_MESSAGE);
+				bien=false;
+			}
 		}
 		return bien;
+
+		
 	}
+	private boolean comprobarDni() {
+		String dni = textDniArt.getText();
+
+		if (dni.isEmpty() || dni.length() != 9)
+			return false;
+
+		String numero = dni.substring(0, 8);
+		char letraControl = dni.charAt(8);
+
+		try {
+			int num = Integer.parseInt(numero);
+			int resto = num % 23;
+			char[] letrasControl = { 'T', 'R', 'W', 'A', 'G', 'M', 'Y', 'F', 'P', 'D', 'X', 'B', 'N', 'J', 'Z', 'S',
+					'Q', 'V', 'H', 'L', 'C', 'K', 'E' };
+			return letraControl == letrasControl[resto];
+		} catch (NumberFormatException e) {
+			return false;
+		}
+	}
+
 
 	//crear automaticamente el codigo de la cancion
 	private int crearCodigo() {
@@ -1062,14 +1060,27 @@ public class VverAdmin extends JDialog implements ActionListener{
 		return art;
 	}
 
+	//Cargas de ComboBox
+	
 	private void cargarComboAlbum() {
 		// TODO Auto-generated method stub
+		comboAlbumCan.removeAllItems();
 		ArrayList<Album> albumes = dao.sacarAlbumes();
 		for(Album a:albumes) {
 			comboAlbumCan.addItem(a.getCodAlbum()+" | "+a.getNombreAlbum());
 		}
 		comboAlbumCan.setSelectedIndex(-1);
 		
+	}
+
+	private void cargarComboAlbumA() {
+		// TODO Auto-generated method stub
+		comboAlb.removeAllItems();
+		ArrayList<Album> albumes = dao.sacarAlbumes();
+		for(Album a:albumes) {
+			comboAlb.addItem(a.getCodAlbum()+" | "+a.getNombreAlbum());
+		}
+		comboAlb.setSelectedIndex(-1);		
 	}
 	
 	private void cargarComboCancion() {
@@ -1081,6 +1092,19 @@ public class VverAdmin extends JDialog implements ActionListener{
 		}
 		comboCancionesCan.setSelectedIndex(-1);
 	}
+	
+
+	private void cargarComboArtista() {
+		// TODO Auto-generated method stub
+		comboArt.removeAllItems();
+		ArrayList<Artista> artistas = dao.sacarartistas();
+		for(Artista a:artistas) {
+			comboArt.addItem(a.getNombreArtistico());
+		}
+		comboArt.setSelectedIndex(-1);
+	}
+	
+	//Carga Tabla Canciones
 	
 	public void cargarTabla() {
 		String[] cabeceras = { "DNI", "Nombre Artista"};
@@ -1101,4 +1125,114 @@ public class VverAdmin extends JDialog implements ActionListener{
 		}
 		table.setModel(model);
 	}
+	
+	//Cargas de datos
+	
+	private void cargarDatosAlbum() {		
+		if(comboAlb.getSelectedIndex()!=-1) {
+			int pos = comboAlb.getSelectedIndex();
+			ArrayList<Album> albumes = dao.sacarAlbumes();
+			btnIntroducirAlb.setEnabled(false);
+			btnBorrarAlb.setEnabled(true);
+			btnModificarAlb.setEnabled(true);
+			textNombreAlb.setText(albumes.get(pos).getNombreAlbum());
+			textFotoAlb.setText(albumes.get(pos).getFotoAlbum());
+			calendario.setDate(albumes.get(pos).getFechaLan());
+			
+		}else {
+			btnIntroducirAlb.setEnabled(true);
+			btnBorrarAlb.setEnabled(false);
+			btnModificarAlb.setEnabled(false);
+			textNombreAlb.setText("");
+			textFotoAlb.setText("");
+			calendario.setDate(Calendar.getInstance().getTime());
+			comboAlb.setSelectedIndex(-1);
+		}
+	}
+	
+	private void cargarDatosCan() {
+		// TODO Auto-generated method stub
+		
+		if(comboCancionesCan.getSelectedIndex()!=-1) {
+			ArrayList<Cancion> canciones = dao.sacarCanciones();
+			int pos = comboCancionesCan.getSelectedIndex();
+			String can = comboCancionesCan.getSelectedItem().toString();
+			int donde = can.indexOf(" |");
+			can = can.substring(0, donde);
+			Cancion cancion=null;
+			for(Cancion c:canciones) {
+				if(c.getCodCancion()==Integer.parseInt(can))
+					cancion=c;
+			}
+			for (int i = 0; i < comboAlbumCan.getItemCount(); i++) {
+	            String item = (String) comboAlbumCan.getItemAt(i);
+	            int p = item.indexOf(" |");
+	            item = item.substring(0, p);
+	            if (item.equalsIgnoreCase(String.valueOf(cancion.getCodAlbum()))) {
+	            	comboAlbumCan.setSelectedIndex(i);
+	            }
+	         }
+			btnIntroducirCan.setEnabled(false);
+			btnBorrarCan.setEnabled(true);
+			btnModificarCan.setEnabled(true);
+			textAudioCan.setText(canciones.get(pos).getAudio());
+			textNombreCan.setText(canciones.get(pos).getNombreCancion());
+			seleccionarArtistas();
+			
+			
+			
+		}else {
+			btnIntroducirCan.setEnabled(true);
+			btnBorrarCan.setEnabled(false);
+			btnModificarCan.setEnabled(false);
+			textAudioCan.setText("");
+			textNombreCan.setText(null);
+			comboAlbumCan.setSelectedIndex(-1);
+			table.clearSelection();
+		}
+	}
+	
+	private void cargarDatosArtista() {
+		if(comboArt.getSelectedIndex()!=-1) {
+			int pos = comboArt.getSelectedIndex();
+			ArrayList<Persona> personas = dao.sacarPersonas();
+			ArrayList<Artista> artistas = dao.sacarArtista();
+			textDniArt.setText(artistas.get(pos).getDni());
+			textDniArt.setEnabled(false);
+			for (Persona p: personas) {
+				if (p.getDni().equalsIgnoreCase(artistas.get(pos).getDni())) {
+					textNombreArt.setText(p.getNombrePersona());
+					textApellidoArt.setText(p.getApellidoPersona());
+					textPaisArt.setText((p.getPais()));
+					textEdadArt.setText(""+(p.getEdad()));
+				}
+			}
+			textNombreArtisticoArt.setText((artistas.get(pos).getNombreArtistico()));
+			checkboxArt.setSelected(artistas.get(pos).isCantaAutor());
+			for (int i = 0; i < comboEstiloArt.getItemCount(); i++) {
+	            Estilo item = (Estilo) comboEstiloArt.getItemAt(i);
+	            if (item.toString().equalsIgnoreCase(String.valueOf(artistas.get(pos).getEstilo()))) {
+	            	comboEstiloArt.setSelectedIndex(i);
+	            }
+	         }
+			btnAltaArt.setEnabled(false);
+			btnBorrarArt.setEnabled(true);
+			btnModificarArt.setEnabled(true);
+		}else {
+			btnAltaArt.setEnabled(true);
+			btnBorrarArt.setEnabled(false);
+			btnModificarArt.setEnabled(false);
+			textDniArt.setEnabled(true);
+			textDniArt.setText("");
+			textNombreArt.setText("");
+			textApellidoArt.setText("");
+			textPaisArt.setText("");
+			textEdadArt.setText("");
+			textNombreArtisticoArt.setText("");
+			checkboxArt.setSelected(false);
+			comboEstiloArt.setSelectedIndex(-1);
+		}		
+	}
+
+	
 }

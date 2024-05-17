@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import controlador.Dao;
+import excepciones.CreateException;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -34,7 +35,7 @@ public class VRegistrarse extends JDialog implements ActionListener{
 	private JTextField tFPais;
 	private JTextField tFEdad;
 	private JTextField tFNombreUsuario;
-	private JTextField tFContraseña;
+	private JTextField tFContrasena;
 	private JButton btnVolver;
 	private JButton btnRegistrar;
 	private JLabel lblLogo;
@@ -49,6 +50,7 @@ public class VRegistrarse extends JDialog implements ActionListener{
 	 */
 	public VRegistrarse(Inicio_Sesion inicio_Sesion, boolean modal, Dao dao) {
 		super(inicio_Sesion);
+		
 		setIconImage(Toolkit.getDefaultToolkit().getImage("C:\\Users\\1dam\\Desktop\\PGR\\3ª Eva\\RetoFinal\\Img\\logoPequeña.png"));
 		this.dao = dao;
 		setBackground(new Color(78, 78, 78));
@@ -105,11 +107,11 @@ public class VRegistrarse extends JDialog implements ActionListener{
 		lblNombreUsuario.setBounds(83, 486, 208, 46);
 		contentPanel.add(lblNombreUsuario);
 		
-		JLabel lblContraseña = new JLabel("Contraseña:");
-		lblContraseña.setForeground(new Color(255, 255, 255));
-		lblContraseña.setFont(new Font("Eras Light ITC", Font.PLAIN, 40));
-		lblContraseña.setBounds(83, 556, 208, 46);
-		contentPanel.add(lblContraseña);
+		JLabel lblContrasena = new JLabel("Contraseña:");
+		lblContrasena.setForeground(new Color(255, 255, 255));
+		lblContrasena.setFont(new Font("Eras Light ITC", Font.PLAIN, 40));
+		lblContrasena.setBounds(83, 556, 208, 46);
+		contentPanel.add(lblContrasena);
 		
 		tFDni = new JTextField();
 		tFDni.setBackground(new Color(255, 255, 255));
@@ -153,12 +155,12 @@ public class VRegistrarse extends JDialog implements ActionListener{
 		tFNombreUsuario.setBounds(329, 486, 480, 46);
 		contentPanel.add(tFNombreUsuario);
 		
-		tFContraseña = new JTextField();
-		tFContraseña.setBackground(new Color(255, 255, 255));
-		tFContraseña.setFont(new Font("Tahoma", Font.PLAIN, 43));
-		tFContraseña.setColumns(10);
-		tFContraseña.setBounds(329, 556, 480, 46);
-		contentPanel.add(tFContraseña);
+		tFContrasena = new JTextField();
+		tFContrasena.setBackground(new Color(255, 255, 255));
+		tFContrasena.setFont(new Font("Tahoma", Font.PLAIN, 43));
+		tFContrasena.setColumns(10);
+		tFContrasena.setBounds(329, 556, 480, 46);
+		contentPanel.add(tFContrasena);
 		
 		btnRegistrar = new JButton("Registrar");
 		btnRegistrar.setForeground(new Color(255, 255, 255));
@@ -234,7 +236,7 @@ public class VRegistrarse extends JDialog implements ActionListener{
 		
 		if(validar()) {
 			dao.registrarPersona(tFDni.getText(),tFNombre.getText(),tFApellido.getText(),tFPais.getText(),Integer.valueOf(tFEdad.getText()));
-			dao.registrarUsuario(tFDni.getText(),tFNombreUsuario.getText(),tFContraseña.getText());
+			dao.registrarUsuario(tFDni.getText(),tFNombreUsuario.getText(),tFContrasena.getText());
 			JOptionPane.showMessageDialog(null, "TE HAS REGISTRADO","Registro",JOptionPane.INFORMATION_MESSAGE);
 			this.dispose();
 			Inicio_Sesion ini = new Inicio_Sesion(dao);
@@ -252,42 +254,36 @@ public class VRegistrarse extends JDialog implements ActionListener{
 			bien = false;
 		}
 		if(tFDni.getText().isEmpty()) {
-			JOptionPane.showMessageDialog(null, "DNI VACIO","ERROR",JOptionPane.ERROR_MESSAGE);
 			tFDni.setBackground(Color.RED);
 			bien = false;
 		}
 		if(tFNombre.getText().isEmpty()) {
-			JOptionPane.showMessageDialog(null, "NOMBRE VACIO","ERROR",JOptionPane.ERROR_MESSAGE);
 			tFNombre.setBackground(Color.RED);
 			bien = false;
 		}
 		if(tFApellido.getText().isEmpty()) {
-			JOptionPane.showMessageDialog(null, "APELLIDO VACIO","ERROR",JOptionPane.ERROR_MESSAGE);
 			tFApellido.setBackground(Color.RED);
 			bien = false;
 		}
 		if(tFPais.getText().isEmpty()) {
-			JOptionPane.showMessageDialog(null, "PAIS VACIO","ERROR",JOptionPane.ERROR_MESSAGE);
 			tFPais.setBackground(Color.RED);
 			bien = false;
 		}
 		if(tFEdad.getText().isEmpty()) {
-			JOptionPane.showMessageDialog(null, "EDAD VACIO","ERROR",JOptionPane.ERROR_MESSAGE);
 			tFEdad.setBackground(Color.RED);
 			bien = false;
 		}
 		if(tFNombreUsuario.getText().isEmpty()) {
-			JOptionPane.showMessageDialog(null, "NOMBRE USUARIO VACIO","ERROR",JOptionPane.ERROR_MESSAGE);
 			tFNombreUsuario.setBackground(Color.RED);
 			bien = false;
 		}
-		if(tFContraseña.getText().isEmpty()) {
-			JOptionPane.showMessageDialog(null, "CONTRASEÑA VACIA","ERROR",JOptionPane.ERROR_MESSAGE);
-			tFContraseña.setBackground(Color.RED);
+		if(tFContrasena.getText().isEmpty()) {
+			
+			tFContrasena.setBackground(Color.RED);
 			bien = false;
 		}
 		
-		
+	
 		return bien;
 	}
 
